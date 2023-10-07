@@ -1,7 +1,7 @@
 <?php
 
 
-namespace AxelotTP;
+namespace TaxUae;
 
 class Site {
 

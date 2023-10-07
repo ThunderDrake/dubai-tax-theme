@@ -12,11 +12,11 @@
 if ( is_admin() ) {
 	// отключим проверку обновлений при любом заходе в админку...
 	remove_action( 'admin_init', '_maybe_update_core' );
-	remove_action( 'admin_init', '_maybe_update_plugins' );
+	// remove_action( 'admin_init', '_maybe_update_plugins' );
 	remove_action( 'admin_init', '_maybe_update_themes' );
 
 	// отключим проверку обновлений при заходе на специальную страницу в админке...
-	remove_action( 'load-plugins.php', 'wp_update_plugins' );
+	// remove_action( 'load-plugins.php', 'wp_update_plugins' );
 	remove_action( 'load-themes.php', 'wp_update_themes' );
 
 	// оставим принудительную проверку при заходе на страницу обновлений...

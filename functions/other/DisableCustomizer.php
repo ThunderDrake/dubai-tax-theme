@@ -9,7 +9,7 @@
  * Jesse Petersen and Andy Wilkerson, licensed under GNU GPLv2 or later */
 
 
-namespace AxelotTP;
+namespace TaxUae;
 
 class DisableCustomizer {
 	private static $instance;

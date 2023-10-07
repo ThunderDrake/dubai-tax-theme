@@ -20,7 +20,7 @@ class Hide {
 		add_action( 'admin_head', [ $this, 'remove_wp_help_tab' ] );
 
 		add_filter( 'admin_footer_text', function() {
-			return '<div class="admin-footer-copyright">Разработано <a href="http://insaim.design/?utm_source=case&utm_medium=footer_link&utm_campaign=axelot-tp" target="_blank">студией INSAIM</a>.<br>Нашли баг или есть предложение по доработке? <a href="/">Напишите нам</a> :)</div>';
+			return '<div class="admin-footer-copyright">Тему разработал: <a href="https://my.idot.vip/ThunderWeb" target="_blank">Тимофей ThunderWebDev</a>.<br>Нашли баг или есть предложение по доработке? <a href="https://t.me/ThunderDrake">Напишите мне</a> :)</div>';
 		} );
 		add_filter( 'update_footer', '__return_empty_string', 11 );
 		add_filter( 'pre_site_transient_php_check_' . md5( phpversion() ), '__return_empty_array' );

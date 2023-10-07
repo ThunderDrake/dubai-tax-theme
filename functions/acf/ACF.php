@@ -1,6 +1,6 @@
 <?php
 
-namespace AxelotTP;
+namespace TaxUae;
 
 class ACF {
 	private $json_dir_path;

@@ -3,7 +3,7 @@
  * Подключение и Запуск основного функционала  *
  * * * * * * * * * * * * * * * * * * * * * * * */
 
-namespace AxelotTP;
+namespace TaxUae;
 
 
 require __DIR__ . '/functions/Site.php';

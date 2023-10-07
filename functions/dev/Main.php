@@ -1,6 +1,6 @@
 <?php
 
-namespace AxelotTP\Dev;
+namespace TaxUae\Dev;
 
 use WP_CLI;
 
