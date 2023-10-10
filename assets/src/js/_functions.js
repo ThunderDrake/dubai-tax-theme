@@ -40,7 +40,7 @@ import { mobileCheck } from "./functions/mobile-check";
 
 // Получение высоты шапки сайта (не забудьте вызвать функцию)
 import { getHeaderHeight } from './functions/header-height';
-// getHeaderHeight();
+getHeaderHeight();
 
 // Подключение плагина кастом-скролла
 // import 'simplebar';

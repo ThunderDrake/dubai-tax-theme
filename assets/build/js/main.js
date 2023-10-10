@@ -63,7 +63,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // Получение высоты шапки сайта (не забудьте вызвать функцию)
 
-// getHeaderHeight();
+(0,_functions_header_height__WEBPACK_IMPORTED_MODULE_1__.getHeaderHeight)();
 
 // Подключение плагина кастом-скролла
 // import 'simplebar';
@@ -158,7 +158,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getHeaderHeight: () => (/* binding */ getHeaderHeight)
 /* harmony export */ });
 const getHeaderHeight = () => {
-  const headerHeight = document?.querySelector('.site-header').offsetHeight;
+  const headerHeight = document?.querySelector('.header').offsetHeight;
   document.querySelector(':root').style.setProperty('--header-height', `${headerHeight}px`);
 };
 
