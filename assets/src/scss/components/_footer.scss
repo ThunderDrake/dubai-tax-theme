@@ -1,0 +1,149 @@
+.footer {
+  color: #fff;
+  background-color: #1c1c1c;
+
+  &__address {
+    display: flex;
+    align-items: center;
+
+    &-map {
+      margin-right: 20px;
+    }
+
+    &-title {
+      margin-bottom: 5px;
+      font-weight: 600;
+      line-height: 155%;
+      letter-spacing: -0.5px;
+    }
+
+    &-text {
+      margin-bottom: 5px;
+      font-size: 20px;
+      line-height: 125%;
+      letter-spacing: -0.5px;
+    }
+
+    &-link {
+      font-size: 16px;
+    }
+  }
+
+  .logo__container {
+    margin-right: 85px;
+    margin-bottom: auto;
+  }
+
+  &__contacts {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  &__top-text {
+    position: relative;
+    margin-bottom: 8px;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      margin-right: 5px;
+      border-radius: 50%;
+      width: 6px;
+      height: 6px;
+      background-color: #009345;
+      transform: translateY(-50%);
+    }
+  }
+
+  &__phone {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    &-flag {
+      margin-right: 5px;
+    }
+
+    &-link {
+      font-weight: 600;
+      font-style: normal;
+      font-size: 34px;
+      line-height: 110%;
+      letter-spacing: -0.5px;
+      color: #009345;
+    }
+  }
+
+  &__col {
+    display: flex;
+    flex-direction: column;
+
+    &:last-child {
+      margin-right: 0;
+      margin-left: auto;
+    }
+  }
+
+  &__socials-block {
+    display: flex;
+  }
+
+  &__nav {
+    margin-right: 50px;
+
+    &-title {
+      margin-bottom: 16px;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 140%;
+      letter-spacing: -0.5px;
+    }
+
+    &-item {
+      margin-bottom: 8px;
+      line-height: 140%;
+      letter-spacing: -0.5px;
+      color: #bdbdbd;
+    }
+
+    &-link {
+      color: inherit;
+    }
+  }
+
+  &__container {
+    display: flex;
+    padding-top: 60px;
+    padding-bottom: 75px;
+
+    &--bottom {
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  &__socials {
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+    margin-right: -8px;
+    margin-bottom: 0;
+    margin-left: -8px;
+
+    &-link {
+      display: block;
+      margin: 0 8px;
+    }
+  }
+
+  &__reserved {
+    opacity: 0.8;
+  }
+
+  &__terms {
+    text-decoration-line: underline;
+    color: #fff;
+    opacity: 0.8;
+  }
+}

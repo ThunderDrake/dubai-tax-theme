@@ -250,6 +250,9 @@ const htmlInclude = () => {
 }
 
 const watchFiles = () => {
+  browserSync.init({
+    proxy: 'dubai-tax.edit'
+  });
 
   watch(paths.srcScss, styles);
   watch(paths.srcFullJs, scripts);
