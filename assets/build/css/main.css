@@ -433,7 +433,7 @@ a {
   position: relative;
   margin-bottom: 85px;
   padding-left: 100px;
-  max-width: 560px;
+  max-width: 670px;
   font-weight: 400;
   font-style: normal;
   font-size: 24px;
@@ -498,8 +498,8 @@ a {
 .hero__advantages {
   display: -ms-grid;
   display: grid;
-  -ms-grid-columns: 285px 175px 190px;
-  grid-template-columns: 285px 175px 190px;
+  -ms-grid-columns: (190px)[3];
+  grid-template-columns: repeat(3, 190px);
   gap: 80px;
 }
 .hero__advantages-title {

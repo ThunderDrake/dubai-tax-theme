@@ -8,15 +8,17 @@
 <div class="hero">
   <div class="content-container hero__container">
     <div class="hero__content">
-      <h1 class="hero__title"><span>Зарегистрируем ваш бизнес в ОАЭ</span> с дальнейшей стратегией ведения за <span>2
-          недели</span> под ключ</h1>
+      <h1 class="hero__title">
+      <span>We will register your business in the UAE</span> with a further strategy
+for <span>2 weeks</span> on a turnkey basis</h1>
       <div class="hero__subtitle">
-        Поможем в открытии счета в банке.<br>
-        <span>С нами вы станете резидентом ОАЭ.</span>
+      We guarantee the opening of a bank account.<br>
+      <span>With us, you will become a resident of the UAE.</span>
+
       </div>
       <div class="hero__footer">
         <button class="hero__button btn-reset btn--main">
-          Рассчитать стоимость услуг
+          Calculate the cost of service
           <svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="none">
             <path d="M26.3582 12.7588L1.3584 12.7588L1.3584 15.4762L26.3582 15.4762L26.3582 12.7588Z" fill="white" />
             <path
@@ -24,20 +26,21 @@
               fill="white" />
           </svg>
         </button>
-        <div class="hero__small-text">Бесплатно получите гайд после расчета <span>“Как открыть свой бизнес в ОАЭ”</span></div>
+        <div class="hero__small-text">
+        Get a free guide after calculating <span>“How to open your business in the UAE”</span></div>
       </div>
       <div class="hero__advantages">
         <div class="hero__advantages-item">
           <div class="hero__advantages-title">9300 +</div>
-          <div class="hero__advantages-text">Проведенных консультаций нашими экспертами</div>
+          <div class="hero__advantages-text">Consultations held</div>
         </div>
         <div class="hero__advantages-item">
           <div class="hero__advantages-title">15</div>
-          <div class="hero__advantages-text">Глобальных партнеров в ОАЭ</div>
+          <div class="hero__advantages-text">Global Partners in the UAE</div>
         </div>
         <div class="hero__advantages-item">
           <div class="hero__advantages-title">700+</div>
-          <div class="hero__advantages-text">Компаний зарегистрировано</div>
+          <div class="hero__advantages-text">Companies registered</div>
         </div>
       </div>
     </div>
