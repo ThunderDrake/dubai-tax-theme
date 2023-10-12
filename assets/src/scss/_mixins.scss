@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import "./mixins/breakpoint";
 @import "./mixins/burger";
 @import "./mixins/checkbox";
@@ -7,3 +9,11 @@
 @import "./mixins/tabs";
 @import "./mixins/disable-mob-hover";
 @import "./mixins/layout";
+
+$vw-viewport: 1920;
+
+@function get-vw($target) {
+  $vw-context: ($vw-viewport * 0.01) * 1px;
+
+  @return math.div($target, $vw-context) * 1vw;
+}

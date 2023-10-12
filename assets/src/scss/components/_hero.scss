@@ -1,6 +1,6 @@
 .hero {
   position: relative;
-  padding-top: calc(var(--header-height) + 125px);
+  padding-top: calc(var(--header-height) + get-vw(125px));
   background-image: url("../../build/img/hero-bg.png");
   background-size: cover;
   background-repeat: no-repeat;
@@ -11,7 +11,7 @@
     left: 0;
     bottom: 0;
     width: 110%;
-    height: 500px;
+    height: get-vw(500px);
     background-image: url("../../build/img/hero-decor.png");
     background-size: contain;
     background-repeat: no-repeat;
@@ -24,22 +24,23 @@
 
   &__persons-image {
     position: absolute;
-    right: -40px;
+    right: get-vw(-40px);
     bottom: 0;
+    width: get-vw(850px);
   }
 
   &__content {
     position: relative;
     z-index: 1;
-    padding-bottom: 68px;
-    max-width: 800px;
+    padding-bottom: get-vw(68px);
+    max-width: get-vw(800px);
   }
 
   &__title {
     margin: 0;
-    margin-bottom: 45px;
+    margin-bottom: get-vw(45px);
     font-weight: 400;
-    font-size: 44px;
+    font-size: get-vw(44px);
     line-height: 130%;
     letter-spacing: -0.5px;
 
@@ -51,12 +52,12 @@
 
   &__subtitle {
     position: relative;
-    margin-bottom: 85px;
+    margin-bottom: get-vw(85px);
     padding-left: 100px;
-    max-width: 670px;
+    max-width: get-vw(670px);
     font-weight: 400;
     font-style: normal;
-    font-size: 24px;
+    font-size: get-vw(24px);
     line-height: 140%;
     letter-spacing: -0.5px;
 
@@ -64,9 +65,9 @@
       content: "";
       position: absolute;
       left: 0;
-      top: 20px;
-      width: 70px;
-      height: 2px;
+      top: get-vw(20px);
+      width: get-vw(70px);
+      height: get-vw(2px);
       background-color: #009345;
     }
 
@@ -77,37 +78,38 @@
 
   &__footer {
     display: flex;
-    margin-bottom: 85px;
+    align-items: flex-start;
+    margin-bottom: get-vw(85px);
   }
 
   &__button {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    border-radius: 72px;
-    padding: 35px 75px;
+    border-radius: get-vw(72px);
+    padding: get-vw(35px) get-vw(75px);
     font-weight: 600;
     font-style: normal;
-    font-size: 20px;
+    font-size: get-vw(20px);
     line-height: 115%;
     letter-spacing: -0.5px;
     color: #fff;
     background: linear-gradient(68deg, #009345 25.59%, #00c15b 103.07%), linear-gradient(180deg, #31b939 0%, #25a92d 100%), #a67cea;
 
     svg {
-      margin-left: 17px;
+      margin-left: get-vw(17px);
     }
   }
 
   &__small-text {
-    margin-left: 30px;
+    margin-left: get-vw(30px);
     font-weight: 400;
     font-style: normal;
-    font-size: 20px;
+    font-size: get-vw(20px);
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #1c1c1c;
-    transform: translateY(48px);
+    transform: translateY(get-vw(48px));
 
     span {
       font-weight: 600;
@@ -116,13 +118,13 @@
 
   &__advantages {
     display: grid;
-    grid-template-columns: repeat(3, 190px);
-    gap: 80px;
+    grid-template-columns: repeat(3, get-vw(190px));
+    gap: get-vw(80px);
 
     &-title {
-      margin-bottom: 5px;
+      margin-bottom: get-vw(5px);
       font-weight: 600;
-      font-size: 44px;
+      font-size: get-vw(44px);
       line-height: 130%;
       letter-spacing: -0.5px;
       color: #1c1c1c;
@@ -130,7 +132,7 @@
 
     &-text {
       font-weight: 400;
-      font-size: 20px;
+      font-size: get-vw(20px);
       line-height: 140%;
       letter-spacing: -0.5px;
       color: #6b6b6b;

@@ -19,7 +19,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px 0;
+    padding: get-vw(24px) 0;
   }
 
   &__address {
@@ -27,40 +27,40 @@
     align-items: center;
 
     &-map {
-      margin-right: 20px;
+      margin-right: get-vw(20px);
     }
 
     &-title {
-      margin-bottom: 5px;
+      margin-bottom: get-vw(5px);
       font-weight: 600;
       line-height: 155%;
       letter-spacing: -0.5px;
     }
 
     &-text {
-      margin-bottom: 5px;
-      font-size: 20px;
+      margin-bottom: get-vw(5px);
+      font-size: get-vw(20px);
       line-height: 125%;
       letter-spacing: -0.5px;
     }
 
     &-link {
-      font-size: 16px;
+      font-size: get-vw(16px);
     }
   }
 
   &__link {
-    font-size: 20px;
+    font-size: get-vw(16px);
   }
 
   &__socials {
     display: flex;
-    margin-right: 15px;
+    margin-right: get-vw(15px);
 
     &-text {
       position: relative;
-      margin-right: 10px;
-      max-width: 145px;
+      margin-right: get-vw(10px);
+      max-width: get-vw(145px);
       line-height: 140%;
       letter-spacing: -0.5px;
       color: #1c1c1c;
@@ -68,10 +68,10 @@
       &::after {
         content: "";
         display: inline-block;
-        margin-left: 5px;
+        margin-left: get-vw(5px);
         border-radius: 50%;
-        width: 6px;
-        height: 6px;
+        width: get-vw(6px);
+        height: get-vw(6px);
         background-color: #009345;
         transform: translateY(-50%);
       }
@@ -83,7 +83,7 @@
 
     &-link {
       display: block;
-      margin-right: 10px;
+      margin-right: get-vw(10px);
     }
   }
 
@@ -95,15 +95,15 @@
 
   &__top-text {
     position: relative;
-    margin-bottom: 8px;
+    margin-bottom: get-vw(8px);
 
     &::before {
       content: "";
       display: inline-block;
-      margin-right: 5px;
+      margin-right: get-vw(5px);
       border-radius: 50%;
-      width: 6px;
-      height: 6px;
+      width: get-vw(6px);
+      height: get-vw(6px);
       background-color: #009345;
       transform: translateY(-50%);
     }
@@ -112,16 +112,16 @@
   &__phone {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: get-vw(10px);
 
     &-flag {
-      margin-right: 5px;
+      margin-right: get-vw(5px);
     }
 
     &-link {
       font-weight: 600;
       font-style: normal;
-      font-size: 24px;
+      font-size: get-vw(24px);
       line-height: 110%;
       letter-spacing: -0.5px;
       color: #009345;
@@ -136,11 +136,11 @@
 
   &__container {
     display: flex;
-    margin-right: 50px;
+    margin-right: get-vw(50px);
   }
 
   &__text {
-    margin-left: 25px;
-    width: 160px;
+    margin-left: get-vw(25px);
+    width: get-vw(160px);
   }
 }

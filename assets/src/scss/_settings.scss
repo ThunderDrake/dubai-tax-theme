@@ -105,16 +105,16 @@ a {
 
 .container {
   margin: 0 auto;
-  padding: 0 15px;
+  padding: 0 get-vw(15px);
   width: 100%;
-  max-width: 1830px;
+  max-width: get-vw(1830px);
 }
 
 .content-container {
   margin: 0 auto;
-  padding: 0 15px;
+  padding: 0 get-vw(15px);
   width: 100%;
-  max-width: 1570px;
+  max-width: get-vw(1570px);
 }
 
 .js-focus-visible :focus:not(.focus-visible) {
