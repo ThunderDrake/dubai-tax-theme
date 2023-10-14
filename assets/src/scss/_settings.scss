@@ -167,6 +167,25 @@ a {
 }
 
 .btn {
+  &--main {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    border-radius: get-vw(72px);
+    padding: get-vw(35px) get-vw(75px);
+    font-weight: 600;
+    font-style: normal;
+    font-size: get-vw(20px);
+    line-height: 115%;
+    letter-spacing: -0.5px;
+    color: #fff;
+    background: linear-gradient(68deg, #009345 25.59%, #00c15b 103.07%), linear-gradient(180deg, #31b939 0%, #25a92d 100%), #a67cea;
+
+    svg {
+      margin-left: get-vw(17px);
+    }
+  }
+
   &--main-stroke {
     display: flex;
     align-items: center;

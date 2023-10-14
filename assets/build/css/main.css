@@ -230,6 +230,28 @@ a {
   transform: translateY(100%);
 }
 
+.btn--main {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-radius: 3.75vw;
+  padding: 1.8229166667vw 3.90625vw;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 115%;
+  letter-spacing: -0.5px;
+  color: #fff;
+  background: linear-gradient(68deg, #009345 25.59%, #00c15b 103.07%), linear-gradient(180deg, #31b939 0%, #25a92d 100%), #a67cea;
+}
+.btn--main svg {
+  margin-left: 0.8854166667vw;
+}
 .btn--main-stroke {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -526,28 +548,6 @@ a {
   align-items: flex-start;
   margin-bottom: 4.4270833333vw;
 }
-.hero__button {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  border-radius: 3.75vw;
-  padding: 1.8229166667vw 3.90625vw;
-  font-weight: 600;
-  font-style: normal;
-  font-size: 1.0416666667vw;
-  line-height: 115%;
-  letter-spacing: -0.5px;
-  color: #fff;
-  background: linear-gradient(68deg, #009345 25.59%, #00c15b 103.07%), linear-gradient(180deg, #31b939 0%, #25a92d 100%), #a67cea;
-}
-.hero__button svg {
-  margin-left: 0.8854166667vw;
-}
 .hero__small-text {
   margin-left: 1.5625vw;
   font-weight: 400;
@@ -675,6 +675,131 @@ a {
 .service:hover .service__button {
   color: #fff;
   background-color: #009345;
+}
+
+.advantages {
+  margin-bottom: 4.6875vw;
+  padding-top: 9.1145833333vw;
+}
+.advantages__title {
+  margin-bottom: 3.75vw;
+  text-align: left;
+}
+.advantages__layout {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: auto 24.4791666667vw;
+  grid-template-columns: auto 24.4791666667vw;
+  gap: 4.1666666667vw;
+}
+.advantages__grid {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (1fr)[2];
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 1.4583333333vw;
+  gap: 4.5833333333vw 2.0833333333vw;
+}
+.advantages__grid-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+}
+.advantages__callback {
+  -ms-flex-item-align: start;
+  align-self: flex-start;
+  border-radius: 1.25vw;
+  padding: 1.9791666667vw 1.1458333333vw 4.5833333333vw 1.9791666667vw;
+  background: #f4f8fb;
+}
+.advantages__callback-cite {
+  margin-bottom: 2.3958333333vw;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 1.4583333333vw;
+  line-height: 150%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.advantages__callback-cite span {
+  color: #009345;
+}
+.advantages__callback-footer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.advantages__callback-person {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  margin-right: 1.3020833333vw;
+  border-radius: 50%;
+  width: 6.5104166667vw;
+  height: 6.5104166667vw;
+}
+.advantages__callback-name {
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.advantages__callback-role {
+  margin-bottom: 0.78125vw;
+  font-style: normal;
+  font-size: 0.9375vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.advantages__callback-button {
+  padding: 0.78125vw 1.5625vw;
+  font-weight: 400;
+  font-size: 0.8333333333vw;
+  line-height: 140%; /* 22.4px */
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+
+.advantage {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.advantage__icon {
+  margin-bottom: 1.5625vw;
+  width: 5.2083333333vw;
+  height: 5.2083333333vw;
+}
+.advantage__title {
+  margin-bottom: 0.78125vw;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 1.4583333333vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.advantage__text {
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
 }
 
 .footer {
