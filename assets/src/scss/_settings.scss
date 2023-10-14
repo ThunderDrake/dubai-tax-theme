@@ -35,6 +35,9 @@ body > .wrapper > main {
   height: 100%;
   font-family: "Montserrat", sans-serif;
   -webkit-text-size-adjust: 100%;
+  background-image: url("../img/bg-noise.png");
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .page__body {
@@ -160,5 +163,30 @@ a {
     width: 100%;
     height: 1px;
     transform: translateY(100%);
+  }
+}
+
+.btn {
+  &--main-stroke {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #009345;
+    border-radius: get-vw(105px);
+    padding-top: get-vw(37px);
+    padding-bottom: get-vw(40px);
+    min-width: 100px;
+    font-weight: 600;
+    font-style: normal;
+    font-size: get-vw(20px);
+    line-height: 140%;
+    letter-spacing: -0.5px;
+    text-align: center;
+    color: #009345;
+
+    &:hover {
+      color: #fff;
+      background-color: #009345;
+    }
   }
 }

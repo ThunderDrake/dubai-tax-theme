@@ -12,7 +12,8 @@
   &__small-logo {
     display: block;
     flex-shrink: 0;
-    height: 100%;
+    width: get-vw(72px);
+    height: get-vw(72px);
   }
 
   .content-container {
@@ -28,6 +29,8 @@
 
     &-map {
       margin-right: get-vw(20px);
+      width: get-vw(98px);
+      height: get-vw(98px);
     }
 
     &-title {
@@ -61,6 +64,7 @@
       position: relative;
       margin-right: get-vw(10px);
       max-width: get-vw(145px);
+      font-size: get-vw(16px);
       line-height: 140%;
       letter-spacing: -0.5px;
       color: #1c1c1c;
@@ -84,6 +88,11 @@
     &-link {
       display: block;
       margin-right: get-vw(10px);
+
+      svg {
+        width: get-vw(54px);
+        height: get-vw(54px);
+      }
     }
   }
 
@@ -96,6 +105,7 @@
   &__top-text {
     position: relative;
     margin-bottom: get-vw(8px);
+    font-size: get-vw(16px);
 
     &::before {
       content: "";
@@ -116,6 +126,8 @@
 
     &-flag {
       margin-right: get-vw(5px);
+      width: get-vw(30px);
+      height: get-vw(15px);
     }
 
     &-link {
@@ -130,6 +142,8 @@
 }
 
 .logo {
+  width: get-vw(110px);
+  height: get-vw(92px);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #1c1c1c;
@@ -142,5 +156,6 @@
   &__text {
     margin-left: get-vw(25px);
     width: get-vw(160px);
+    font-size: get-vw(16px);
   }
 }

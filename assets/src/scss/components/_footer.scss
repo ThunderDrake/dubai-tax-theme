@@ -8,11 +8,14 @@
 
     &-map {
       margin-right: get-vw(20px);
+      width: get-vw(98px);
+      height: get-vw(98px);
     }
 
     &-title {
       margin-bottom: get-vw(5px);
       font-weight: 600;
+      font-size: get-vw(16px);
       line-height: 155%;
       letter-spacing: -0.5px;
     }
@@ -43,6 +46,7 @@
   &__top-text {
     position: relative;
     margin-bottom: get-vw(8px);
+    font-size: get-vw(16px);
 
     &::before {
       content: "";
@@ -63,6 +67,8 @@
 
     &-flag {
       margin-right: get-vw(5px);
+      width: get-vw(30px);
+      height: get-vw(15px);
     }
 
     &-link {
@@ -87,6 +93,11 @@
 
   &__socials-block {
     display: flex;
+
+    svg {
+      width: get-vw(54px);
+      height: get-vw(54px);
+    }
   }
 
   &__nav {
@@ -108,6 +119,7 @@
     }
 
     &-link {
+      font-size: get-vw(16px);
       color: inherit;
     }
   }
@@ -135,13 +147,20 @@
       display: block;
       margin: 0 get-vw(8px);
     }
+
+    svg {
+      width: get-vw(35px);
+      height: get-vw(35px);
+    }
   }
 
   &__reserved {
+    font-size: get-vw(16px);
     opacity: 0.8;
   }
 
   &__terms {
+    font-size: get-vw(16px);
     text-decoration-line: underline;
     color: #fff;
     opacity: 0.8;
