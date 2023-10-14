@@ -89,9 +89,6 @@ body > .wrapper > main {
   height: 100%;
   font-family: "Montserrat", sans-serif;
   -webkit-text-size-adjust: 100%;
-  background-image: url("../img/bg-noise.png");
-  background-size: cover;
-  background-repeat: no-repeat;
 }
 
 .page__body {
@@ -106,6 +103,9 @@ body > .wrapper > main {
   min-width: 320px;
   min-height: 100%;
   font-size: 16px;
+  background-image: url("../img/site-bg.png");
+  background-size: auto;
+  background-repeat: no-repeat;
 }
 
 img {
@@ -256,6 +256,25 @@ a {
 .btn--main-stroke:hover {
   color: #fff;
   background-color: #009345;
+}
+
+.site-title {
+  margin: 0;
+  margin-bottom: 1em;
+  font-weight: 400;
+  font-size: 2.2916666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  text-align: center;
+  color: #6b6b6b;
+}
+.site-title span {
+  font-weight: 700;
+  color: #009345;
+}
+.site-title b {
+  font-weight: 700;
+  color: #1c1c1c;
 }
 
 .header {
@@ -571,24 +590,6 @@ a {
   margin-bottom: 3.6458333333vw;
   padding-top: 2.2916666667vw;
 }
-.services__title {
-  margin: 0;
-  margin-bottom: 1em;
-  font-weight: 400;
-  font-size: 2.2916666667vw;
-  line-height: 140%;
-  letter-spacing: -0.5px;
-  text-align: center;
-  color: #6b6b6b;
-}
-.services__title span {
-  font-weight: 700;
-  color: #009345;
-}
-.services__title b {
-  font-weight: 700;
-  color: #1c1c1c;
-}
 .services__list {
   display: -ms-grid;
   display: grid;
@@ -666,6 +667,14 @@ a {
 }
 .service__button {
   width: 100%;
+}
+.service:hover {
+  color: #f4f8fb;
+  background: #1c1c1c;
+}
+.service:hover .service__button {
+  color: #fff;
+  background-color: #009345;
 }
 
 .footer {

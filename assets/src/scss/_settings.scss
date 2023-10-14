@@ -35,9 +35,6 @@ body > .wrapper > main {
   height: 100%;
   font-family: "Montserrat", sans-serif;
   -webkit-text-size-adjust: 100%;
-  background-image: url("../img/bg-noise.png");
-  background-size: cover;
-  background-repeat: no-repeat;
 }
 
 .page__body {
@@ -47,6 +44,9 @@ body > .wrapper > main {
   min-width: 320px;
   min-height: 100%;
   font-size: 16px;
+  background-image: url("../img/site-bg.png");
+  background-size: auto;
+  background-repeat: no-repeat;
 }
 
 img {
@@ -188,5 +188,26 @@ a {
       color: #fff;
       background-color: #009345;
     }
+  }
+}
+
+.site-title {
+  margin: 0;
+  margin-bottom: 1em;
+  font-weight: 400;
+  font-size: get-vw(44px);
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  text-align: center;
+  color: #6b6b6b;
+
+  span {
+    font-weight: 700;
+    color: #009345;
+  }
+
+  b {
+    font-weight: 700;
+    color: #1c1c1c;
   }
 }

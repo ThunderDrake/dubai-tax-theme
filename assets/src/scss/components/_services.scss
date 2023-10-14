@@ -2,27 +2,6 @@
   margin-bottom: get-vw(70px);
   padding-top: get-vw(44px);
 
-  &__title {
-    margin: 0;
-    margin-bottom: 1em;
-    font-weight: 400;
-    font-size: get-vw(44px);
-    line-height: 140%;
-    letter-spacing: -0.5px;
-    text-align: center;
-    color: #6b6b6b;
-
-    span {
-      font-weight: 700;
-      color: #009345;
-    }
-
-    b {
-      font-weight: 700;
-      color: #1c1c1c;
-    }
-  }
-
   &__list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -100,5 +79,15 @@
 
   &__button {
     width: 100%;
+  }
+
+  &:hover {
+    color: #f4f8fb;
+    background: #1c1c1c;
+
+    .service__button {
+      color: #fff;
+      background-color: #009345;
+    }
   }
 }
