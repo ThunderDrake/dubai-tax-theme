@@ -11,5 +11,6 @@
 <?php ct()->template('/front-page/parts/flags-section.php') ?>
 <?php ct()->template('/front-page/parts/steps-section.php') ?>
 <?php ct()->template('/front-page/parts/form-section.php') ?>
+<?php ct()->template('/front-page/parts/map-section.php') ?>
 <?php
 ct()->footer();
