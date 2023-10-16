@@ -279,6 +279,25 @@ a {
   color: #fff;
   background-color: #009345;
 }
+.btn--second {
+  border: 2px solid transparent;
+  border-radius: 5.46875vw;
+  padding: 1.7708333333vw 4.5833333333vw;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%; /* 28px */
+  letter-spacing: -0.5px;
+  color: #009345;
+  background-color: #fff;
+}
+@media (any-hover: hover) {
+  .btn--second:hover {
+    border-color: #fff;
+    color: #fff;
+    background-color: #009345;
+  }
+}
 
 .site-title {
   margin: 0;
@@ -800,6 +819,41 @@ a {
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #6b6b6b;
+}
+
+.flags-section {
+  margin-bottom: 10.4166666667vw;
+}
+.flags-section__wrapper {
+  overflow: hidden;
+  border-radius: 36px;
+  padding: 2.96875vw;
+  background-image: url("../img/flags-section__bg.png");
+  background-position: right;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: #009345;
+}
+.flags-section__title {
+  margin: 0;
+  margin-bottom: 0.78125vw;
+  max-width: 35.7291666667vw;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 1.875vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+.flags-section__text {
+  margin-bottom: 3.5416666667vw;
+  max-width: 22.1354166667vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #e4e4e4;
 }
 
 .footer {

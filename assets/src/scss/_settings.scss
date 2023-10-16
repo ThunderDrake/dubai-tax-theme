@@ -208,6 +208,25 @@ a {
       background-color: #009345;
     }
   }
+
+  &--second {
+    border: 2px solid transparent;
+    border-radius: get-vw(105px);
+    padding: get-vw(34px) get-vw(88px);
+    font-weight: 600;
+    font-style: normal;
+    font-size: get-vw(20px);
+    line-height: 140%; /* 28px */
+    letter-spacing: -0.5px;
+    color: #009345;
+    background-color: #fff;
+
+    @include hover {
+      border-color: #fff;
+      color: #fff;
+      background-color: #009345;
+    }
+  }
 }
 
 .site-title {
