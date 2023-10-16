@@ -38,7 +38,7 @@
               developed transport network and perfectly streamlined logistics chains.</div>
           </div>
         </div>
-        <a class="advantages__button btn--main" href="#callback">Еще преимущества
+        <a class="advantages__button btn--main" href="#callback">More benefits
           <svg
             xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="none">
             <path d="M26.3582 12.7588L1.3584 12.7588L1.3584 15.4762L26.3582 15.4762L26.3582 12.7588Z" fill="white" />
