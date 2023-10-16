@@ -881,6 +881,127 @@ a {
   color: #e4e4e4;
 }
 
+.steps {
+  padding-bottom: 10.4166666667vw;
+}
+.steps__container {
+  border-radius: 36px;
+  padding-top: 12.7604166667vw;
+  background-image: url("../img/steps__bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.steps__container .content-container {
+  position: relative;
+  bottom: -7.8125vw;
+}
+.steps__title {
+  margin: 0;
+  margin-bottom: 1.8229166667vw;
+  max-width: 57.2916666667vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.2916666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+.steps__title span {
+  font-weight: 600;
+}
+.steps__list {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (1fr)[4];
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5625vw;
+}
+
+.step {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  border-radius: 1.875vw;
+  padding: 1.4583333333vw;
+  background: #f4f8fb;
+}
+.step__number {
+  margin-bottom: 1.8229166667vw;
+  border-radius: 3.1770833333vw;
+  padding: 0.2604166667vw 1.0416666667vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 0.9375vw;
+  line-height: 140%; /* 25.2px */
+  letter-spacing: -0.5px;
+  color: #fff;
+  background: #009345;
+}
+.step__title {
+  margin-bottom: 1.3020833333vw;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 1.4583333333vw;
+  line-height: 140%; /* 39.2px */
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.step__text {
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%; /* 28px */
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.step__text span {
+  color: #1c1c1c;
+}
+.step__button {
+  margin-top: auto;
+  padding-top: 1.4583333333vw;
+  padding-bottom: 1.4583333333vw;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 0.8333333333vw;
+  line-height: 140%; /* 22.4px */
+  letter-spacing: -0.5px;
+  text-align: center;
+  color: #fff;
+}
+.step--first .step__text {
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.4583333333vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.step--first .step__text span {
+  font-weight: 600;
+}
+.step--last {
+  background-color: #009345;
+}
+.step--last .step__number {
+  color: #009345;
+  background-color: #fff;
+}
+.step--last .step__title,
+.step--last .step__text {
+  color: #fff;
+}
+
 .footer {
   color: #fff;
   background-color: #1c1c1c;
