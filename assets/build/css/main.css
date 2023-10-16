@@ -825,14 +825,39 @@ a {
   margin-bottom: 10.4166666667vw;
 }
 .flags-section__wrapper {
-  overflow: hidden;
+  position: relative;
+  z-index: 1;
   border-radius: 36px;
   padding: 2.96875vw;
+  background-color: #009345;
+}
+.flags-section__wrapper::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2.0833333333vw;
+  z-index: -1;
+  margin: 0 auto;
+  border-radius: 36px;
+  width: 95%;
+  height: 18.3854166667vw;
+  background: #009345;
+  opacity: 0.4;
+  -webkit-filter: blur(3.125vw);
+  filter: blur(3.125vw);
+}
+.flags-section__wrapper::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 67.7083333333vw;
   background-image: url("../img/flags-section__bg.png");
   background-position: right;
   background-size: contain;
   background-repeat: no-repeat;
-  background-color: #009345;
 }
 .flags-section__title {
   margin: 0;

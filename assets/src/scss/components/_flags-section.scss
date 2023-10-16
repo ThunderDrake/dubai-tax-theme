@@ -2,14 +2,40 @@
   margin-bottom: get-vw(200px);
 
   &__wrapper {
-    overflow: hidden;
+    position: relative;
+    z-index: 1;
     border-radius: 36px;
     padding: get-vw(57px);
-    background-image: url("../img/flags-section__bg.png");
-    background-position: right;
-    background-size: contain;
-    background-repeat: no-repeat;
     background-color: #009345;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: get-vw(-40px);
+      z-index: -1;
+      margin: 0 auto;
+      border-radius: 36px;
+      width: 95%;
+      height: get-vw(353px);
+      background: #009345;
+      opacity: 0.4;
+      filter: blur(get-vw(60px));
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: get-vw(1300px);
+      background-image: url("../img/flags-section__bg.png");
+      background-position: right;
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
   }
 
   &__title {
