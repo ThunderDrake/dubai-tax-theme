@@ -51,4 +51,9 @@
     width: get-vw(868px);
     height: get-vw(839px);
   }
+
+  &__callback-button {
+    position: relative;
+    z-index: 10;
+  }
 }

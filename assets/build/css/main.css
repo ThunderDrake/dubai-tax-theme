@@ -1515,6 +1515,94 @@ a {
   width: 45.2083333333vw;
   height: 43.6979166667vw;
 }
+.status-section__callback-button {
+  position: relative;
+  z-index: 10;
+}
+
+.about-section {
+  position: relative;
+  z-index: 1;
+  margin-top: -16.6666666667vw;
+  background-image: url("../img/about-section__bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.about-section__container {
+  padding-top: 14.5833333333vw;
+}
+.about-section__content {
+  position: relative;
+  z-index: 1;
+  margin-right: 2.6041666667vw;
+  margin-left: auto;
+  padding-top: 10.4166666667vw;
+  padding-bottom: 5.9895833333vw;
+  max-width: 46.875vw;
+}
+.about-section__persons {
+  position: absolute;
+  left: -1.0416666667vw;
+  bottom: 0;
+  width: 43.6458333333vw;
+  height: 43.1770833333vw;
+}
+.about-section__title {
+  margin: 0;
+  margin-bottom: 1.7708333333vw;
+  max-width: 36.4583333333vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.2916666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.about-section__title span {
+  font-weight: 500;
+  color: #1c1c1c;
+}
+.about-section__text {
+  margin-bottom: 4.1666666667vw;
+  max-width: 41.0416666667vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.25vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.about-section__text span {
+  font-weight: 500;
+  color: #1c1c1c;
+}
+.about-section__stats {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 14.84375vw 9.1145833333vw 9.8958333333vw;
+  grid-template-columns: 14.84375vw 9.1145833333vw 9.8958333333vw;
+  border-radius: 0.625vw;
+  padding: 1.8229166667vw;
+  background: #009345;
+  gap: 4.1666666667vw;
+}
+.about-section__item-number {
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-style: normal;
+  font-size: 2.2916666667vw;
+  line-height: 130%;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+.about-section__item-text {
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%; /* 28px */
+  letter-spacing: -0.5px;
+  color: #fff;
+}
 
 .footer {
   color: #fff;
