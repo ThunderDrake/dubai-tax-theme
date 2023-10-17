@@ -13,5 +13,6 @@
 <?php ct()->template('/front-page/parts/form-section.php') ?>
 <?php ct()->template('/front-page/parts/map-section.php') ?>
 <?php ct()->template('/front-page/parts/team-section.php') ?>
+<?php ct()->template('/front-page/parts/status-section.php') ?>
 <?php
 ct()->footer();

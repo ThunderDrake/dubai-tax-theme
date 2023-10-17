@@ -1467,6 +1467,55 @@ a {
   color: #6b6b6b;
 }
 
+.status-section {
+  overflow: hidden;
+  margin-top: -5.2083333333vw;
+  background-image: url("../img/status-section__bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.status-section__container {
+  position: relative;
+  padding-top: 9.8958333333vw;
+  padding-bottom: 9.375vw;
+}
+.status-section__title {
+  margin: 0;
+  margin-bottom: 3.125vw;
+  max-width: 46.875vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.0833333333vw;
+  line-height: 140%; /* 56px */
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.status-section__title span {
+  font-weight: 500;
+  color: #009345;
+}
+.status-section__text {
+  margin-bottom: 3.90625vw;
+  max-width: 43.4895833333vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.25vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.status-section__text span {
+  font-weight: 500;
+  color: #1c1c1c;
+}
+.status-section__doc-image {
+  position: absolute;
+  right: -0.9375vw;
+  bottom: -4.1666666667vw;
+  width: 45.2083333333vw;
+  height: 43.6979166667vw;
+}
+
 .footer {
   color: #fff;
   background-color: #1c1c1c;
