@@ -169,6 +169,10 @@ a {
   width: 100%;
   max-width: 95.3125vw;
 }
+.container .content-container {
+  padding-right: 0;
+  padding-left: 0;
+}
 
 .content-container {
   margin: 0 auto;
@@ -1373,6 +1377,94 @@ a {
 .map-section__item-text b {
   font-weight: 500;
   color: #1c1c1c;
+}
+
+.team {
+  position: relative;
+  z-index: 2;
+}
+.team__container {
+  border-radius: 36px;
+  padding-top: 5.5208333333vw;
+  padding-bottom: 4.2708333333vw;
+  background-image: url("../img/team__bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.team__title {
+  margin: 0;
+  margin-bottom: 1.0416666667vw;
+  max-width: 61.4583333333vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.2916666667vw;
+  line-height: 140%; /* 61.6px */
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.team__title span {
+  font-weight: 500;
+  color: #1c1c1c;
+}
+.team__text {
+  margin-bottom: 4.1666666667vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.4583333333vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.team__text b {
+  font-weight: 500;
+  color: #1c1c1c;
+}
+.team__text span {
+  font-weight: 500;
+  color: #009345;
+}
+.team__list {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: (1fr)[4];
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.0833333333vw;
+}
+.team__list-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.team__list-item-image {
+  margin-bottom: 2.6041666667vw;
+  border-radius: 50%;
+  width: 18.2291666667vw;
+  height: 18.2291666667vw;
+}
+.team__list-item-title {
+  margin-bottom: 0.3125vw;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 1.3541666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.team__list-item-text {
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  text-align: center;
+  color: #6b6b6b;
 }
 
 .footer {
