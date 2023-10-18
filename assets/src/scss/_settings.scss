@@ -254,3 +254,16 @@ a {
     color: #1c1c1c;
   }
 }
+
+.link-round-hover {
+  display: inline-block;
+  transition: transform 0.3s ease;
+
+  svg {
+    pointer-events: none;
+  }
+
+  @include hover {
+    transform: scale(1.2);
+  }
+}
