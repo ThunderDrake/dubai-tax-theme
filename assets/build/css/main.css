@@ -1966,6 +1966,177 @@ a {
   color: #009345;
 }
 
+.news-section {
+  margin-bottom: 4.1666666667vw;
+}
+.news-section__title {
+  margin: 0;
+  max-width: 64.0625vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.2916666667vw;
+  line-height: 140%; /* 61.6px */
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.news-section__title span {
+  font-weight: 600;
+  color: #009345;
+}
+.news-section__title b {
+  font-weight: 500;
+  color: #1c1c1c;
+}
+.news-section__header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-bottom: 3.6458333333vw;
+}
+.news-section__slider-button {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border: 2px solid rgba(107, 107, 107, 0.2);
+  border-radius: 50%;
+  width: 4.1666666667vw;
+  height: 4.1666666667vw;
+}
+.news-section__slider-button.swiper-button-disabled {
+  border-color: #6b6b6b;
+  opacity: 0.2;
+  cursor: auto;
+}
+.news-section__slider-button--next {
+  margin-left: 1.875vw;
+  -webkit-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+@media (any-hover: hover) {
+  .news-section__slider-button:hover {
+    border-color: #6b6b6b;
+  }
+}
+.news-section__slider-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.news {
+  height: auto;
+}
+.news__wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  border-radius: 1.25vw;
+  height: 100%;
+  background: #f4f8fb;
+}
+.news__image {
+  display: block;
+  border-radius: 1.25vw;
+}
+.news__image-wrapper {
+  position: relative;
+}
+.news__date {
+  position: absolute;
+  right: 1.6666666667vw;
+  bottom: 0.9375vw;
+  border-radius: 3.3333333333vw;
+  padding: 0.3645833333vw 0.7291666667vw;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 0.7291666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #fff;
+  background: #009345;
+}
+.news__content {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding: 1.3020833333vw;
+  height: 100%;
+}
+.news__title {
+  margin-bottom: 0.78125vw;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 1.0416666667vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.news__description {
+  margin-bottom: 2.0833333333vw;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 0.9375vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.news__link {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: 0;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 0.9375vw;
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #009345;
+}
+.news__link::after {
+  content: "";
+  display: block;
+  margin-left: 1.3020833333vw;
+  width: 3.1770833333vw;
+  height: 0.8333333333vw;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='61' height='16' viewBox='0 0 61 16' fill='none'%3E%3Cpath d='M60.7071 8.7071C61.0976 8.31658 61.0976 7.68341 60.7071 7.29289L54.3432 0.928927C53.9526 0.538403 53.3195 0.538403 52.9289 0.928928C52.5384 1.31945 52.5384 1.95262 52.9289 2.34314L58.5858 7.99999L52.9289 13.6568C52.5384 14.0474 52.5384 14.6805 52.9289 15.0711C53.3195 15.4616 53.9526 15.4616 54.3432 15.0711L60.7071 8.7071ZM8.74228e-08 9L60 8.99999L60 6.99999L-8.74228e-08 7L8.74228e-08 9Z' fill='%23009345'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+@media (any-hover: hover) {
+  .news__link:hover {
+    font-weight: 600;
+  }
+  .news__link:hover::after {
+    margin-left: 1.8229166667vw;
+  }
+}
+
 .footer {
   color: #fff;
   background-color: #1c1c1c;

@@ -1,1 +1,1 @@
-
+import "./components/news-slider"

@@ -17,5 +17,6 @@
 <?php ct()->template('/front-page/parts/about-section.php') ?>
 <?php ct()->template('/front-page/parts/preferences-section.php') ?>
 <?php ct()->template('/front-page/parts/socials-section.php') ?>
+<?php ct()->template('/front-page/parts/news-section.php') ?>
 <?php
 ct()->footer();
