@@ -1,4 +1,20 @@
 <footer class="footer">
+  <div class="content-container">
+    <div class="footer__form">
+      <div class="footer__form-title">Didn't find the answer to your question?</div>
+      <div class="footer__form-subtitle">Leave a request for a free preliminary consultation. We will answer all questions.</div>
+      <form class="footer__form-form" action="">
+        <input class="footer__form-input input-reset" type="text" placeholder="Your name">
+        <input class="footer__form-input input-reset" type="text" placeholder="Your e-mail">
+        <button class="btn-reset footer__form-button btn--main">Next</button>
+        <label class="custom-checkbox footer__form-checkbox">
+          <input type="checkbox" class="custom-checkbox__field">
+          <span class="custom-checkbox__content">I agree with the terms of the <a href="#">policy data
+              privacy</a></span>
+        </label>
+      </form>
+    </div>
+  </div>
   <div class="content-container footer__container">
     <div class="footer__col">
       <div class="logo__container">
