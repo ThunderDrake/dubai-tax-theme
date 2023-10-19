@@ -10,6 +10,11 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_news_slider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/news-slider */ "./assets/src/js/components/news-slider.js");
+/* harmony import */ var _components_submenus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/submenus */ "./assets/src/js/components/submenus.js");
+/* harmony import */ var _components_submenus__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_components_submenus__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components_burger_menu__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/burger-menu */ "./assets/src/js/components/burger-menu.js");
+
+
 
 
 /***/ }),
@@ -149,6 +154,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./assets/src/js/components/burger-menu.js":
+/*!*************************************************!*\
+  !*** ./assets/src/js/components/burger-menu.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _functions_burger__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../functions/burger */ "./assets/src/js/functions/burger.js");
+
+
+/***/ }),
+
 /***/ "./assets/src/js/components/news-slider.js":
 /*!*************************************************!*\
   !*** ./assets/src/js/components/news-slider.js ***!
@@ -170,6 +188,182 @@ const newsSlider = new swiper__WEBPACK_IMPORTED_MODULE_0__["default"]('.news-sec
   slidesPerView: 4,
   spaceBetween: 30
 });
+
+/***/ }),
+
+/***/ "./assets/src/js/components/submenus.js":
+/*!**********************************************!*\
+  !*** ./assets/src/js/components/submenus.js ***!
+  \**********************************************/
+/***/ (() => {
+
+if (window.matchMedia("(min-width: 576px)").matches) {
+  const menuBtns = document.querySelectorAll('.nav__link--dropdown');
+  const drops = document.querySelectorAll('.nav__item-submenu');
+  menuBtns.forEach(el => {
+    el.addEventListener('mouseover', e => {
+      let currentBtn = e.currentTarget;
+      let drop = currentBtn.closest('.nav__item').querySelector('.nav__item-submenu');
+      menuBtns.forEach(el => {
+        if (el !== currentBtn) {
+          el.classList.remove('nav__link--active');
+        }
+      });
+      drops.forEach(el => {
+        if (el !== drop) {
+          el.classList.remove('nav__item-submenu--active');
+        }
+      });
+      drop.classList.add('nav__item-submenu--active');
+      currentBtn.classList.add('nav__link--active');
+    });
+  });
+  document.addEventListener('mouseover', e => {
+    if (!e.target.closest('.header-menu__nav')) {
+      menuBtns.forEach(el => {
+        el.classList.remove('nav__link--active');
+      });
+      drops.forEach(el => {
+        el.classList.remove('nav__item-submenu--active');
+      });
+    }
+  });
+} else {
+  const menuBtns = document.querySelectorAll('.nav__link--dropdown');
+  const drops = document.querySelectorAll('.nav__item-submenu');
+  menuBtns.forEach(el => {
+    el.addEventListener('click', e => {
+      let currentBtn = e.currentTarget;
+      let drop = currentBtn.closest('.nav__item').querySelector('.nav__item-submenu');
+      menuBtns.forEach(el => {
+        if (el !== currentBtn) {
+          el.classList.remove('nav__link--active');
+        }
+      });
+      drops.forEach(el => {
+        if (el !== drop) {
+          el.classList.remove('nav__item-submenu--active');
+        }
+      });
+      drop.classList.add('nav__item-submenu--active');
+      currentBtn.classList.add('nav__link--active');
+    });
+  });
+}
+
+/***/ }),
+
+/***/ "./assets/src/js/functions/burger.js":
+/*!*******************************************!*\
+  !*** ./assets/src/js/functions/burger.js ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _functions_disable_scroll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../functions/disable-scroll */ "./assets/src/js/functions/disable-scroll.js");
+/* harmony import */ var _functions_enable_scroll__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../functions/enable-scroll */ "./assets/src/js/functions/enable-scroll.js");
+
+
+(function () {
+  const burger = document?.querySelector('[data-burger]');
+  const menu = document?.querySelector('[data-menu]');
+  const menuItems = document?.querySelectorAll('[data-menu-item]');
+  const overlay = document?.querySelector('[data-menu-overlay]');
+  const header = document?.querySelector('.header');
+  burger?.addEventListener('click', e => {
+    burger?.classList.toggle('burger--active');
+    menu?.classList.toggle('menu--active');
+    header?.classList.toggle('header--menu-active');
+    if (menu?.classList.contains('menu--active')) {
+      burger?.setAttribute('aria-expanded', 'true');
+      burger?.setAttribute('aria-label', 'Закрыть меню');
+      (0,_functions_disable_scroll__WEBPACK_IMPORTED_MODULE_0__.disableScroll)();
+    } else {
+      burger?.setAttribute('aria-expanded', 'false');
+      burger?.setAttribute('aria-label', 'Открыть меню');
+      (0,_functions_enable_scroll__WEBPACK_IMPORTED_MODULE_1__.enableScroll)();
+    }
+  });
+  overlay?.addEventListener('click', () => {
+    burger?.setAttribute('aria-expanded', 'false');
+    burger?.setAttribute('aria-label', 'Открыть меню');
+    burger.classList.remove('burger--active');
+    menu.classList.remove('menu--active');
+    (0,_functions_enable_scroll__WEBPACK_IMPORTED_MODULE_1__.enableScroll)();
+  });
+  menuItems?.forEach(el => {
+    el.addEventListener('click', () => {
+      burger?.setAttribute('aria-expanded', 'false');
+      burger?.setAttribute('aria-label', 'Открыть меню');
+      burger.classList.remove('burger--active');
+      menu.classList.remove('menu--active');
+      (0,_functions_enable_scroll__WEBPACK_IMPORTED_MODULE_1__.enableScroll)();
+    });
+  });
+})();
+
+/***/ }),
+
+/***/ "./assets/src/js/functions/disable-scroll.js":
+/*!***************************************************!*\
+  !*** ./assets/src/js/functions/disable-scroll.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   disableScroll: () => (/* binding */ disableScroll)
+/* harmony export */ });
+/* harmony import */ var _vars__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_vars */ "./assets/src/js/_vars.js");
+
+const disableScroll = () => {
+  const fixBlocks = document?.querySelectorAll('.fixed-block');
+  const pagePosition = window.scrollY;
+  const paddingOffset = `${window.innerWidth - _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.offsetWidth}px`;
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].htmlEl.style.scrollBehavior = 'none';
+  fixBlocks.forEach(el => {
+    el.style.paddingRight = paddingOffset;
+  });
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.style.paddingRight = paddingOffset;
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.classList.add('dis-scroll');
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.dataset.position = pagePosition;
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.style.top = `-${pagePosition}px`;
+};
+
+/***/ }),
+
+/***/ "./assets/src/js/functions/enable-scroll.js":
+/*!**************************************************!*\
+  !*** ./assets/src/js/functions/enable-scroll.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   enableScroll: () => (/* binding */ enableScroll)
+/* harmony export */ });
+/* harmony import */ var _vars__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_vars */ "./assets/src/js/_vars.js");
+
+const enableScroll = () => {
+  const fixBlocks = document?.querySelectorAll('.fixed-block');
+  const body = document.body;
+  const pagePosition = parseInt(_vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.dataset.position, 10);
+  fixBlocks.forEach(el => {
+    el.style.paddingRight = '0px';
+  });
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.style.paddingRight = '0px';
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.style.top = 'auto';
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.classList.remove('dis-scroll');
+  window.scroll({
+    top: pagePosition,
+    left: 0
+  });
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].bodyEl.removeAttribute('data-position');
+  _vars__WEBPACK_IMPORTED_MODULE_0__["default"].htmlEl.style.scrollBehavior = 'smooth';
+};
 
 /***/ }),
 

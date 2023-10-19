@@ -39,7 +39,7 @@
 
           <div class="header__socials">
             <div class="header__socials-text">Ask a question, <br><span>we are online</span></div>
-            <a class="header__socials-link" href="#">
+            <a class="header__socials-link link-round-hover" href="#">
               <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="54" height="54" rx="27" fill="#31B939" />
                 <path
@@ -48,7 +48,7 @@
               </svg>
 
             </a>
-            <a class="header__socials-link" href="#">
+            <a class="header__socials-link link-round-hover" href="#">
               <svg width="55" height="54" viewBox="0 0 55 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="0.0839844" width="54" height="54" rx="27" fill="#05A0EB" />
                 <path
@@ -68,6 +68,43 @@
               <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/dub-flag.png" class="header__phone-flag" width="30" height="15" alt="">
               <a class="header__phone-link" href="tel:+ 971 (58) 547-22-35">+ 971 (58) 547-22-35</a>
             </div>
+          </div>
+
+          <button class="burger header__burger" aria-label="Открыть меню" aria-expanded="false" data-burger>
+            <span class="burger__line"></span>
+          </button>
+
+          <div class="header-menu" data-menu>
+            <nav class="header-menu__nav nav">
+              <ul class="nav__list list-reset">
+                <li class="nav__item"><a href="/" class="nav__link nav__link--main">Main</a></li>
+                <li class="nav__item">
+                  <span class="nav__link nav__link--dropdown">Accounting services</span>
+                  <div class="nav__item-submenu">
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 1</a>
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 2</a>
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 3</a>
+                  </div>
+                </li>
+                <li class="nav__item">
+                  <span class="nav__link nav__link--dropdown">Legal services</span>
+                  <div class="nav__item-submenu">
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 1</a>
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 2</a>
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 3</a>
+                  </div>
+                </li>
+                <li class="nav__item">
+                  <span class="nav__link nav__link--dropdown">Helpful information</span>
+                  <div class="nav__item-submenu">
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 1</a>
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 2</a>
+                    <a class="nav__link nav__link--submenu" href="#">Подменю 3</a>
+                  </div>
+                </li>
+                <li class="nav__item"><a href="/contacts/" class="nav__link">Contacts</a></li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>

@@ -108,9 +108,9 @@ a {
 
 .container {
   margin: 0 auto;
-  padding: 0 get-vw(15px);
+  padding: 0 max(15px, get-vw(15px));
   width: 100%;
-  max-width: get-vw(1830px);
+  max-width: max(1240px, get-vw(1830px));
 
   .content-container {
     padding-right: 0;
@@ -120,9 +120,9 @@ a {
 
 .content-container {
   margin: 0 auto;
-  padding: 0 get-vw(15px);
+  padding: 0 max(15px, get-vw(15px));
   width: 100%;
-  max-width: get-vw(1570px);
+  max-width: max(980px, get-vw(1570px));
 }
 
 .js-focus-visible :focus:not(.focus-visible) {
@@ -157,6 +157,7 @@ a {
   line-height: 155%;
   letter-spacing: -0.5px;
   color: #009345;
+  transition: all 0.3s ease;
 
   &::before {
     content: "";
@@ -168,6 +169,15 @@ a {
     width: 100%;
     height: 1px;
     transform: translateY(100%);
+    transition: all 0.3s ease;
+  }
+
+  @include hover {
+    color: #00c15b;
+
+    &::before {
+      border-bottom: 1px solid currentcolor;
+    }
   }
 }
 
@@ -184,10 +194,15 @@ a {
     line-height: 115%;
     letter-spacing: -0.5px;
     color: #fff;
-    background: linear-gradient(68deg, #009345 25.59%, #00c15b 103.07%), linear-gradient(180deg, #31b939 0%, #25a92d 100%), #a67cea;
+    background: #009345;
+    transition: background 0.3s ease;
 
     svg {
       margin-left: get-vw(17px);
+    }
+
+    @include hover {
+      background: #00c15b;
     }
   }
 

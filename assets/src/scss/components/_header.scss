@@ -14,13 +14,22 @@
     flex-shrink: 0;
     width: get-vw(72px);
     height: get-vw(72px);
+
+    @include tablet {
+      display: none;
+    }
   }
 
   .content-container {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     padding: get-vw(24px) 0;
+
+    @include mobile {
+      padding: 20px 0;
+    }
   }
 
   &__address {
@@ -42,18 +51,26 @@
 
     &-text {
       margin-bottom: get-vw(5px);
-      font-size: get-vw(20px);
+      font-size: max(14px, get-vw(20px));
       line-height: 125%;
       letter-spacing: -0.5px;
     }
 
     &-link {
-      font-size: get-vw(16px);
+      font-size: max(12px, get-vw(16px));
+    }
+
+    @include small-tablet {
+      display: none;
     }
   }
 
   &__link {
-    font-size: get-vw(16px);
+    font-size: max(12px, get-vw(16px));
+
+    @include small-tablet {
+      display: none;
+    }
   }
 
   &__socials {
@@ -64,7 +81,7 @@
       position: relative;
       margin-right: get-vw(10px);
       max-width: get-vw(145px);
-      font-size: get-vw(16px);
+      font-size: max(12px, get-vw(16px));
       line-height: 140%;
       letter-spacing: -0.5px;
       color: #1c1c1c;
@@ -83,6 +100,10 @@
       span {
         font-weight: 600;
       }
+
+      @include small-tablet {
+        max-width: none;
+      }
     }
 
     &-link {
@@ -90,9 +111,13 @@
       margin-right: get-vw(10px);
 
       svg {
-        width: get-vw(54px);
-        height: get-vw(54px);
+        width: max(25px, get-vw(54px));
+        height: max(25px, get-vw(54px));
       }
+    }
+
+    @include mobile {
+      display: none;
     }
   }
 
@@ -105,7 +130,7 @@
   &__top-text {
     position: relative;
     margin-bottom: get-vw(8px);
-    font-size: get-vw(16px);
+    font-size: max(12px, get-vw(16px));
 
     &::before {
       content: "";
@@ -116,6 +141,10 @@
       height: get-vw(6px);
       background-color: #009345;
       transform: translateY(-50%);
+    }
+
+    @include mobile {
+      display: none;
     }
   }
 
@@ -133,10 +162,19 @@
     &-link {
       font-weight: 600;
       font-style: normal;
-      font-size: get-vw(24px);
+      font-size: max(16px, get-vw(24px));
       line-height: 110%;
       letter-spacing: -0.5px;
       color: #009345;
+      transition: color 0.3s ease;
+
+      @include hover {
+        color: #00c15b;
+      }
+    }
+
+    @include mobile {
+      display: none;
     }
   }
 }
@@ -156,6 +194,21 @@
   &__text {
     margin-left: get-vw(25px);
     width: get-vw(160px);
-    font-size: get-vw(16px);
+    font-size: max(12px, get-vw(16px));
+
+    @include mobile {
+      width: 160px;
+    }
   }
+
+  @include mobile {
+    width: 60px;
+    height: 50px;
+  }
+}
+
+.burger {
+  @include burger;
+
+  z-index: 10;
 }

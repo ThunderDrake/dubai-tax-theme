@@ -94,6 +94,10 @@
     }
   }
 
+  &__button {
+    pointer-events: all;
+  }
+
   &__left {
     position: relative;
 
