@@ -3,7 +3,7 @@
   padding-top: get-vw(175px);
 
   &__title {
-    margin-bottom: get-vw(72px);
+    margin-bottom: max(34px, get-vw(72px));
     text-align: left;
   }
 
@@ -11,6 +11,10 @@
     display: grid;
     grid-template-columns: auto get-vw(470px);
     gap: get-vw(80px);
+
+    @include small-tablet {
+      grid-template-columns: none;
+    }
   }
 
   &__grid {
@@ -24,6 +28,20 @@
       flex-direction: column;
       align-items: flex-start;
     }
+
+    @include mobile {
+      grid-template-columns: none;
+    }
+  }
+
+  &__button {
+    @include mobile {
+      padding: 27px 65px;
+
+      svg {
+        display: none;
+      }
+    }
   }
 
   &__callback {
@@ -36,7 +54,7 @@
       margin-bottom: get-vw(46px);
       font-weight: 600;
       font-style: normal;
-      font-size: get-vw(28px);
+      font-size: max(20px, get-vw(28px));
       line-height: 150%;
       letter-spacing: -0.5px;
       color: #1c1c1c;
@@ -54,15 +72,15 @@
       flex-shrink: 0;
       margin-right: get-vw(25px);
       border-radius: 50%;
-      width: get-vw(125px);
-      height: get-vw(125px);
+      width: max(85px, get-vw(125px));
+      height: max(85px, get-vw(125px));
     }
 
     &-name {
       margin-bottom: 5px;
       font-weight: 600;
       font-style: normal;
-      font-size: get-vw(20px);
+      font-size: max(16px, get-vw(20px));
       line-height: 140%;
       letter-spacing: -0.5px;
       color: #1c1c1c;
@@ -71,7 +89,7 @@
     &-role {
       margin-bottom: get-vw(15px);
       font-style: normal;
-      font-size: get-vw(18px);
+      font-size: max(12px, get-vw(18px));
       line-height: 140%;
       letter-spacing: -0.5px;
       color: #6b6b6b;
@@ -80,10 +98,14 @@
     &-button {
       padding: get-vw(15px) get-vw(30px);
       font-weight: 400;
-      font-size: get-vw(16px);
+      font-size: max(12px, get-vw(16px));
       line-height: 140%; /* 22.4px */
       letter-spacing: -0.5px;
       color: #fff;
+
+      @include mobile {
+        padding: 10px 65px;
+      }
     }
   }
 }
@@ -93,16 +115,16 @@
   flex-direction: column;
 
   &__icon {
-    margin-bottom: get-vw(30px);
-    width: get-vw(100px);
-    height: get-vw(100px);
+    margin-bottom: max(15px, get-vw(30px));
+    width: max(60px, get-vw(100px));
+    height: max(60px, get-vw(100px));
   }
 
   &__title {
-    margin-bottom: get-vw(15px);
+    margin-bottom: max(10px, get-vw(15px));
     font-weight: 600;
     font-style: normal;
-    font-size: get-vw(28px);
+    font-size: max(18px, get-vw(28px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #1c1c1c;
@@ -111,7 +133,7 @@
   &__text {
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(20px);
+    font-size: max(16px, get-vw(20px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #6b6b6b;
