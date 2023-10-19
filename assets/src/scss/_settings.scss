@@ -190,7 +190,7 @@ a {
     padding: get-vw(35px) get-vw(75px);
     font-weight: 600;
     font-style: normal;
-    font-size: get-vw(20px);
+    font-size: max(14px, get-vw(20px));
     line-height: 115%;
     letter-spacing: -0.5px;
     color: #fff;
