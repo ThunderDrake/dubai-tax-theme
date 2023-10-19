@@ -235,7 +235,7 @@ a {
     padding: get-vw(34px) get-vw(88px);
     font-weight: 600;
     font-style: normal;
-    font-size: get-vw(20px);
+    font-size: max(14px, get-vw(20px));
     line-height: 140%; /* 28px */
     letter-spacing: -0.5px;
     color: #009345;

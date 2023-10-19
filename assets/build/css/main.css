@@ -308,7 +308,7 @@ a {
   padding: 1.7708333333vw 4.5833333333vw;
   font-weight: 600;
   font-style: normal;
-  font-size: 1.0416666667vw;
+  font-size: max(14px, 1.0416666667vw);
   line-height: 140%; /* 28px */
   letter-spacing: -0.5px;
   color: #009345;
@@ -1382,13 +1382,18 @@ a {
   background-repeat: no-repeat;
   pointer-events: none;
 }
+@media (max-width: 768px) {
+  .flags-section__wrapper::after {
+    background-size: cover;
+  }
+}
 .flags-section__title {
   margin: 0;
   margin-bottom: 0.78125vw;
   max-width: 35.7291666667vw;
   font-weight: 600;
   font-style: normal;
-  font-size: 1.875vw;
+  font-size: max(16px, 1.875vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #fff;
@@ -1398,10 +1403,15 @@ a {
   max-width: 22.1354166667vw;
   font-weight: 400;
   font-style: normal;
-  font-size: 1.0416666667vw;
+  font-size: max(14px, 1.0416666667vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #e4e4e4;
+}
+@media (max-width: 576px) {
+  .flags-section {
+    display: none;
+  }
 }
 
 .steps {
