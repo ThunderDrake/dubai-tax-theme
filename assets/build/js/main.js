@@ -13,6 +13,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_submenus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/submenus */ "./assets/src/js/components/submenus.js");
 /* harmony import */ var _components_submenus__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_components_submenus__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components_burger_menu__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/burger-menu */ "./assets/src/js/components/burger-menu.js");
+/* harmony import */ var _components_steps_slider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/steps-slider */ "./assets/src/js/components/steps-slider.js");
+
 
 
 
@@ -188,6 +190,40 @@ const newsSlider = new swiper__WEBPACK_IMPORTED_MODULE_0__["default"]('.news-sec
   slidesPerView: 4,
   spaceBetween: 30
 });
+
+/***/ }),
+
+/***/ "./assets/src/js/components/steps-slider.js":
+/*!**************************************************!*\
+  !*** ./assets/src/js/components/steps-slider.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var swiper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! swiper */ "./node_modules/swiper/swiper.mjs");
+/* harmony import */ var swiper_modules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! swiper/modules */ "./node_modules/swiper/modules/index.mjs");
+
+
+if (window.matchMedia("(max-width: 768px").matches) {
+  const stepsSlider = new swiper__WEBPACK_IMPORTED_MODULE_0__["default"]('.steps__slider', {
+    modules: [swiper_modules__WEBPACK_IMPORTED_MODULE_1__.Navigation],
+    navigation: {
+      nextEl: '.steps__slider-button--next',
+      prevEl: '.steps__slider-button--prev'
+    },
+    breakpoints: {
+      320: {
+        slidesPerView: 1,
+        spaceBetween: 0
+      },
+      575: {
+        slidesPerView: 2,
+        spaceBetween: 30
+      }
+    }
+  });
+}
 
 /***/ }),
 

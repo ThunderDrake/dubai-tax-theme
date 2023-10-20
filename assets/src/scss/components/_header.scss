@@ -211,4 +211,9 @@
   @include burger;
 
   z-index: 10;
+  display: none;
+
+  @include mobile {
+    display: block;
+  }
 }
