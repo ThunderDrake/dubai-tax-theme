@@ -2910,17 +2910,22 @@ a {
 }
 
 .socials-section {
-  margin-bottom: 4.1666666667vw;
+  margin-bottom: max(56px, 4.1666666667vw);
 }
 .socials-section__wrapper {
-  padding-top: 5.9895833333vw;
+  padding-top: max(65px, 5.9895833333vw);
   max-width: 65.625vw;
 }
+@media (max-width: 768px) {
+  .socials-section__wrapper {
+    max-width: none;
+  }
+}
 .socials-section__subtitle {
-  margin-bottom: 0.78125vw;
+  margin-bottom: 15px;
   font-weight: 400;
   font-style: normal;
-  font-size: 1.25vw;
+  font-size: max(14px, 1.25vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #009345;
@@ -2933,11 +2938,19 @@ a {
   -ms-flex-align: start;
   align-items: flex-start;
 }
+@media (max-width: 576px) {
+  .socials-section__content {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    -ms-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+  }
+}
 .socials-section__title {
   margin-bottom: 2.4479166667vw;
   font-weight: 400;
   font-style: normal;
-  font-size: 2.2916666667vw;
+  font-size: max(22px, 2.2916666667vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #6b6b6b;
@@ -2961,6 +2974,18 @@ a {
   width: 37.7604166667vw;
   height: 22.9166666667vw;
 }
+@media (max-width: 576px) {
+  .socials-section__video img {
+    width: 100%;
+    height: auto;
+  }
+}
+@media (max-width: 576px) {
+  .socials-section__video {
+    margin-top: 26px;
+    width: 100%;
+  }
+}
 .socials-section__links {
   position: absolute;
   left: 50%;
@@ -2972,18 +2997,22 @@ a {
 .socials-section__links-item {
   margin: 0 0.5208333333vw;
 }
+.socials-section__links-item svg {
+  width: max(58px, 5.8333333333vw);
+  height: max(58px, 5.8333333333vw);
+}
 .socials-section__list-item:not(:last-child) {
-  margin-bottom: 2.8125vw;
+  margin-bottom: max(26px, 2.8125vw);
 }
 .socials-section__list-bullet {
-  margin-bottom: 1.1458333333vw;
-  width: 3.4895833333vw;
-  height: 3.4895833333vw;
+  margin-bottom: max(10px, 1.1458333333vw);
+  width: max(40px, 3.4895833333vw);
+  height: max(40px, 3.4895833333vw);
 }
 .socials-section__list-text {
   font-weight: 400;
   font-style: normal;
-  font-size: 1.25vw;
+  font-size: max(16px, 1.25vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #1c1c1c;
