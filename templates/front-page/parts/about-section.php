@@ -3,6 +3,7 @@
     <div class="about-section__content">
       <h2 class="about-section__title"><span>We are professionals</span> in the field of legal and accounting services in the UAE</h2>
       <div class="about-section__text">Initially we worked for hire, but now we decided to create our own business. <span>Experience and knowledge in various fields allow us to offer our clients high quality services and solutions.</span></div>
+      <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/about-section__persons.png" class="about-section__persons" width="838" height="829" alt="">
       <div class="about-section__stats">
         <div class="about-section__item">
           <div class="about-section__item-number">9300 +</div>
@@ -18,6 +19,5 @@
         </div>
       </div>
     </div>
-    <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/about-section__persons.png" class="about-section__persons" width="838" height="829" alt="">
   </div>
 </section>
