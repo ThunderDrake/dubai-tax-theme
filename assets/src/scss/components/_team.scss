@@ -4,8 +4,8 @@
 
   &__container {
     border-radius: 36px;
-    padding-top: get-vw(106px);
-    padding-bottom: get-vw(82px);
+    padding-top: max(70px, get-vw(106px));
+    padding-bottom: max(60px, get-vw(82px));
     background-image: url("../img/team__bg.png");
     background-size: cover;
     background-repeat: no-repeat;
@@ -17,7 +17,7 @@
     max-width: get-vw(1180px);
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(44px);
+    font-size: max(22px, get-vw(44px));
     line-height: 140%; /* 61.6px */
     letter-spacing: -0.5px;
     color: #6b6b6b;
@@ -32,7 +32,7 @@
     margin-bottom: get-vw(80px);
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(28px);
+    font-size: max(16px, get-vw(28px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #6b6b6b;
@@ -61,15 +61,15 @@
       &-image {
         margin-bottom: get-vw(50px);
         border-radius: 50%;
-        width: get-vw(350px);
-        height: get-vw(350px);
+        width: max(210px, get-vw(350px));
+        height: max(210px, get-vw(350px));
       }
 
       &-title {
-        margin-bottom: get-vw(6px);
+        margin-bottom: 6px;
         font-weight: 500;
         font-style: normal;
-        font-size: get-vw(26px);
+        font-size: max(20px, get-vw(26px));
         line-height: 140%;
         letter-spacing: -0.5px;
         color: #1c1c1c;
@@ -78,11 +78,56 @@
       &-text {
         font-weight: 400;
         font-style: normal;
-        font-size: get-vw(20px);
+        font-size: max(12px, get-vw(20px));
         line-height: 140%;
         letter-spacing: -0.5px;
         text-align: center;
         color: #6b6b6b;
+      }
+    }
+  }
+
+  &__slider {
+    &-item {
+      height: auto;
+      box-sizing: border-box;
+
+      @include mobile {
+        width: 210px;
+      }
+    }
+
+    &-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(#6b6b6b, 0.2);
+      border-radius: 50%;
+      width: 55px;
+      height: 55px;
+
+      &.swiper-button-disabled {
+        border-color: #6b6b6b;
+        opacity: 0.2;
+        cursor: auto;
+      }
+
+      &--next {
+        margin-left: 24px;
+        transform: rotate(180deg);
+      }
+
+      @include hover {
+        border-color: #6b6b6b;
+      }
+    }
+
+    &-controls {
+      display: none;
+
+      @include small-tablet {
+        display: flex;
+        margin-bottom: 45px;
       }
     }
   }
