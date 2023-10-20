@@ -17,7 +17,7 @@
     max-width: get-vw(900px);
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(40px);
+    font-size: max(22px, get-vw(40px));
     line-height: 140%; /* 56px */
     letter-spacing: -0.5px;
     color: #1c1c1c;
@@ -26,6 +26,14 @@
       font-weight: 500;
       color: #009345;
     }
+
+    @include small-tablet {
+      max-width: 80%;
+    }
+
+    @include mobile {
+      max-width: none;
+    }
   }
 
   &__text {
@@ -33,7 +41,7 @@
     max-width: get-vw(835px);
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(24px);
+    font-size: max(16px, get-vw(24px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #6b6b6b;
@@ -41,6 +49,16 @@
     span {
       font-weight: 500;
       color: #1c1c1c;
+    }
+
+    @include small-tablet {
+      margin-bottom: 270px;
+      max-width: 80%;
+    }
+
+    @include mobile {
+      margin-bottom: 310px;
+      max-width: none;
     }
   }
 
@@ -50,10 +68,31 @@
     bottom: get-vw(-80px);
     width: get-vw(868px);
     height: get-vw(839px);
+
+    @include small-tablet {
+      left: 0;
+      right: auto;
+      bottom: 10%;
+      width: 350px;
+      height: auto;
+    }
   }
 
   &__callback-button {
     position: relative;
     z-index: 10;
+
+    @include small-tablet {
+      padding: 28px 75px;
+    }
+
+    @include mobile {
+      justify-content: center;
+      width: 100%;
+    }
+  }
+
+  @include small-tablet {
+    background-position: left 25% center;
   }
 }
