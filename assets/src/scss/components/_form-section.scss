@@ -1,5 +1,5 @@
 .form-section {
-  margin-bottom: get-vw(85px);
+  margin-bottom: max(45px, get-vw(85px));
 
   &__container {
     position: relative;

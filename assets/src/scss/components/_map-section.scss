@@ -15,6 +15,18 @@
     background-size: cover;
     background-repeat: no-repeat;
     pointer-events: none;
+
+    @include big-desktop {
+      top: -35%;
+    }
+
+    @include tablet {
+      top: -50%;
+    }
+
+    @include small-tablet {
+      display: none;
+    }
   }
 
   &::after {
@@ -29,6 +41,18 @@
     background-size: cover;
     background-repeat: no-repeat;
     pointer-events: none;
+
+    @include big-desktop {
+      height: 570px;
+    }
+
+    @include tablet {
+      height: 300px;
+    }
+
+    @include small-tablet {
+      display: none;
+    }
   }
 
   &__map {
@@ -36,6 +60,22 @@
     left: 0;
     top: 0;
     margin-left: get-vw(395px);
+
+    @include tablet {
+      margin-left: 0;
+      aspect-ratio: 16 / 9;
+    }
+
+    @include small-tablet {
+      position: static;
+    }
+  }
+
+  &__container {
+    @include small-tablet {
+      display: flex;
+      flex-direction: column-reverse;
+    }
   }
 
   &__content {
@@ -43,10 +83,23 @@
     z-index: 1;
     display: flex;
     pointer-events: none;
+
+    @include small-tablet {
+      margin-bottom: 50px;
+      pointer-events: all;
+    }
   }
 
   &__list {
-    margin-bottom: get-vw(76px);
+    margin-bottom: max(20px, get-vw(76px));
+
+    @include small-tablet {
+      display: flex;
+    }
+
+    @include mobile {
+      flex-direction: column;
+    }
   }
 
   &__right {
@@ -58,15 +111,19 @@
     padding-top: get-vw(35px);
     pointer-events: all;
     gap: get-vw(24px);
+
+    @include small-tablet {
+      display: none;
+    }
   }
 
   &__title {
     margin: 0;
-    margin-bottom: get-vw(15px);
+    margin-bottom: 15px;
     max-width: get-vw(900px);
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(44px);
+    font-size: max(22px, get-vw(44px));
     line-height: 140%; /* 61.6px */
     letter-spacing: -0.5px;
     color: #6b6b6b;
@@ -76,6 +133,10 @@
       font-weight: 500;
       color: #1c1c1c;
     }
+
+    @include small-tablet {
+      max-width: none;
+    }
   }
 
   &__text {
@@ -83,7 +144,7 @@
     max-width: get-vw(715px);
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(28px);
+    font-size: max(14px, get-vw(28px));
     line-height: 140%; /* 39.2px */
     letter-spacing: -0.5px;
     color: #6b6b6b;
@@ -92,10 +153,24 @@
     span {
       font-weight: 500;
     }
+
+    @include small-tablet {
+      max-width: none;
+    }
   }
 
   &__button {
     pointer-events: all;
+
+    @include small-tablet {
+      padding-top: 25px;
+      padding-bottom: 25px;
+    }
+
+    @include mobile {
+      justify-content: center;
+      width: 100%;
+    }
   }
 
   &__left {
@@ -110,7 +185,30 @@
       background-image: url("../img/map-section__left-decor.png");
       background-size: cover;
       background-repeat: no-repeat;
+
+      @include big-desktop {
+        left: -190px;
+        top: -80px;
+        width: 600px;
+        height: 1200px;
+      }
+
+      @include tablet {
+        top: -370px;
+        width: 700px;
+      }
+
+      @include small-tablet {
+        display: none;
+      }
     }
+  }
+
+  &__image {
+    margin-right: get-vw(37px);
+    width: get-vw(195px);
+    height: get-vw(250px);
+    object-fit: contain;
   }
 
   &__item {
@@ -125,8 +223,8 @@
 
     &-image {
       margin-right: get-vw(37px);
-      width: get-vw(100px);
-      height: get-vw(125px);
+      width: max(66px, get-vw(100px));
+      height: max(83px, get-vw(125px));
       object-fit: contain;
     }
 
@@ -134,7 +232,7 @@
       max-width: get-vw(350px);
       font-weight: 400;
       font-style: normal;
-      font-size: get-vw(28px);
+      font-size: max(16px, get-vw(28px));
       line-height: 140%;
       letter-spacing: -0.5px;
       color: #6b6b6b;
@@ -148,6 +246,14 @@
         font-weight: 500;
         color: #1c1c1c;
       }
+
+      @include mobile {
+        max-width: none;
+      }
+    }
+
+    @include mobile {
+      width: auto;
     }
   }
 }
