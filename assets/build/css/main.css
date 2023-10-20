@@ -2602,6 +2602,12 @@ a {
   background-size: cover;
   background-repeat: no-repeat;
 }
+@media (max-width: 576px) {
+  .preferences-section__container {
+    padding-right: 25px;
+    padding-left: 25px;
+  }
+}
 .preferences-section .content-container {
   position: relative;
   display: -webkit-box;
@@ -2611,11 +2617,24 @@ a {
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
+@media (max-width: 576px) {
+  .preferences-section .content-container {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+}
 .preferences-section__left {
   position: relative;
   z-index: 1;
   padding-top: 5.7291666667vw;
   padding-bottom: 11.4583333333vw;
+}
+@media (max-width: 576px) {
+  .preferences-section__left {
+    padding-top: 36px;
+  }
 }
 .preferences-section__right {
   position: relative;
@@ -2628,13 +2647,19 @@ a {
   -ms-flex-direction: column;
   flex-direction: column;
   padding-top: 5.2083333333vw;
-  max-width: 20.8333333333vw;
+  max-width: max(250px, 20.8333333333vw);
+}
+@media (max-width: 576px) {
+  .preferences-section__right {
+    padding-top: 0;
+    max-width: none;
+  }
 }
 .preferences-section__subtitle {
   margin-bottom: 0.78125vw;
   font-weight: 400;
   font-style: normal;
-  font-size: 1.25vw;
+  font-size: max(14px, 1.25vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #9b9b9b;
@@ -2645,7 +2670,7 @@ a {
   max-width: 29.9479166667vw;
   font-weight: 400;
   font-style: normal;
-  font-size: 2.2916666667vw;
+  font-size: max(20px, 2.2916666667vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #fff;
@@ -2654,24 +2679,29 @@ a {
   font-weight: 600;
   color: #00d664;
 }
+@media (max-width: 576px) {
+  .preferences-section__title {
+    max-width: none;
+  }
+}
 .preferences-section__list {
   max-width: 25vw;
 }
 .preferences-section__list-title {
-  margin-bottom: 0.78125vw;
+  margin-bottom: 15px;
   font-weight: 500;
   font-style: normal;
-  font-size: 1.25vw;
+  font-size: max(14px, 1.25vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #00d664;
 }
 .preferences-section__list-item {
   position: relative;
-  padding-left: 2.8645833333vw;
+  padding-left: max(22px, 2.8645833333vw);
   font-weight: 400;
   font-style: normal;
-  font-size: 1.25vw;
+  font-size: max(12px, 1.25vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #fff;
@@ -2681,20 +2711,30 @@ a {
   position: absolute;
   left: 0;
   top: 4px;
-  width: 1.5625vw;
-  height: 1.5625vw;
+  width: max(16px, 1.5625vw);
+  height: max(16px, 1.5625vw);
   background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='15' fill='%2300D664'/%3E%3Cpath d='M19.5204 12.2868L18.6943 11.4244C18.5829 11.3081 18.4437 11.25 18.2859 11.25C18.1281 11.25 17.9889 11.3081 17.8775 11.4244L13.9047 15.5717L12.1318 13.7112C12.0204 13.595 11.8812 13.5368 11.7234 13.5368C11.5656 13.5368 11.4264 13.595 11.315 13.7112L10.4889 14.5736C10.3682 14.6899 10.3125 14.8353 10.3125 15C10.3125 15.1647 10.3682 15.3101 10.4796 15.4264L12.6702 17.7132L13.4963 18.5756C13.6077 18.6919 13.7469 18.75 13.9047 18.75C14.0625 18.75 14.2017 18.6919 14.3131 18.5756L15.1392 17.7132L19.5204 13.1395C19.6318 13.0233 19.6875 12.8779 19.6875 12.7132C19.6875 12.5484 19.6318 12.4031 19.5204 12.2868Z' fill='%231C1C1C'/%3E%3C/svg%3E%0A");
   background-size: contain;
   background-repeat: no-repeat;
 }
+@media (max-width: 576px) {
+  .preferences-section__list-item::before {
+    top: 0;
+  }
+}
 .preferences-section__list-item:not(:last-child) {
-  margin-bottom: 1.0416666667vw;
+  margin-bottom: max(10px, 1.0416666667vw);
+}
+@media (max-width: 576px) {
+  .preferences-section__list {
+    max-width: none;
+  }
 }
 .preferences-section__form-title {
-  margin-bottom: 1.25vw;
+  margin-bottom: max(16px, 1.25vw);
   font-weight: 400;
   font-style: normal;
-  font-size: 1.875vw;
+  font-size: max(16px, 1.875vw);
   line-height: 140%;
   letter-spacing: -0.5px;
   text-align: center;
@@ -2748,15 +2788,15 @@ a {
   transition: opacity 0.3s ease-in-out;
 }
 .preferences-section__form-input {
-  margin-bottom: 1.0416666667vw;
-  border-radius: 5.9895833333vw;
-  padding: 1.9791666667vw 2.34375vw;
+  margin-bottom: max(12px, 1.0416666667vw);
+  border-radius: 115px;
+  padding: max(20px, 1.9791666667vw) max(40px, 2.34375vw);
   width: 100%;
   -webkit-box-shadow: 0 0 21px 0 rgba(255, 255, 255, 0.4) inset;
   box-shadow: 0 0 21px 0 rgba(255, 255, 255, 0.4) inset;
   font-weight: 500;
   font-style: normal;
-  font-size: 0.9375vw;
+  font-size: max(14px, 0.9375vw);
   line-height: 135%;
   letter-spacing: -0.5px;
   color: #000;
@@ -2765,7 +2805,7 @@ a {
 .preferences-section__form-input::-webkit-input-placeholder {
   font-weight: 500;
   font-style: normal;
-  font-size: 0.9375vw;
+  font-size: max(14px, 0.9375vw);
   line-height: 135%;
   letter-spacing: -0.5px;
   color: #000;
@@ -2773,7 +2813,7 @@ a {
 .preferences-section__form-input::-moz-placeholder {
   font-weight: 500;
   font-style: normal;
-  font-size: 0.9375vw;
+  font-size: max(14px, 0.9375vw);
   line-height: 135%;
   letter-spacing: -0.5px;
   color: #000;
@@ -2781,7 +2821,7 @@ a {
 .preferences-section__form-input:-ms-input-placeholder {
   font-weight: 500;
   font-style: normal;
-  font-size: 0.9375vw;
+  font-size: max(14px, 0.9375vw);
   line-height: 135%;
   letter-spacing: -0.5px;
   color: #000;
@@ -2789,7 +2829,7 @@ a {
 .preferences-section__form-input::-ms-input-placeholder {
   font-weight: 500;
   font-style: normal;
-  font-size: 0.9375vw;
+  font-size: max(14px, 0.9375vw);
   line-height: 135%;
   letter-spacing: -0.5px;
   color: #000;
@@ -2797,7 +2837,7 @@ a {
 .preferences-section__form-input::placeholder {
   font-weight: 500;
   font-style: normal;
-  font-size: 0.9375vw;
+  font-size: max(14px, 0.9375vw);
   line-height: 135%;
   letter-spacing: -0.5px;
   color: #000;
@@ -2807,6 +2847,7 @@ a {
   -ms-flex-pack: center;
   justify-content: center;
   margin-bottom: 1.5625vw;
+  padding: max(20px, 1.9791666667vw) max(40px, 2.34375vw);
   width: 100%;
 }
 .preferences-section__form-checkbox {
@@ -2816,7 +2857,7 @@ a {
 .preferences-section__form-checkbox span {
   font-weight: 500;
   font-style: normal;
-  font-size: 0.7291666667vw;
+  font-size: 14px;
   line-height: 135%;
   letter-spacing: -0.5px;
   color: #fff;
@@ -2830,12 +2871,12 @@ a {
   }
 }
 .preferences-section__form .custom-checkbox__content {
-  padding-left: 1.875vw;
+  padding-left: 36px;
 }
 .preferences-section__form .custom-checkbox__content::before {
   border-radius: 5px;
-  width: 1.0416666667vw;
-  height: 1.0416666667vw;
+  width: 20px;
+  height: 20px;
   background: linear-gradient(68deg, #009345 25.59%, #00c15b 103.07%), #31b939;
 }
 .preferences-section__form .custom-checkbox__content::after {
@@ -2854,6 +2895,18 @@ a {
   -webkit-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
   transform: translateX(-50%);
+}
+@media (max-width: 576px) {
+  .preferences-section__person {
+    position: static;
+    display: block;
+    margin: 0 auto;
+    width: 255px;
+    height: auto;
+    -webkit-transform: translate(0);
+    -ms-transform: translate(0);
+    transform: translate(0);
+  }
 }
 
 .socials-section {

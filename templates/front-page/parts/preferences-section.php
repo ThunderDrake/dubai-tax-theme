@@ -14,7 +14,7 @@
 
       <div class="preferences-section__right">
         <div class="preferences-section__form-title">
-          Fill out the form and our specialist will<br>will contact you<br><span>within 15 minutes</span>
+          Fill out the form and our specialist will will contact you<br><span>within 15 minutes</span>
         </div>
         <form class="preferences-section__form" action="">
           <input class="preferences-section__form-input input-reset" type="text" placeholder="Your e-mail">
