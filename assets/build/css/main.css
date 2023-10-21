@@ -3368,6 +3368,9 @@ a {
     margin-bottom: 20px;
   }
 }
+.contacts-map .footer__address {
+  margin-bottom: 0;
+}
 
 .footer {
   color: #fff;
