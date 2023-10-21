@@ -861,6 +861,41 @@ a {
   }
 }
 
+.breadcrumbs__list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+@media (max-width: 576px) {
+  .breadcrumbs__list {
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+}
+.breadcrumbs__item:not(:last-child)::after {
+  content: "/";
+  display: inline-block;
+  margin-right: 4px;
+  font-weight: 400;
+  font-style: normal;
+  font-size: max(18px, 1.25vw);
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.breadcrumbs__link {
+  font-weight: 400;
+  font-style: normal;
+  font-size: max(18px, 1.25vw);
+  line-height: 140%;
+  letter-spacing: -0.5px;
+  color: #6b6b6b;
+}
+.breadcrumbs__link--current {
+  color: #1c1c1c;
+}
+
 .hero {
   position: relative;
   padding-top: calc(var(--header-height) + 2.6041666667vw);
@@ -3226,6 +3261,111 @@ a {
   }
   .news__link:hover::after {
     margin-left: 1.8229166667vw;
+  }
+}
+
+.inner-hero {
+  position: relative;
+  border-bottom-right-radius: 64px;
+  border-bottom-left-radius: 64px;
+  padding-top: calc(var(--header-height) + max(50px, 3.125vw));
+  padding-bottom: max(68px, 6.25vw);
+  background-image: url("../img/inner-hero-bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.inner-hero__title {
+  margin: 0;
+  font-weight: 600;
+  font-style: normal;
+  font-size: max(40px, 2.7083333333vw);
+  line-height: 130%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+@media (max-width: 576px) {
+  .inner-hero__title {
+    text-align: center;
+  }
+}
+
+.contacts-map__content {
+  position: relative;
+}
+.contacts-map__wrapper {
+  border-radius: 12px;
+  padding: max(25px, 2.6041666667vw);
+  background-color: #fff;
+}
+.contacts-map__title {
+  margin-bottom: max(14px, 1.3541666667vw);
+  font-weight: 600;
+  font-style: normal;
+  font-size: max(22px, 2.5vw);
+  line-height: 130%;
+  letter-spacing: -0.5px;
+  color: #1c1c1c;
+}
+.contacts-map__left {
+  position: absolute;
+  left: 0;
+  top: 5.2083333333vw;
+}
+@media (max-width: 576px) {
+  .contacts-map__left {
+    position: static;
+  }
+}
+.contacts-map__right {
+  position: absolute;
+  right: 0;
+  top: 5.2083333333vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+@media (max-width: 768px) {
+  .contacts-map__right {
+    display: none;
+  }
+}
+.contacts-map__map {
+  aspect-ratio: 16/9;
+}
+@media (max-width: 576px) {
+  .contacts-map__map {
+    height: 525px;
+  }
+}
+.contacts-map__image {
+  margin-bottom: 24px;
+  width: 10.15625vw;
+  height: 13.0208333333vw;
+}
+.contacts-map .footer__socials {
+  margin: 0 -8px;
+  margin-bottom: 26px;
+}
+@media (max-width: 576px) {
+  .contacts-map .footer__socials-link {
+    margin: 0 8px;
+  }
+}
+@media (max-width: 576px) {
+  .contacts-map .footer__socials {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+@media (max-width: 576px) {
+  .contacts-map .footer__socials-block {
+    margin-top: 22px;
+    margin-bottom: 20px;
   }
 }
 

@@ -7,6 +7,7 @@
 // подключения компонентов страницы
 @import "components/header";
 @import "components/header-menu";
+@import "components/breadcrumbs";
 @import "components/hero";
 @import "components/services";
 @import "components/advantages";
@@ -20,4 +21,6 @@
 @import "components/preferences";
 @import "components/socials-section";
 @import "components/news-section";
+@import "components/inner-hero";
+@import "components/contacts-map";
 @import "components/footer";

@@ -9,7 +9,7 @@
 function add_templates_to_dropdown( $templates ) {
 
 	// выбор шаблона в атрибутах
-	// $templates['templates/page-documents/page-documents.php'] = 'Шаблон страницы "Документация"';
+	$templates['templates/contacts-page/contacts-page.php'] = 'Шаблон страницы "Контакты"';
 
 	return $templates;
 }
