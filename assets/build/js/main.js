@@ -189,8 +189,21 @@ const newsSlider = new swiper__WEBPACK_IMPORTED_MODULE_0__["default"]('.news-sec
     nextEl: '.news-section__slider-button--next',
     prevEl: '.news-section__slider-button--prev'
   },
-  slidesPerView: 4,
-  spaceBetween: 30
+  breakpoints: {
+    320: {
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      loop: true
+    },
+    575: {
+      slidesPerView: 2,
+      spaceBetween: 30
+    },
+    769: {
+      slidesPerView: 4,
+      spaceBetween: 30
+    }
+  }
 });
 
 /***/ }),

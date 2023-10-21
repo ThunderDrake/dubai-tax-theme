@@ -6,7 +6,7 @@
     max-width: get-vw(1230px);
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(44px);
+    font-size: max(22px, get-vw(44px));
     line-height: 140%; /* 61.6px */
     letter-spacing: -0.5px;
     color: #6b6b6b;
@@ -20,12 +20,22 @@
       font-weight: 500;
       color: #1c1c1c;
     }
+
+    @include mobile {
+      margin-bottom: 23px;
+      max-width: none;
+    }
   }
 
   &__header {
     display: flex;
     align-items: center;
-    margin-bottom: get-vw(70px);
+    margin-bottom: max(23px, get-vw(70px));
+
+    @include mobile {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 
   &__slider {
@@ -35,8 +45,13 @@
       justify-content: center;
       border: 2px solid rgba(#6b6b6b, 0.2);
       border-radius: 50%;
-      width: get-vw(80px);
-      height: get-vw(80px);
+      width: max(55px, get-vw(80px));
+      height: max(55px, get-vw(80px));
+
+      svg {
+        width: max(21px, get-vw(29px));
+        height: 16px;
+      }
 
       &.swiper-button-disabled {
         border-color: #6b6b6b;
@@ -57,6 +72,12 @@
     &-controls {
       display: flex;
     }
+
+    &-slide {
+      @include mobile {
+        width: 260px;
+      }
+    }
   }
 }
 
@@ -67,29 +88,33 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    border-radius: get-vw(24px);
+    border-radius: max(12px, get-vw(24px));
     height: 100%;
     background: #f4f8fb;
   }
 
   &__image {
     display: block;
-    border-radius: get-vw(24px);
+    border-radius: max(12px, get-vw(24px));
 
     &-wrapper {
       position: relative;
+    }
+
+    @include mobile {
+      width: 100%;
     }
   }
 
   &__date {
     position: absolute;
-    right: get-vw(32px);
-    bottom: get-vw(18px);
-    border-radius: get-vw(64px);
-    padding: get-vw(7px) get-vw(14px);
+    right: max(15px, get-vw(32px));
+    bottom: max(15px, get-vw(18px));
+    border-radius: 64px;
+    padding: 7px 14px;
     font-weight: 500;
     font-style: normal;
-    font-size: get-vw(14px);
+    font-size: max(12px, get-vw(14px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #fff;
@@ -101,23 +126,27 @@
     flex-direction: column;
     padding: get-vw(25px);
     height: 100%;
+
+    @include mobile {
+      padding: 25px 18px;
+    }
   }
 
   &__title {
-    margin-bottom: get-vw(15px);
+    margin-bottom: 15px;
     font-weight: 500;
     font-style: normal;
-    font-size: get-vw(20px);
+    font-size: max(14px, get-vw(20px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #1c1c1c;
   }
 
   &__description {
-    margin-bottom: get-vw(40px);
+    margin-bottom: max(30px, get-vw(40px));
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(18px);
+    font-size: max(12px, get-vw(18px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #6b6b6b;
@@ -131,7 +160,7 @@
     margin-bottom: 0;
     font-weight: 400;
     font-style: normal;
-    font-size: get-vw(18px);
+    font-size: max(16px, get-vw(18px));
     line-height: 140%;
     letter-spacing: -0.5px;
     color: #009345;
