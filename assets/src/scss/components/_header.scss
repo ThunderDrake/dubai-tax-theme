@@ -180,8 +180,8 @@
 }
 
 .logo {
-  width: get-vw(110px);
-  height: get-vw(92px);
+  width: max(60px, get-vw(110px));
+  height: max(50px, get-vw(92px));
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #1c1c1c;
