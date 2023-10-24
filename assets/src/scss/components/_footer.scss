@@ -36,9 +36,31 @@
     }
   }
 
+  &__logo {
+    width: max(110px, get-vw(140px));
+  }
+
   .logo__container {
+    position: relative;
     margin-right: get-vw(85px);
     margin-bottom: auto;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: -30px;
+      top: 0;
+      width: get-vw(72px);
+      height: get-vw(72px);
+      background-image: url("../img/small-logo.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform: translateX(-100%);
+
+      @include tablet {
+        display: none;
+      }
+    }
 
     @include mobile {
       margin-right: 0;

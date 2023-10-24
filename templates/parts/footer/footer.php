@@ -18,8 +18,8 @@
   <div class="content-container footer__container">
     <div class="footer__col">
       <div class="logo__container">
-        <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/logo.svg" class="footer__logo logo" width="110"
-          height="92" alt="">
+        <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/logo--footer.svg" class="footer__logo logo" width="140"
+          height="97" alt="">
         <span class="logo__text">
           Legal and accounting services TAX~UAE
         </span>

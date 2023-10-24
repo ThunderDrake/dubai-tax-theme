@@ -306,3 +306,23 @@ a {
     color: #1c1c1c;
   }
 }
+
+.page {
+  &__container {
+    font-size: max(14px, get-vw(16px));
+
+    p {
+      margin: 0;
+      margin-bottom: 1em;
+    }
+
+    a {
+      text-decoration: none;
+      color: #00c15b;
+
+      @include hover {
+        color: #009345;
+      }
+    }
+  }
+}
