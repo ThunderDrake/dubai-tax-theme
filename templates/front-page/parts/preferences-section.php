@@ -1,4 +1,4 @@
-<section class="preferences-section">
+<section class="preferences-section" id="callback-section">
   <div class="preferences-section__container container">
     <div class="content-container">
       <div class="preferences-section__left">

@@ -10,7 +10,7 @@
 
       </div>
       <div class="hero__footer">
-        <button class="hero__button btn-reset btn--main">
+        <a class="hero__button btn-reset btn--main" href="#quiz">
           Calculate the cost of service
           <svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="none">
             <path d="M26.3582 12.7588L1.3584 12.7588L1.3584 15.4762L26.3582 15.4762L26.3582 12.7588Z" fill="white" />
@@ -18,7 +18,7 @@
               d="M21.5898 20.8462L19.6684 18.9247L24.4336 14.1594L19.6684 9.39414L21.5898 7.47266L28.2766 14.1594L21.5898 20.8462Z"
               fill="white" />
           </svg>
-        </button>
+        </a>
         <div class="hero__small-text">
           Get a free guide after calculating <span>“How to open your business in the UAE”</span></div>
       </div>

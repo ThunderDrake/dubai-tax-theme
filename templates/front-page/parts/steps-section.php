@@ -22,8 +22,8 @@
               <span class="step__number">1 step</span>
               <div class="step__text"><span>Free preliminary consultation</span> from our specialist immediately upon
                 application</div>
-              <button class="btn-reset step__button btn btn--main" data-graph-path="callback-modal">Get a
-                consultation</button>
+              <a class="btn-reset step__button btn btn--main" href="#callback-section">Get a
+                consultation</a>
             </div>
           </div>
           <div class="swiper-slide steps__slider-item">

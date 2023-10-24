@@ -35,7 +35,7 @@
             </div>
           </div>
 
-          <a class="header__link link-default" href="#">Calculate the cost</a>
+          <a class="header__link link-default" href="<?= get_home_url() ?>/#quiz">Calculate the cost</a>
 
           <div class="header__socials">
             <div class="header__socials-text">Ask a question, <br><span>we are online</span></div>
@@ -60,10 +60,6 @@
 
           <div class="header__contacts">
             <div class="header__top-text">We are working now, call</div>
-            <div class="header__phone">
-              <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/ru-flag.png" class="header__phone-flag" width="30" height="15" alt="">
-              <a class="header__phone-link" href="tel:+7 (995) 055 22-35">+7 (995) 055 22-35</a>
-            </div>
             <div class="header__phone">
               <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/dub-flag.png" class="header__phone-flag" width="30" height="15" alt="">
               <a class="header__phone-link" href="tel:+ 971 (58) 547-22-35">+ 971 (58) 547-22-35</a>

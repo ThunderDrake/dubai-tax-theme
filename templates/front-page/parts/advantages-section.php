@@ -38,7 +38,7 @@
               developed transport network and perfectly streamlined logistics chains.</div>
           </div>
         </div>
-        <a class="advantages__button btn--main" href="#callback">More benefits
+        <a class="advantages__button btn--main" href="#guide">More benefits
           <svg
             xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="none">
             <path d="M26.3582 12.7588L1.3584 12.7588L1.3584 15.4762L26.3582 15.4762L26.3582 12.7588Z" fill="white" />
@@ -55,7 +55,7 @@
           <div class="advantages__callback-info">
             <div class="advantages__callback-name">Roman Bykov</div>
             <div class="advantages__callback-role">CCO</div>
-            <button class="btn-reset advantages__callback-button btn--main" data-graph-path="callback-modal">Ask a question</button>
+            <a class="btn-reset advantages__callback-button btn--main" href="https://wa.me/+971585472235" target="_blank">Ask a question</a>
           </div>
         </div>
       </div>

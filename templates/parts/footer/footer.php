@@ -54,6 +54,7 @@
               fill="white" />
           </svg>
         </a>
+        <a class="footer__socials-email" href="mailto:info@taxu.ae">info@taxu.ae</a>
       </div>
     </div>
 
@@ -97,11 +98,6 @@
       <div class="footer__contacts">
         <div class="footer__top-text">We are working now, call</div>
         <div class="footer__phone">
-          <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/ru-flag.png" class="footer__phone-flag" width="30"
-            height="15" alt="">
-          <a class="footer__phone-link" href="tel:+7 (995) 055 22-35">+7 (995) 055 22-35</a>
-        </div>
-        <div class="footer__phone">
           <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/dub-flag.png" class="footer__phone-flag" width="30"
             height="15" alt="">
           <a class="footer__phone-link" href="tel:+ 971 (58) 547-22-35">+ 971 (58) 547-22-35</a>
@@ -139,11 +135,14 @@
       </div>
     </div>
 
-    <div class="footer__reserved">Все права защищены</div>
+    <div class="footer__reserved">All rights reserved</div>
 
-    <a class="footer__terms" href="#">Политика конфиденциальности</a>
+    <a class="footer__terms" href="#">Privacy Policy</a>
   </div>
 </footer>
+<div class="lang-switcher">
+<?php echo do_shortcode('[gtranslate]') ?>
+</div>
 <?php ct()->template('/parts/modals/modals-section.php') ?>
 <?php wp_footer() ?>
 </div>

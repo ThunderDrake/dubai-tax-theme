@@ -22,11 +22,11 @@ const validateForms = (selector, rules, url, nonce, action, afterSend) => {
     const telInput = intlTelInput(telSelector, {
       utilsScript: utils,
       separateDialCode: true,
-      hiddenInput: "full"
+      hiddenInput: "full",
+      initialCountry: 'ae'
     })
 
     function getCodeMask(selector) {
-      console.log(selector);
       let country = selector.getSelectedCountryData();
       let countryData = countryList.find(({ iso }) => iso === country.iso2.toUpperCase());
       let countryMask = countryData.mask

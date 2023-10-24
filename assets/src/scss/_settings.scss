@@ -291,3 +291,18 @@ a {
   border-radius: 0;
   width: 560px;
 }
+
+.lang-switcher {
+  position: fixed;
+  left: 2%;
+  bottom: 2%;
+  z-index: 10;
+  border-radius: 12px;
+  padding: 10px;
+  background-color: #fff;
+
+  .gt_container-eu2ewk a.glink span {
+    font-size: max(14px, get-vw(16px));
+    color: #1c1c1c;
+  }
+}

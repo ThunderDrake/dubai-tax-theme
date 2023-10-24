@@ -212,10 +212,10 @@ const validateForms = (selector, rules, url, nonce, action, afterSend) => {
     const telInput = intl_tel_input__WEBPACK_IMPORTED_MODULE_2___default()(telSelector, {
       utilsScript: _node_modules_intl_tel_input_build_js_utils__WEBPACK_IMPORTED_MODULE_3__,
       separateDialCode: true,
-      hiddenInput: "full"
+      hiddenInput: "full",
+      initialCountry: 'ae'
     });
     function getCodeMask(selector) {
-      console.log(selector);
       let country = selector.getSelectedCountryData();
       let countryData = countries_phone_masks__WEBPACK_IMPORTED_MODULE_4__.find(_ref => {
         let {

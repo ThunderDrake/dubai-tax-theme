@@ -368,6 +368,20 @@ a {
   width: 560px;
 }
 
+.lang-switcher {
+  position: fixed;
+  left: 2%;
+  bottom: 2%;
+  z-index: 10;
+  border-radius: 12px;
+  padding: 10px;
+  background-color: #fff;
+}
+.lang-switcher .gt_container-eu2ewk a.glink span {
+  font-size: max(14px, 0.8333333333vw);
+  color: #1c1c1c;
+}
+
 .header {
   position: absolute;
   left: 0;
@@ -3610,6 +3624,13 @@ a {
 .footer__socials-link {
   display: block;
   margin: 0 0.4166666667vw;
+}
+.footer__socials-email {
+  margin-left: max(20px, 1.8229166667vw);
+  font-weight: 600;
+  font-size: max(12px, 0.8333333333vw);
+  line-height: 140%;
+  color: #fff;
 }
 .footer__socials svg {
   width: max(30px, 1.8229166667vw);

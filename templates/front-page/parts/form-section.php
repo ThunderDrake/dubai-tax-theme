@@ -1,4 +1,4 @@
-<section class="form-section">
+<section class="form-section" id="guide">
   <div class="form-section__container container">
     <div class="content-container">
       <div class="form-section__wrapper">
