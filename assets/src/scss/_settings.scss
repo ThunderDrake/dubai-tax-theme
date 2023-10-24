@@ -282,3 +282,12 @@ a {
     transform: scale(1.2);
   }
 }
+
+.disable-scroll {
+  height: auto !important;
+}
+
+.graph-modal__container {
+  border-radius: 0;
+  width: 560px;
+}

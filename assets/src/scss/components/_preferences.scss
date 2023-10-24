@@ -147,6 +147,11 @@
       @include custom-checkbox;
     }
 
+    .iti {
+      margin-bottom: max(12px, get-vw(20px));
+      width: 100%;
+    }
+
     &-input {
       margin-bottom: max(12px, get-vw(20px));
       border-radius: 115px;

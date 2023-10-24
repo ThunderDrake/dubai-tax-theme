@@ -18,6 +18,15 @@ class Assets {
 		// Custom
 		$this->attach_style( '/custom/custom.css' );
 		$this->attach_script( '/custom/custom.js', [ 'jquery' ] );
+
+    wp_localize_script(
+      $this->get_handle( '/assets/build/js/main.js' ),
+      'form_object',
+      array(
+        'url'   => admin_url( 'admin-ajax.php' ),
+        'nonce' => wp_create_nonce( 'form-nonce' ),
+      )
+    );
 	}
 
 	private function attach_style( $path, $deps = [] ) {

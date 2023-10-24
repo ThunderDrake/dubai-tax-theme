@@ -1,15 +1,15 @@
 <?php
 
-namespace Axelot;
+namespace TaxUae;
 
 class Hide {
 
 	public function __construct() {
 		// Убирает notice для переключения обратно на Админа.
 		// Это можно сделать и в выпадающем меню профиля админбара.
-		if ( isset( $GLOBALS['user_switching'] ) ) {
-			remove_action( 'all_admin_notices', [ $GLOBALS['user_switching'], 'action_admin_notices' ], 1 );
-		}
+		// if ( isset( $GLOBALS['user_switching'] ) ) {
+		// 	remove_action( 'all_admin_notices', [ $GLOBALS['user_switching'], 'action_admin_notices' ], 1 );
+		// }
 
 		// Отключает все стандартные виджеты WordPress.
 		remove_action( 'init', 'wp_widgets_init', 1 );

@@ -3,9 +3,9 @@
     <div class="footer__form">
       <div class="footer__form-title">Didn't find the answer to your question?</div>
       <div class="footer__form-subtitle">Leave a request for a free preliminary consultation. We will answer all questions.</div>
-      <form class="footer__form-form" action="">
-        <input class="footer__form-input input-reset" type="text" placeholder="Your name">
-        <input class="footer__form-input input-reset" type="text" placeholder="Your e-mail">
+      <form class="footer__form-form" action="" data-form="footer-form">
+        <input class="footer__form-input input-reset footer__form-input--name" name="name" type="text" placeholder="Your name">
+        <input class="footer__form-input input-reset footer__form-input--tel" name="phone" data-phone-country type="tel">
         <button class="btn-reset footer__form-button btn--main">Next</button>
         <label class="custom-checkbox footer__form-checkbox">
           <input type="checkbox" class="custom-checkbox__field">
@@ -144,8 +144,9 @@
     <a class="footer__terms" href="#">Политика конфиденциальности</a>
   </div>
 </footer>
-</div>
+<?php ct()->template('/parts/modals/modals-section.php') ?>
 <?php wp_footer() ?>
+</div>
 </body>
 
 </html>

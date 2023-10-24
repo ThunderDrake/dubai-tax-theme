@@ -15,6 +15,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_burger_menu__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/burger-menu */ "./assets/src/js/components/burger-menu.js");
 /* harmony import */ var _components_steps_slider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/steps-slider */ "./assets/src/js/components/steps-slider.js");
 /* harmony import */ var _components_team_slider__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/team-slider */ "./assets/src/js/components/team-slider.js");
+/* harmony import */ var _components_form_validations__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/form-validations */ "./assets/src/js/components/form-validations.js");
+/* harmony import */ var _components_modals__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/modals */ "./assets/src/js/components/modals.js");
+
+
 
 
 
@@ -168,6 +172,205 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _functions_burger__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../functions/burger */ "./assets/src/js/functions/burger.js");
 
+
+/***/ }),
+
+/***/ "./assets/src/js/components/form-validations.js":
+/*!******************************************************!*\
+  !*** ./assets/src/js/components/form-validations.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var just_validate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! just-validate */ "./node_modules/just-validate/dist/just-validate.es.js");
+/* harmony import */ var inputmask__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! inputmask */ "./node_modules/inputmask/dist/inputmask.js");
+/* harmony import */ var inputmask__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(inputmask__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var intl_tel_input__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! intl-tel-input */ "./node_modules/intl-tel-input/index.js");
+/* harmony import */ var intl_tel_input__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(intl_tel_input__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_intl_tel_input_build_js_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/intl-tel-input/build/js/utils */ "./node_modules/intl-tel-input/build/js/utils.js");
+/* harmony import */ var _node_modules_intl_tel_input_build_js_utils__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_intl_tel_input_build_js_utils__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var countries_phone_masks__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! countries-phone-masks */ "./node_modules/countries-phone-masks/src/index.js");
+/* harmony import */ var countries_phone_masks__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(countries_phone_masks__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+const validateForms = (selector, rules, url, nonce, action, afterSend) => {
+  const form = document?.querySelector(selector);
+  const telSelector = form?.querySelector('input[type="tel"]');
+  if (!form) {
+    console.error('Нет такого селектора!');
+    return false;
+  }
+  if (!rules) {
+    console.error('Вы не передали правила валидации!');
+    return false;
+  }
+  if (telSelector) {
+    const telInput = intl_tel_input__WEBPACK_IMPORTED_MODULE_2___default()(telSelector, {
+      utilsScript: _node_modules_intl_tel_input_build_js_utils__WEBPACK_IMPORTED_MODULE_3__,
+      separateDialCode: true,
+      hiddenInput: "full"
+    });
+    function getCodeMask(selector) {
+      console.log(selector);
+      let country = selector.getSelectedCountryData();
+      let countryData = countries_phone_masks__WEBPACK_IMPORTED_MODULE_4__.find(_ref => {
+        let {
+          iso
+        } = _ref;
+        return iso === country.iso2.toUpperCase();
+      });
+      let countryMask = countryData.mask;
+      let maskValue;
+      if (Array.isArray(countryMask)) {
+        maskValue = countryMask[0];
+      } else {
+        maskValue = countryMask;
+      }
+      const inputMask = new (inputmask__WEBPACK_IMPORTED_MODULE_1___default())(maskValue.replace(/#/g, '9').toString());
+      inputMask.mask(telSelector);
+    }
+    getCodeMask(telInput);
+    telSelector.addEventListener("countrychange", function (e) {
+      getCodeMask(telInput);
+    });
+    for (let item of rules) {
+      if (item.tel) {
+        item.rules.push({
+          rule: 'function',
+          validator: function () {
+            const phone = telSelector.inputmask.unmaskedvalue();
+            return phone;
+          },
+          errorMessage: item.telError
+        });
+      }
+    }
+  }
+  const validation = new just_validate__WEBPACK_IMPORTED_MODULE_0__["default"](selector);
+  for (let item of rules) {
+    validation.addField(item.ruleSelector, item.rules);
+  }
+  validation.onSuccess(ev => {
+    let formData = new FormData(ev.target);
+    formData.append('action', action);
+    formData.append('nonce', nonce);
+    let xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          if (afterSend) {
+            // form.querySelector('.form__button').insertAdjacentHTML('afterend', `<p class="form-success">Спасибо за заявку! Мы скоро с вами свяжемся</p>`)
+          }
+          console.log('Отправлено');
+        } else {
+          // form.querySelector('.form__button').insertAdjacentHTML('afterend', `<p class="just-validate-error-label">Что-то пошло не так!</p>`)
+          console.log('Ошибка');
+        }
+      }
+    };
+    xhr.open('POST', url, true);
+    xhr.send(formData);
+    ev.target.reset();
+  });
+};
+const footerFormRules = [{
+  ruleSelector: '.footer__form-input--name',
+  rules: [{
+    rule: 'minLength',
+    value: 3
+  }, {
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните имя!'
+  }]
+}, {
+  ruleSelector: '.footer__form-input--tel',
+  tel: true,
+  telError: 'Введите корректный телефон',
+  rules: [{
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните телефон!'
+  }]
+}];
+const sectionFormRules = [{
+  ruleSelector: '.preferences-section__form-input--name',
+  rules: [{
+    rule: 'minLength',
+    value: 3
+  }, {
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните имя!'
+  }]
+}, {
+  ruleSelector: '.preferences-section__form-input--tel',
+  tel: true,
+  telError: 'Введите корректный телефон',
+  rules: [{
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните телефон!'
+  }]
+}];
+const serviceFormRules = [{
+  ruleSelector: '.service-modal__form-input--name',
+  rules: [{
+    rule: 'minLength',
+    value: 3
+  }, {
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните имя!'
+  }]
+}, {
+  ruleSelector: '.service-modal__form-input--tel',
+  tel: true,
+  telError: 'Введите корректный телефон',
+  rules: [{
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните телефон!'
+  }]
+}];
+const guideFormRules = [{
+  ruleSelector: '.form-section__form-input--mail',
+  rules: [{
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните email!'
+  }]
+}, {
+  ruleSelector: '.form-section__form-checkbox .custom-checkbox__field',
+  rules: [{
+    rule: 'required',
+    value: true,
+    errorMessage: 'Согласитесь на обработку!'
+  }]
+}];
+validateForms('[data-form="footer-form"]', footerFormRules, form_object.url, form_object.nonce, 'form_action');
+validateForms('[data-form="section-form"]', sectionFormRules, form_object.url, form_object.nonce, 'form_action');
+validateForms('[data-form="legal-form"]', serviceFormRules, form_object.url, form_object.nonce, 'form_action');
+validateForms('[data-form="accounting-form"]', serviceFormRules, form_object.url, form_object.nonce, 'form_action');
+validateForms('[data-form="guide-form"]', guideFormRules, form_object.url, form_object.nonce, 'form_action');
+
+/***/ }),
+
+/***/ "./assets/src/js/components/modals.js":
+/*!********************************************!*\
+  !*** ./assets/src/js/components/modals.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var graph_modal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! graph-modal */ "./node_modules/graph-modal/src/graph-modal.js");
+
+const modal = new graph_modal__WEBPACK_IMPORTED_MODULE_0__["default"]();
 
 /***/ }),
 
@@ -784,6 +987,7083 @@ if (typeof document !== 'undefined') {
   // coordination is required to use the polyfill in the top-level document:
   applyFocusVisiblePolyfill(document);
 }
+
+/***/ }),
+
+/***/ "./node_modules/countries-phone-masks/src/index.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/countries-phone-masks/src/index.js ***!
+  \*********************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const countries = __webpack_require__(/*! ./countries.json */ "./node_modules/countries-phone-masks/src/countries.json")
+
+module.exports = countries
+
+
+/***/ }),
+
+/***/ "./node_modules/graph-modal/src/graph-modal.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/graph-modal/src/graph-modal.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ GraphModal)
+/* harmony export */ });
+class GraphModal {
+  constructor(options) {
+    let defaultOptions = {
+      isOpen: () => {},
+      isClose: () => {},
+    }
+    this.options = Object.assign(defaultOptions, options);
+    this.modal = document.querySelector('.graph-modal');
+    this.speed = 300;
+    this.animation = 'fade';
+    this._reOpen = false;
+    this._nextContainer = false;
+    this.modalContainer = false;
+    this.isOpen = false;
+    this.previousActiveElement = false;
+    this._focusElements = [
+      'a[href]',
+      'input',
+      'select',
+      'textarea',
+      'button',
+      'iframe',
+      '[contenteditable]',
+      '[tabindex]:not([tabindex^="-"])'
+    ];
+    this._fixBlocks = document.querySelectorAll('.fix-block');
+    this.events();
+  }
+
+  events() {
+    if (this.modal) {
+      document.addEventListener('click', function (e) {
+        const clickedElement = e.target.closest(`[data-graph-path]`);
+        if (clickedElement) {
+          let target = clickedElement.dataset.graphPath;
+          let animation = clickedElement.dataset.graphAnimation;
+          let speed = clickedElement.dataset.graphSpeed;
+          this.animation = animation ? animation : 'fade';
+          this.speed = speed ? parseInt(speed) : 300;
+          this._nextContainer = document.querySelector(`[data-graph-target="${target}"]`);
+          this.open();
+          return;
+        }
+
+        if (e.target.closest('.js-modal-close')) {
+          this.close();
+          return;
+        }
+      }.bind(this));
+
+      window.addEventListener('keydown', function (e) {
+        if (e.keyCode == 27 && this.isOpen) {
+          this.close();
+        }
+
+        if (e.which == 9 && this.isOpen) {
+          this.focusCatch(e);
+          return;
+        }
+      }.bind(this));
+
+      document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('graph-modal') && e.target.classList.contains("is-open")) {
+          this.close();
+        }
+      }.bind(this));
+    }
+
+  }
+
+  open(selector) {
+    this.previousActiveElement = document.activeElement;
+
+    if (this.isOpen) {
+      this.reOpen = true;
+      this.close();
+      return;
+    }
+
+    this.modalContainer = this._nextContainer;
+
+    if (selector) {
+      this.modalContainer = document.querySelector(`[data-graph-target="${selector}"]`);
+    }
+
+    this.modalContainer.scrollTo(0, 0)
+
+    this.modal.style.setProperty('--transition-time', `${this.speed / 1000}s`);
+    this.modal.classList.add('is-open');
+
+    document.body.style.scrollBehavior = 'auto';
+    document.documentElement.style.scrollBehavior = 'auto';
+
+    this.disableScroll();
+
+    this.modalContainer.classList.add('graph-modal-open');
+    this.modalContainer.classList.add(this.animation);
+
+    setTimeout(() => {
+      this.options.isOpen(this);
+      this.modalContainer.classList.add('animate-open');
+      this.isOpen = true;
+      this.focusTrap();
+    }, this.speed);
+  }
+
+  close() {
+    if (this.modalContainer) {
+      this.modalContainer.classList.remove('animate-open');
+      this.modalContainer.classList.remove(this.animation);
+      this.modal.classList.remove('is-open');
+      this.modalContainer.classList.remove('graph-modal-open');
+
+      this.enableScroll();
+
+      document.body.style.scrollBehavior = 'auto';
+      document.documentElement.style.scrollBehavior = 'auto';
+
+      this.options.isClose(this);
+      this.isOpen = false;
+      this.focusTrap();
+
+      if (this.reOpen) {
+        this.reOpen = false;
+        this.open();
+      }
+    }
+  }
+
+  focusCatch(e) {
+    const nodes = this.modalContainer.querySelectorAll(this._focusElements);
+    const nodesArray = Array.prototype.slice.call(nodes);
+    const focusedItemIndex = nodesArray.indexOf(document.activeElement)
+    if (e.shiftKey && focusedItemIndex === 0) {
+      nodesArray[nodesArray.length - 1].focus();
+      e.preventDefault();
+    }
+    if (!e.shiftKey && focusedItemIndex === nodesArray.length - 1) {
+      nodesArray[0].focus();
+      e.preventDefault();
+    }
+  }
+
+  focusTrap() {
+    const nodes = this.modalContainer.querySelectorAll(this._focusElements);
+    if (this.isOpen) {
+      if (nodes.length) nodes[0].focus();
+    } else {
+      this.previousActiveElement.focus();
+    }
+  }
+
+  disableScroll() {
+    let pagePosition = window.scrollY;
+    this.lockPadding();
+    document.body.classList.add('disable-scroll');
+    document.body.dataset.position = pagePosition;
+    document.body.style.top = -pagePosition + 'px';
+  }
+
+  enableScroll() {
+    let pagePosition = parseInt(document.body.dataset.position, 10);
+    this.unlockPadding();
+    document.body.style.top = 'auto';
+    document.body.classList.remove('disable-scroll');
+    window.scrollTo({
+      top: pagePosition,
+      left: 0
+    });
+    document.body.removeAttribute('data-position');
+  }
+
+  lockPadding() {
+    let paddingOffset = window.innerWidth - document.body.offsetWidth + 'px';
+    this._fixBlocks.forEach((el) => {
+      el.style.paddingRight = paddingOffset;
+    });
+    document.body.style.paddingRight = paddingOffset;
+  }
+
+  unlockPadding() {
+    this._fixBlocks.forEach((el) => {
+      el.style.paddingRight = '0px';
+    });
+    document.body.style.paddingRight = '0px';
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/inputmask/dist/inputmask.js":
+/*!**************************************************!*\
+  !*** ./node_modules/inputmask/dist/inputmask.js ***!
+  \**************************************************/
+/***/ (function(module) {
+
+/*!
+ * dist/inputmask
+ * https://github.com/RobinHerbots/Inputmask
+ * Copyright (c) 2010 - 2023 Robin Herbots
+ * Licensed under the MIT license
+ * Version: 5.0.8
+ */
+!function(e, t) {
+    if (true) module.exports = t(); else { var n, i; }
+}("undefined" != typeof self ? self : this, (function() {
+    return function() {
+        "use strict";
+        var e = {
+            8741: function(e, t) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = void 0;
+                var i = !("undefined" == typeof window || !window.document || !window.document.createElement);
+                t.default = i;
+            },
+            3976: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = void 0;
+                var n = i(2839), a = {
+                    _maxTestPos: 500,
+                    placeholder: "_",
+                    optionalmarker: [ "[", "]" ],
+                    quantifiermarker: [ "{", "}" ],
+                    groupmarker: [ "(", ")" ],
+                    alternatormarker: "|",
+                    escapeChar: "\\",
+                    mask: null,
+                    regex: null,
+                    oncomplete: function() {},
+                    onincomplete: function() {},
+                    oncleared: function() {},
+                    repeat: 0,
+                    greedy: !1,
+                    autoUnmask: !1,
+                    removeMaskOnSubmit: !1,
+                    clearMaskOnLostFocus: !0,
+                    insertMode: !0,
+                    insertModeVisual: !0,
+                    clearIncomplete: !1,
+                    alias: null,
+                    onKeyDown: function() {},
+                    onBeforeMask: null,
+                    onBeforePaste: function(e, t) {
+                        return "function" == typeof t.onBeforeMask ? t.onBeforeMask.call(this, e, t) : e;
+                    },
+                    onBeforeWrite: null,
+                    onUnMask: null,
+                    showMaskOnFocus: !0,
+                    showMaskOnHover: !0,
+                    onKeyValidation: function() {},
+                    skipOptionalPartCharacter: " ",
+                    numericInput: !1,
+                    rightAlign: !1,
+                    undoOnEscape: !0,
+                    radixPoint: "",
+                    _radixDance: !1,
+                    groupSeparator: "",
+                    keepStatic: null,
+                    positionCaretOnTab: !0,
+                    tabThrough: !1,
+                    supportsInputType: [ "text", "tel", "url", "password", "search" ],
+                    ignorables: [ n.keys.Backspace, n.keys.Tab, n.keys.Pause, n.keys.Escape, n.keys.PageUp, n.keys.PageDown, n.keys.End, n.keys.Home, n.keys.ArrowLeft, n.keys.ArrowUp, n.keys.ArrowRight, n.keys.ArrowDown, n.keys.Insert, n.keys.Delete, n.keys.ContextMenu, n.keys.F1, n.keys.F2, n.keys.F3, n.keys.F4, n.keys.F5, n.keys.F6, n.keys.F7, n.keys.F8, n.keys.F9, n.keys.F10, n.keys.F11, n.keys.F12, n.keys.Process, n.keys.Unidentified, n.keys.Shift, n.keys.Control, n.keys.Alt, n.keys.Tab, n.keys.AltGraph, n.keys.CapsLock ],
+                    isComplete: null,
+                    preValidation: null,
+                    postValidation: null,
+                    staticDefinitionSymbol: void 0,
+                    jitMasking: !1,
+                    nullable: !0,
+                    inputEventOnly: !1,
+                    noValuePatching: !1,
+                    positionCaretOnClick: "lvp",
+                    casing: null,
+                    inputmode: "text",
+                    importDataAttributes: !0,
+                    shiftPositions: !0,
+                    usePrototypeDefinitions: !0,
+                    validationEventTimeOut: 3e3,
+                    substitutes: {}
+                };
+                t.default = a;
+            },
+            7392: function(e, t) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = void 0;
+                t.default = {
+                    9: {
+                        validator: "[0-9\uff10-\uff19]",
+                        definitionSymbol: "*"
+                    },
+                    a: {
+                        validator: "[A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]",
+                        definitionSymbol: "*"
+                    },
+                    "*": {
+                        validator: "[0-9\uff10-\uff19A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]"
+                    }
+                };
+            },
+            253: function(e, t) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = function(e, t, i) {
+                    if (void 0 === i) return e.__data ? e.__data[t] : null;
+                    e.__data = e.__data || {}, e.__data[t] = i;
+                };
+            },
+            3776: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.Event = void 0, t.off = function(e, t) {
+                    var i, n;
+                    f(this[0]) && e && (i = this[0].eventRegistry, n = this[0], e.split(" ").forEach((function(e) {
+                        var a = l(e.split("."), 2);
+                        (function(e, n) {
+                            var a, r, o = [];
+                            if (e.length > 0) if (void 0 === t) for (a = 0, r = i[e][n].length; a < r; a++) o.push({
+                                ev: e,
+                                namespace: n && n.length > 0 ? n : "global",
+                                handler: i[e][n][a]
+                            }); else o.push({
+                                ev: e,
+                                namespace: n && n.length > 0 ? n : "global",
+                                handler: t
+                            }); else if (n.length > 0) for (var s in i) for (var l in i[s]) if (l === n) if (void 0 === t) for (a = 0, 
+                            r = i[s][l].length; a < r; a++) o.push({
+                                ev: s,
+                                namespace: l,
+                                handler: i[s][l][a]
+                            }); else o.push({
+                                ev: s,
+                                namespace: l,
+                                handler: t
+                            });
+                            return o;
+                        })(a[0], a[1]).forEach((function(e) {
+                            var t = e.ev, a = e.handler;
+                            !function(e, t, a) {
+                                if (e in i == 1) if (n.removeEventListener ? n.removeEventListener(e, a, !1) : n.detachEvent && n.detachEvent("on".concat(e), a), 
+                                "global" === t) for (var r in i[e]) i[e][r].splice(i[e][r].indexOf(a), 1); else i[e][t].splice(i[e][t].indexOf(a), 1);
+                            }(t, e.namespace, a);
+                        }));
+                    })));
+                    return this;
+                }, t.on = function(e, t) {
+                    if (f(this[0])) {
+                        var i = this[0].eventRegistry, n = this[0];
+                        e.split(" ").forEach((function(e) {
+                            var a = l(e.split("."), 2), r = a[0], o = a[1];
+                            !function(e, a) {
+                                n.addEventListener ? n.addEventListener(e, t, !1) : n.attachEvent && n.attachEvent("on".concat(e), t), 
+                                i[e] = i[e] || {}, i[e][a] = i[e][a] || [], i[e][a].push(t);
+                            }(r, void 0 === o ? "global" : o);
+                        }));
+                    }
+                    return this;
+                }, t.trigger = function(e) {
+                    var t = arguments;
+                    if (f(this[0])) for (var i = this[0].eventRegistry, n = this[0], r = "string" == typeof e ? e.split(" ") : [ e.type ], s = 0; s < r.length; s++) {
+                        var l = r[s].split("."), c = l[0], u = l[1] || "global";
+                        if (void 0 !== document && "global" === u) {
+                            var d, p = {
+                                bubbles: !0,
+                                cancelable: !0,
+                                composed: !0,
+                                detail: arguments[1]
+                            };
+                            if (document.createEvent) {
+                                try {
+                                    if ("input" === c) p.inputType = "insertText", d = new InputEvent(c, p); else d = new CustomEvent(c, p);
+                                } catch (e) {
+                                    (d = document.createEvent("CustomEvent")).initCustomEvent(c, p.bubbles, p.cancelable, p.detail);
+                                }
+                                e.type && (0, a.default)(d, e), n.dispatchEvent(d);
+                            } else (d = document.createEventObject()).eventType = c, d.detail = arguments[1], 
+                            e.type && (0, a.default)(d, e), n.fireEvent("on" + d.eventType, d);
+                        } else if (void 0 !== i[c]) {
+                            arguments[0] = arguments[0].type ? arguments[0] : o.default.Event(arguments[0]), 
+                            arguments[0].detail = arguments.slice(1);
+                            var h = i[c];
+                            ("global" === u ? Object.values(h).flat() : h[u]).forEach((function(e) {
+                                return e.apply(n, t);
+                            }));
+                        }
+                    }
+                    return this;
+                };
+                var n, a = u(i(600)), r = u(i(9380)), o = u(i(4963)), s = u(i(8741));
+                function l(e, t) {
+                    return function(e) {
+                        if (Array.isArray(e)) return e;
+                    }(e) || function(e, t) {
+                        var i = null == e ? null : "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
+                        if (null != i) {
+                            var n, a, r, o, s = [], l = !0, c = !1;
+                            try {
+                                if (r = (i = i.call(e)).next, 0 === t) {
+                                    if (Object(i) !== i) return;
+                                    l = !1;
+                                } else for (;!(l = (n = r.call(i)).done) && (s.push(n.value), s.length !== t); l = !0) ;
+                            } catch (e) {
+                                c = !0, a = e;
+                            } finally {
+                                try {
+                                    if (!l && null != i.return && (o = i.return(), Object(o) !== o)) return;
+                                } finally {
+                                    if (c) throw a;
+                                }
+                            }
+                            return s;
+                        }
+                    }(e, t) || function(e, t) {
+                        if (!e) return;
+                        if ("string" == typeof e) return c(e, t);
+                        var i = Object.prototype.toString.call(e).slice(8, -1);
+                        "Object" === i && e.constructor && (i = e.constructor.name);
+                        if ("Map" === i || "Set" === i) return Array.from(e);
+                        if ("Arguments" === i || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(i)) return c(e, t);
+                    }(e, t) || function() {
+                        throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+                    }();
+                }
+                function c(e, t) {
+                    (null == t || t > e.length) && (t = e.length);
+                    for (var i = 0, n = new Array(t); i < t; i++) n[i] = e[i];
+                    return n;
+                }
+                function u(e) {
+                    return e && e.__esModule ? e : {
+                        default: e
+                    };
+                }
+                function f(e) {
+                    return e instanceof Element;
+                }
+                t.Event = n, "function" == typeof r.default.CustomEvent ? t.Event = n = r.default.CustomEvent : s.default && (t.Event = n = function(e, t) {
+                    t = t || {
+                        bubbles: !1,
+                        cancelable: !1,
+                        composed: !0,
+                        detail: void 0
+                    };
+                    var i = document.createEvent("CustomEvent");
+                    return i.initCustomEvent(e, t.bubbles, t.cancelable, t.detail), i;
+                }, n.prototype = r.default.Event.prototype);
+            },
+            600: function(e, t) {
+                function i(e) {
+                    return i = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(e) {
+                        return typeof e;
+                    } : function(e) {
+                        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+                    }, i(e);
+                }
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = function e() {
+                    var t, n, a, r, o, s, l = arguments[0] || {}, c = 1, u = arguments.length, f = !1;
+                    "boolean" == typeof l && (f = l, l = arguments[c] || {}, c++);
+                    "object" !== i(l) && "function" != typeof l && (l = {});
+                    for (;c < u; c++) if (null != (t = arguments[c])) for (n in t) a = l[n], l !== (r = t[n]) && (f && r && ("[object Object]" === Object.prototype.toString.call(r) || (o = Array.isArray(r))) ? (o ? (o = !1, 
+                    s = a && Array.isArray(a) ? a : []) : s = a && "[object Object]" === Object.prototype.toString.call(a) ? a : {}, 
+                    l[n] = e(f, s, r)) : void 0 !== r && (l[n] = r));
+                    return l;
+                };
+            },
+            4963: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = void 0;
+                var n = s(i(600)), a = s(i(9380)), r = s(i(253)), o = i(3776);
+                function s(e) {
+                    return e && e.__esModule ? e : {
+                        default: e
+                    };
+                }
+                var l = a.default.document;
+                function c(e) {
+                    return e instanceof c ? e : this instanceof c ? void (null != e && e !== a.default && (this[0] = e.nodeName ? e : void 0 !== e[0] && e[0].nodeName ? e[0] : l.querySelector(e), 
+                    void 0 !== this[0] && null !== this[0] && (this[0].eventRegistry = this[0].eventRegistry || {}))) : new c(e);
+                }
+                c.prototype = {
+                    on: o.on,
+                    off: o.off,
+                    trigger: o.trigger
+                }, c.extend = n.default, c.data = r.default, c.Event = o.Event;
+                var u = c;
+                t.default = u;
+            },
+            9845: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.mobile = t.iphone = t.ie = void 0;
+                var n, a = (n = i(9380)) && n.__esModule ? n : {
+                    default: n
+                };
+                var r = a.default.navigator && a.default.navigator.userAgent || "", o = r.indexOf("MSIE ") > 0 || r.indexOf("Trident/") > 0, s = navigator.userAgentData && navigator.userAgentData.mobile || a.default.navigator && a.default.navigator.maxTouchPoints || "ontouchstart" in a.default, l = /iphone/i.test(r);
+                t.iphone = l, t.mobile = s, t.ie = o;
+            },
+            7184: function(e, t) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = function(e) {
+                    return e.replace(i, "\\$1");
+                };
+                var i = new RegExp("(\\" + [ "/", ".", "*", "+", "?", "|", "(", ")", "[", "]", "{", "}", "\\", "$", "^" ].join("|\\") + ")", "gim");
+            },
+            6030: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.EventHandlers = void 0;
+                var n = i(8711), a = i(2839), r = i(9845), o = i(7215), s = i(7760), l = i(4713);
+                function c(e, t) {
+                    var i = "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
+                    if (!i) {
+                        if (Array.isArray(e) || (i = function(e, t) {
+                            if (!e) return;
+                            if ("string" == typeof e) return u(e, t);
+                            var i = Object.prototype.toString.call(e).slice(8, -1);
+                            "Object" === i && e.constructor && (i = e.constructor.name);
+                            if ("Map" === i || "Set" === i) return Array.from(e);
+                            if ("Arguments" === i || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(i)) return u(e, t);
+                        }(e)) || t && e && "number" == typeof e.length) {
+                            i && (e = i);
+                            var n = 0, a = function() {};
+                            return {
+                                s: a,
+                                n: function() {
+                                    return n >= e.length ? {
+                                        done: !0
+                                    } : {
+                                        done: !1,
+                                        value: e[n++]
+                                    };
+                                },
+                                e: function(e) {
+                                    throw e;
+                                },
+                                f: a
+                            };
+                        }
+                        throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+                    }
+                    var r, o = !0, s = !1;
+                    return {
+                        s: function() {
+                            i = i.call(e);
+                        },
+                        n: function() {
+                            var e = i.next();
+                            return o = e.done, e;
+                        },
+                        e: function(e) {
+                            s = !0, r = e;
+                        },
+                        f: function() {
+                            try {
+                                o || null == i.return || i.return();
+                            } finally {
+                                if (s) throw r;
+                            }
+                        }
+                    };
+                }
+                function u(e, t) {
+                    (null == t || t > e.length) && (t = e.length);
+                    for (var i = 0, n = new Array(t); i < t; i++) n[i] = e[i];
+                    return n;
+                }
+                var f = {
+                    keyEvent: function(e, t, i, c, u) {
+                        var d = this.inputmask, p = d.opts, h = d.dependencyLib, v = d.maskset, m = this, g = h(m), y = e.key, k = n.caret.call(d, m), b = p.onKeyDown.call(this, e, n.getBuffer.call(d), k, p);
+                        if (void 0 !== b) return b;
+                        if (y === a.keys.Backspace || y === a.keys.Delete || r.iphone && y === a.keys.BACKSPACE_SAFARI || e.ctrlKey && y === a.keys.x && !("oncut" in m)) e.preventDefault(), 
+                        o.handleRemove.call(d, m, y, k), (0, s.writeBuffer)(m, n.getBuffer.call(d, !0), v.p, e, m.inputmask._valueGet() !== n.getBuffer.call(d).join("")); else if (y === a.keys.End || y === a.keys.PageDown) {
+                            e.preventDefault();
+                            var x = n.seekNext.call(d, n.getLastValidPosition.call(d));
+                            n.caret.call(d, m, e.shiftKey ? k.begin : x, x, !0);
+                        } else y === a.keys.Home && !e.shiftKey || y === a.keys.PageUp ? (e.preventDefault(), 
+                        n.caret.call(d, m, 0, e.shiftKey ? k.begin : 0, !0)) : p.undoOnEscape && y === a.keys.Escape && !0 !== e.altKey ? ((0, 
+                        s.checkVal)(m, !0, !1, d.undoValue.split("")), g.trigger("click")) : y !== a.keys.Insert || e.shiftKey || e.ctrlKey || void 0 !== d.userOptions.insertMode ? !0 === p.tabThrough && y === a.keys.Tab ? !0 === e.shiftKey ? (k.end = n.seekPrevious.call(d, k.end, !0), 
+                        !0 === l.getTest.call(d, k.end - 1).match.static && k.end--, k.begin = n.seekPrevious.call(d, k.end, !0), 
+                        k.begin >= 0 && k.end > 0 && (e.preventDefault(), n.caret.call(d, m, k.begin, k.end))) : (k.begin = n.seekNext.call(d, k.begin, !0), 
+                        k.end = n.seekNext.call(d, k.begin, !0), k.end < v.maskLength && k.end--, k.begin <= v.maskLength && (e.preventDefault(), 
+                        n.caret.call(d, m, k.begin, k.end))) : e.shiftKey || p.insertModeVisual && !1 === p.insertMode && (y === a.keys.ArrowRight ? setTimeout((function() {
+                            var e = n.caret.call(d, m);
+                            n.caret.call(d, m, e.begin);
+                        }), 0) : y === a.keys.ArrowLeft && setTimeout((function() {
+                            var e = n.translatePosition.call(d, m.inputmask.caretPos.begin);
+                            n.translatePosition.call(d, m.inputmask.caretPos.end);
+                            d.isRTL ? n.caret.call(d, m, e + (e === v.maskLength ? 0 : 1)) : n.caret.call(d, m, e - (0 === e ? 0 : 1));
+                        }), 0)) : o.isSelection.call(d, k) ? p.insertMode = !p.insertMode : (p.insertMode = !p.insertMode, 
+                        n.caret.call(d, m, k.begin, k.begin));
+                        return d.isComposing = y == a.keys.Process || y == a.keys.Unidentified, d.ignorable = p.ignorables.includes(y), 
+                        f.keypressEvent.call(this, e, t, i, c, u);
+                    },
+                    keypressEvent: function(e, t, i, r, l) {
+                        var c = this.inputmask || this, u = c.opts, f = c.dependencyLib, d = c.maskset, p = c.el, h = f(p), v = e.key;
+                        if (!0 === t || e.ctrlKey && e.altKey || !(e.ctrlKey || e.metaKey || c.ignorable)) {
+                            if (v) {
+                                var m, g = t ? {
+                                    begin: l,
+                                    end: l
+                                } : n.caret.call(c, p);
+                                v = u.substitutes[v] || v, d.writeOutBuffer = !0;
+                                var y = o.isValid.call(c, g, v, r, void 0, void 0, void 0, t);
+                                if (!1 !== y && (n.resetMaskSet.call(c, !0), m = void 0 !== y.caret ? y.caret : n.seekNext.call(c, y.pos.begin ? y.pos.begin : y.pos), 
+                                d.p = m), m = u.numericInput && void 0 === y.caret ? n.seekPrevious.call(c, m) : m, 
+                                !1 !== i && (setTimeout((function() {
+                                    u.onKeyValidation.call(p, v, y);
+                                }), 0), d.writeOutBuffer && !1 !== y)) {
+                                    var k = n.getBuffer.call(c);
+                                    (0, s.writeBuffer)(p, k, m, e, !0 !== t);
+                                }
+                                if (e.preventDefault(), t) return !1 !== y && (y.forwardPosition = m), y;
+                            }
+                        } else v === a.keys.Enter && c.undoValue !== c._valueGet(!0) && (c.undoValue = c._valueGet(!0), 
+                        setTimeout((function() {
+                            h.trigger("change");
+                        }), 0));
+                    },
+                    pasteEvent: function(e) {
+                        var t, i = this.inputmask, a = i.opts, r = i._valueGet(!0), o = n.caret.call(i, this);
+                        i.isRTL && (t = o.end, o.end = n.translatePosition.call(i, o.begin), o.begin = n.translatePosition.call(i, t));
+                        var l = r.substr(0, o.begin), u = r.substr(o.end, r.length);
+                        if (l == (i.isRTL ? n.getBufferTemplate.call(i).slice().reverse() : n.getBufferTemplate.call(i)).slice(0, o.begin).join("") && (l = ""), 
+                        u == (i.isRTL ? n.getBufferTemplate.call(i).slice().reverse() : n.getBufferTemplate.call(i)).slice(o.end).join("") && (u = ""), 
+                        window.clipboardData && window.clipboardData.getData) r = l + window.clipboardData.getData("Text") + u; else {
+                            if (!e.clipboardData || !e.clipboardData.getData) return !0;
+                            r = l + e.clipboardData.getData("text/plain") + u;
+                        }
+                        var f = r;
+                        if (i.isRTL) {
+                            f = f.split("");
+                            var d, p = c(n.getBufferTemplate.call(i));
+                            try {
+                                for (p.s(); !(d = p.n()).done; ) {
+                                    var h = d.value;
+                                    f[0] === h && f.shift();
+                                }
+                            } catch (e) {
+                                p.e(e);
+                            } finally {
+                                p.f();
+                            }
+                            f = f.join("");
+                        }
+                        if ("function" == typeof a.onBeforePaste) {
+                            if (!1 === (f = a.onBeforePaste.call(i, f, a))) return !1;
+                            f || (f = r);
+                        }
+                        (0, s.checkVal)(this, !0, !1, f.toString().split(""), e), e.preventDefault();
+                    },
+                    inputFallBackEvent: function(e) {
+                        var t = this.inputmask, i = t.opts, o = t.dependencyLib;
+                        var c, u = this, d = u.inputmask._valueGet(!0), p = (t.isRTL ? n.getBuffer.call(t).slice().reverse() : n.getBuffer.call(t)).join(""), h = n.caret.call(t, u, void 0, void 0, !0);
+                        if (p !== d) {
+                            if (c = function(e, a, r) {
+                                for (var o, s, c, u = e.substr(0, r.begin).split(""), f = e.substr(r.begin).split(""), d = a.substr(0, r.begin).split(""), p = a.substr(r.begin).split(""), h = u.length >= d.length ? u.length : d.length, v = f.length >= p.length ? f.length : p.length, m = "", g = [], y = "~"; u.length < h; ) u.push(y);
+                                for (;d.length < h; ) d.push(y);
+                                for (;f.length < v; ) f.unshift(y);
+                                for (;p.length < v; ) p.unshift(y);
+                                var k = u.concat(f), b = d.concat(p);
+                                for (s = 0, o = k.length; s < o; s++) switch (c = l.getPlaceholder.call(t, n.translatePosition.call(t, s)), 
+                                m) {
+                                  case "insertText":
+                                    b[s - 1] === k[s] && r.begin == k.length - 1 && g.push(k[s]), s = o;
+                                    break;
+
+                                  case "insertReplacementText":
+                                  case "deleteContentBackward":
+                                    k[s] === y ? r.end++ : s = o;
+                                    break;
+
+                                  default:
+                                    k[s] !== b[s] && (k[s + 1] !== y && k[s + 1] !== c && void 0 !== k[s + 1] || (b[s] !== c || b[s + 1] !== y) && b[s] !== y ? b[s + 1] === y && b[s] === k[s + 1] ? (m = "insertText", 
+                                    g.push(k[s]), r.begin--, r.end--) : k[s] !== c && k[s] !== y && (k[s + 1] === y || b[s] !== k[s] && b[s + 1] === k[s + 1]) ? (m = "insertReplacementText", 
+                                    g.push(k[s]), r.begin--) : k[s] === y ? (m = "deleteContentBackward", (n.isMask.call(t, n.translatePosition.call(t, s), !0) || b[s] === i.radixPoint) && r.end++) : s = o : (m = "insertText", 
+                                    g.push(k[s]), r.begin--, r.end--));
+                                }
+                                return {
+                                    action: m,
+                                    data: g,
+                                    caret: r
+                                };
+                            }(d, p, h), (u.inputmask.shadowRoot || u.ownerDocument).activeElement !== u && u.focus(), 
+                            (0, s.writeBuffer)(u, n.getBuffer.call(t)), n.caret.call(t, u, h.begin, h.end, !0), 
+                            !r.mobile && t.skipNextInsert && "insertText" === e.inputType && "insertText" === c.action && t.isComposing) return !1;
+                            switch ("insertCompositionText" === e.inputType && "insertText" === c.action && t.isComposing ? t.skipNextInsert = !0 : t.skipNextInsert = !1, 
+                            c.action) {
+                              case "insertText":
+                              case "insertReplacementText":
+                                c.data.forEach((function(e, i) {
+                                    var n = new o.Event("keypress");
+                                    n.key = e, t.ignorable = !1, f.keypressEvent.call(u, n);
+                                })), setTimeout((function() {
+                                    t.$el.trigger("keyup");
+                                }), 0);
+                                break;
+
+                              case "deleteContentBackward":
+                                var v = new o.Event("keydown");
+                                v.key = a.keys.Backspace, f.keyEvent.call(u, v);
+                                break;
+
+                              default:
+                                (0, s.applyInputValue)(u, d), n.caret.call(t, u, h.begin, h.end, !0);
+                            }
+                            e.preventDefault();
+                        }
+                    },
+                    setValueEvent: function(e) {
+                        var t = this.inputmask, i = this, a = e && e.detail ? e.detail[0] : arguments[1];
+                        void 0 === a && (a = i.inputmask._valueGet(!0)), (0, s.applyInputValue)(i, a), (e.detail && void 0 !== e.detail[1] || void 0 !== arguments[2]) && n.caret.call(t, i, e.detail ? e.detail[1] : arguments[2]);
+                    },
+                    focusEvent: function(e) {
+                        var t = this.inputmask, i = t.opts, a = null == t ? void 0 : t._valueGet();
+                        i.showMaskOnFocus && a !== n.getBuffer.call(t).join("") && (0, s.writeBuffer)(this, n.getBuffer.call(t), n.seekNext.call(t, n.getLastValidPosition.call(t))), 
+                        !0 !== i.positionCaretOnTab || !1 !== t.mouseEnter || o.isComplete.call(t, n.getBuffer.call(t)) && -1 !== n.getLastValidPosition.call(t) || f.clickEvent.apply(this, [ e, !0 ]), 
+                        t.undoValue = null == t ? void 0 : t._valueGet(!0);
+                    },
+                    invalidEvent: function(e) {
+                        this.inputmask.validationEvent = !0;
+                    },
+                    mouseleaveEvent: function() {
+                        var e = this.inputmask, t = e.opts, i = this;
+                        e.mouseEnter = !1, t.clearMaskOnLostFocus && (i.inputmask.shadowRoot || i.ownerDocument).activeElement !== i && (0, 
+                        s.HandleNativePlaceholder)(i, e.originalPlaceholder);
+                    },
+                    clickEvent: function(e, t) {
+                        var i = this.inputmask;
+                        i.clicked++;
+                        var a = this;
+                        if ((a.inputmask.shadowRoot || a.ownerDocument).activeElement === a) {
+                            var r = n.determineNewCaretPosition.call(i, n.caret.call(i, a), t);
+                            void 0 !== r && n.caret.call(i, a, r);
+                        }
+                    },
+                    cutEvent: function(e) {
+                        var t = this.inputmask, i = t.maskset, r = this, l = n.caret.call(t, r), c = t.isRTL ? n.getBuffer.call(t).slice(l.end, l.begin) : n.getBuffer.call(t).slice(l.begin, l.end), u = t.isRTL ? c.reverse().join("") : c.join("");
+                        window.navigator.clipboard ? window.navigator.clipboard.writeText(u) : window.clipboardData && window.clipboardData.getData && window.clipboardData.setData("Text", u), 
+                        o.handleRemove.call(t, r, a.keys.Delete, l), (0, s.writeBuffer)(r, n.getBuffer.call(t), i.p, e, t.undoValue !== t._valueGet(!0));
+                    },
+                    blurEvent: function(e) {
+                        var t = this.inputmask, i = t.opts, a = t.dependencyLib;
+                        t.clicked = 0;
+                        var r = a(this), l = this;
+                        if (l.inputmask) {
+                            (0, s.HandleNativePlaceholder)(l, t.originalPlaceholder);
+                            var c = l.inputmask._valueGet(), u = n.getBuffer.call(t).slice();
+                            "" !== c && (i.clearMaskOnLostFocus && (-1 === n.getLastValidPosition.call(t) && c === n.getBufferTemplate.call(t).join("") ? u = [] : s.clearOptionalTail.call(t, u)), 
+                            !1 === o.isComplete.call(t, u) && (setTimeout((function() {
+                                r.trigger("incomplete");
+                            }), 0), i.clearIncomplete && (n.resetMaskSet.call(t), u = i.clearMaskOnLostFocus ? [] : n.getBufferTemplate.call(t).slice())), 
+                            (0, s.writeBuffer)(l, u, void 0, e)), t.undoValue !== t._valueGet(!0) && (t.undoValue = t._valueGet(!0), 
+                            r.trigger("change"));
+                        }
+                    },
+                    mouseenterEvent: function() {
+                        var e = this.inputmask, t = e.opts.showMaskOnHover, i = this;
+                        if (e.mouseEnter = !0, (i.inputmask.shadowRoot || i.ownerDocument).activeElement !== i) {
+                            var a = (e.isRTL ? n.getBufferTemplate.call(e).slice().reverse() : n.getBufferTemplate.call(e)).join("");
+                            t && (0, s.HandleNativePlaceholder)(i, a);
+                        }
+                    },
+                    submitEvent: function() {
+                        var e = this.inputmask, t = e.opts;
+                        e.undoValue !== e._valueGet(!0) && e.$el.trigger("change"), -1 === n.getLastValidPosition.call(e) && e._valueGet && e._valueGet() === n.getBufferTemplate.call(e).join("") && e._valueSet(""), 
+                        t.clearIncomplete && !1 === o.isComplete.call(e, n.getBuffer.call(e)) && e._valueSet(""), 
+                        t.removeMaskOnSubmit && (e._valueSet(e.unmaskedvalue(), !0), setTimeout((function() {
+                            (0, s.writeBuffer)(e.el, n.getBuffer.call(e));
+                        }), 0));
+                    },
+                    resetEvent: function() {
+                        var e = this.inputmask;
+                        e.refreshValue = !0, setTimeout((function() {
+                            (0, s.applyInputValue)(e.el, e._valueGet(!0));
+                        }), 0);
+                    }
+                };
+                t.EventHandlers = f;
+            },
+            9716: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.EventRuler = void 0;
+                var n, a = (n = i(2394)) && n.__esModule ? n : {
+                    default: n
+                }, r = i(2839), o = i(8711), s = i(7760);
+                var l = {
+                    on: function(e, t, i) {
+                        var n = e.inputmask.dependencyLib, l = function(t) {
+                            t.originalEvent && (t = t.originalEvent || t, arguments[0] = t);
+                            var l, c = this, u = c.inputmask, f = u ? u.opts : void 0;
+                            if (void 0 === u && "FORM" !== this.nodeName) {
+                                var d = n.data(c, "_inputmask_opts");
+                                n(c).off(), d && new a.default(d).mask(c);
+                            } else {
+                                if ([ "submit", "reset", "setvalue" ].includes(t.type) || "FORM" === this.nodeName || !(c.disabled || c.readOnly && !("keydown" === t.type && t.ctrlKey && t.key === r.keys.c || !1 === f.tabThrough && t.key === r.keys.Tab))) {
+                                    switch (t.type) {
+                                      case "input":
+                                        if (!0 === u.skipInputEvent) return u.skipInputEvent = !1, t.preventDefault();
+                                        break;
+
+                                      case "click":
+                                      case "focus":
+                                        return u.validationEvent ? (u.validationEvent = !1, e.blur(), (0, s.HandleNativePlaceholder)(e, (u.isRTL ? o.getBufferTemplate.call(u).slice().reverse() : o.getBufferTemplate.call(u)).join("")), 
+                                        setTimeout((function() {
+                                            e.focus();
+                                        }), f.validationEventTimeOut), !1) : (l = arguments, void setTimeout((function() {
+                                            e.inputmask && i.apply(c, l);
+                                        }), 0));
+                                    }
+                                    var p = i.apply(c, arguments);
+                                    return !1 === p && (t.preventDefault(), t.stopPropagation()), p;
+                                }
+                                t.preventDefault();
+                            }
+                        };
+                        [ "submit", "reset" ].includes(t) ? (l = l.bind(e), null !== e.form && n(e.form).on(t, l)) : n(e).on(t, l), 
+                        e.inputmask.events[t] = e.inputmask.events[t] || [], e.inputmask.events[t].push(l);
+                    },
+                    off: function(e, t) {
+                        if (e.inputmask && e.inputmask.events) {
+                            var i = e.inputmask.dependencyLib, n = e.inputmask.events;
+                            for (var a in t && ((n = [])[t] = e.inputmask.events[t]), n) {
+                                for (var r = n[a]; r.length > 0; ) {
+                                    var o = r.pop();
+                                    [ "submit", "reset" ].includes(a) ? null !== e.form && i(e.form).off(a, o) : i(e).off(a, o);
+                                }
+                                delete e.inputmask.events[a];
+                            }
+                        }
+                    }
+                };
+                t.EventRuler = l;
+            },
+            219: function(e, t, i) {
+                var n = d(i(2394)), a = i(2839), r = d(i(7184)), o = i(8711), s = i(4713);
+                function l(e, t) {
+                    return function(e) {
+                        if (Array.isArray(e)) return e;
+                    }(e) || function(e, t) {
+                        var i = null == e ? null : "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
+                        if (null != i) {
+                            var n, a, r, o, s = [], l = !0, c = !1;
+                            try {
+                                if (r = (i = i.call(e)).next, 0 === t) {
+                                    if (Object(i) !== i) return;
+                                    l = !1;
+                                } else for (;!(l = (n = r.call(i)).done) && (s.push(n.value), s.length !== t); l = !0) ;
+                            } catch (e) {
+                                c = !0, a = e;
+                            } finally {
+                                try {
+                                    if (!l && null != i.return && (o = i.return(), Object(o) !== o)) return;
+                                } finally {
+                                    if (c) throw a;
+                                }
+                            }
+                            return s;
+                        }
+                    }(e, t) || function(e, t) {
+                        if (!e) return;
+                        if ("string" == typeof e) return c(e, t);
+                        var i = Object.prototype.toString.call(e).slice(8, -1);
+                        "Object" === i && e.constructor && (i = e.constructor.name);
+                        if ("Map" === i || "Set" === i) return Array.from(e);
+                        if ("Arguments" === i || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(i)) return c(e, t);
+                    }(e, t) || function() {
+                        throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+                    }();
+                }
+                function c(e, t) {
+                    (null == t || t > e.length) && (t = e.length);
+                    for (var i = 0, n = new Array(t); i < t; i++) n[i] = e[i];
+                    return n;
+                }
+                function u(e) {
+                    return u = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(e) {
+                        return typeof e;
+                    } : function(e) {
+                        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+                    }, u(e);
+                }
+                function f(e, t) {
+                    for (var i = 0; i < t.length; i++) {
+                        var n = t[i];
+                        n.enumerable = n.enumerable || !1, n.configurable = !0, "value" in n && (n.writable = !0), 
+                        Object.defineProperty(e, (a = n.key, r = void 0, r = function(e, t) {
+                            if ("object" !== u(e) || null === e) return e;
+                            var i = e[Symbol.toPrimitive];
+                            if (void 0 !== i) {
+                                var n = i.call(e, t || "default");
+                                if ("object" !== u(n)) return n;
+                                throw new TypeError("@@toPrimitive must return a primitive value.");
+                            }
+                            return ("string" === t ? String : Number)(e);
+                        }(a, "string"), "symbol" === u(r) ? r : String(r)), n);
+                    }
+                    var a, r;
+                }
+                function d(e) {
+                    return e && e.__esModule ? e : {
+                        default: e
+                    };
+                }
+                var p = n.default.dependencyLib, h = function() {
+                    function e(t, i, n) {
+                        !function(e, t) {
+                            if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
+                        }(this, e), this.mask = t, this.format = i, this.opts = n, this._date = new Date(1, 0, 1), 
+                        this.initDateObject(t, this.opts);
+                    }
+                    var t, i, n;
+                    return t = e, (i = [ {
+                        key: "date",
+                        get: function() {
+                            return void 0 === this._date && (this._date = new Date(1, 0, 1), this.initDateObject(void 0, this.opts)), 
+                            this._date;
+                        }
+                    }, {
+                        key: "initDateObject",
+                        value: function(e, t) {
+                            var i;
+                            for (P(t).lastIndex = 0; i = P(t).exec(this.format); ) {
+                                var n = new RegExp("\\d+$").exec(i[0]), a = n ? i[0][0] + "x" : i[0], r = void 0;
+                                if (void 0 !== e) {
+                                    if (n) {
+                                        var o = P(t).lastIndex, s = E(i.index, t);
+                                        P(t).lastIndex = o, r = e.slice(0, e.indexOf(s.nextMatch[0]));
+                                    } else r = e.slice(0, g[a] && g[a][4] || a.length);
+                                    e = e.slice(r.length);
+                                }
+                                Object.prototype.hasOwnProperty.call(g, a) && this.setValue(this, r, a, g[a][2], g[a][1]);
+                            }
+                        }
+                    }, {
+                        key: "setValue",
+                        value: function(e, t, i, n, a) {
+                            if (void 0 !== t && (e[n] = "ampm" === n ? t : t.replace(/[^0-9]/g, "0"), e["raw" + n] = t.replace(/\s/g, "_")), 
+                            void 0 !== a) {
+                                var r = e[n];
+                                ("day" === n && 29 === parseInt(r) || "month" === n && 2 === parseInt(r)) && (29 !== parseInt(e.day) || 2 !== parseInt(e.month) || "" !== e.year && void 0 !== e.year || e._date.setFullYear(2012, 1, 29)), 
+                                "day" === n && (m = !0, 0 === parseInt(r) && (r = 1)), "month" === n && (m = !0), 
+                                "year" === n && (m = !0, r.length < 4 && (r = M(r, 4, !0))), "" === r || isNaN(r) || a.call(e._date, r), 
+                                "ampm" === n && a.call(e._date, r);
+                            }
+                        }
+                    }, {
+                        key: "reset",
+                        value: function() {
+                            this._date = new Date(1, 0, 1);
+                        }
+                    }, {
+                        key: "reInit",
+                        value: function() {
+                            this._date = void 0, this.date;
+                        }
+                    } ]) && f(t.prototype, i), n && f(t, n), Object.defineProperty(t, "prototype", {
+                        writable: !1
+                    }), e;
+                }(), v = (new Date).getFullYear(), m = !1, g = {
+                    d: [ "[1-9]|[12][0-9]|3[01]", Date.prototype.setDate, "day", Date.prototype.getDate ],
+                    dd: [ "0[1-9]|[12][0-9]|3[01]", Date.prototype.setDate, "day", function() {
+                        return M(Date.prototype.getDate.call(this), 2);
+                    } ],
+                    ddd: [ "" ],
+                    dddd: [ "" ],
+                    m: [ "[1-9]|1[012]", function(e) {
+                        var t = e ? parseInt(e) : 0;
+                        return t > 0 && t--, Date.prototype.setMonth.call(this, t);
+                    }, "month", function() {
+                        return Date.prototype.getMonth.call(this) + 1;
+                    } ],
+                    mm: [ "0[1-9]|1[012]", function(e) {
+                        var t = e ? parseInt(e) : 0;
+                        return t > 0 && t--, Date.prototype.setMonth.call(this, t);
+                    }, "month", function() {
+                        return M(Date.prototype.getMonth.call(this) + 1, 2);
+                    } ],
+                    mmm: [ "" ],
+                    mmmm: [ "" ],
+                    yy: [ "[0-9]{2}", Date.prototype.setFullYear, "year", function() {
+                        return M(Date.prototype.getFullYear.call(this), 2);
+                    } ],
+                    yyyy: [ "[0-9]{4}", Date.prototype.setFullYear, "year", function() {
+                        return M(Date.prototype.getFullYear.call(this), 4);
+                    } ],
+                    h: [ "[1-9]|1[0-2]", Date.prototype.setHours, "hours", Date.prototype.getHours ],
+                    hh: [ "0[1-9]|1[0-2]", Date.prototype.setHours, "hours", function() {
+                        return M(Date.prototype.getHours.call(this), 2);
+                    } ],
+                    hx: [ function(e) {
+                        return "[0-9]{".concat(e, "}");
+                    }, Date.prototype.setHours, "hours", function(e) {
+                        return Date.prototype.getHours;
+                    } ],
+                    H: [ "1?[0-9]|2[0-3]", Date.prototype.setHours, "hours", Date.prototype.getHours ],
+                    HH: [ "0[0-9]|1[0-9]|2[0-3]", Date.prototype.setHours, "hours", function() {
+                        return M(Date.prototype.getHours.call(this), 2);
+                    } ],
+                    Hx: [ function(e) {
+                        return "[0-9]{".concat(e, "}");
+                    }, Date.prototype.setHours, "hours", function(e) {
+                        return function() {
+                            return M(Date.prototype.getHours.call(this), e);
+                        };
+                    } ],
+                    M: [ "[1-5]?[0-9]", Date.prototype.setMinutes, "minutes", Date.prototype.getMinutes ],
+                    MM: [ "0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]", Date.prototype.setMinutes, "minutes", function() {
+                        return M(Date.prototype.getMinutes.call(this), 2);
+                    } ],
+                    s: [ "[1-5]?[0-9]", Date.prototype.setSeconds, "seconds", Date.prototype.getSeconds ],
+                    ss: [ "0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]", Date.prototype.setSeconds, "seconds", function() {
+                        return M(Date.prototype.getSeconds.call(this), 2);
+                    } ],
+                    l: [ "[0-9]{3}", Date.prototype.setMilliseconds, "milliseconds", function() {
+                        return M(Date.prototype.getMilliseconds.call(this), 3);
+                    }, 3 ],
+                    L: [ "[0-9]{2}", Date.prototype.setMilliseconds, "milliseconds", function() {
+                        return M(Date.prototype.getMilliseconds.call(this), 2);
+                    }, 2 ],
+                    t: [ "[ap]", k, "ampm", b, 1 ],
+                    tt: [ "[ap]m", k, "ampm", b, 2 ],
+                    T: [ "[AP]", k, "ampm", b, 1 ],
+                    TT: [ "[AP]M", k, "ampm", b, 2 ],
+                    Z: [ ".*", void 0, "Z", function() {
+                        var e = this.toString().match(/\((.+)\)/)[1];
+                        e.includes(" ") && (e = (e = e.replace("-", " ").toUpperCase()).split(" ").map((function(e) {
+                            return l(e, 1)[0];
+                        })).join(""));
+                        return e;
+                    } ],
+                    o: [ "" ],
+                    S: [ "" ]
+                }, y = {
+                    isoDate: "yyyy-mm-dd",
+                    isoTime: "HH:MM:ss",
+                    isoDateTime: "yyyy-mm-dd'T'HH:MM:ss",
+                    isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
+                };
+                function k(e) {
+                    var t = this.getHours();
+                    e.toLowerCase().includes("p") ? this.setHours(t + 12) : e.toLowerCase().includes("a") && t >= 12 && this.setHours(t - 12);
+                }
+                function b() {
+                    var e = this.getHours();
+                    return (e = e || 12) >= 12 ? "PM" : "AM";
+                }
+                function x(e) {
+                    var t = new RegExp("\\d+$").exec(e[0]);
+                    if (t && void 0 !== t[0]) {
+                        var i = g[e[0][0] + "x"].slice("");
+                        return i[0] = i[0](t[0]), i[3] = i[3](t[0]), i;
+                    }
+                    if (g[e[0]]) return g[e[0]];
+                }
+                function P(e) {
+                    if (!e.tokenizer) {
+                        var t = [], i = [];
+                        for (var n in g) if (/\.*x$/.test(n)) {
+                            var a = n[0] + "\\d+";
+                            -1 === i.indexOf(a) && i.push(a);
+                        } else -1 === t.indexOf(n[0]) && t.push(n[0]);
+                        e.tokenizer = "(" + (i.length > 0 ? i.join("|") + "|" : "") + t.join("+|") + ")+?|.", 
+                        e.tokenizer = new RegExp(e.tokenizer, "g");
+                    }
+                    return e.tokenizer;
+                }
+                function w(e, t, i) {
+                    if (!m) return !0;
+                    if (void 0 === e.rawday || !isFinite(e.rawday) && new Date(e.date.getFullYear(), isFinite(e.rawmonth) ? e.month : e.date.getMonth() + 1, 0).getDate() >= e.day || "29" == e.day && (!isFinite(e.rawyear) || void 0 === e.rawyear || "" === e.rawyear) || new Date(e.date.getFullYear(), isFinite(e.rawmonth) ? e.month : e.date.getMonth() + 1, 0).getDate() >= e.day) return t;
+                    if ("29" == e.day) {
+                        var n = E(t.pos, i);
+                        if ("yyyy" === n.targetMatch[0] && t.pos - n.targetMatchIndex == 2) return t.remove = t.pos + 1, 
+                        t;
+                    } else if ("02" == e.month && "30" == e.day && void 0 !== t.c) return e.day = "03", 
+                    e.date.setDate(3), e.date.setMonth(1), t.insert = [ {
+                        pos: t.pos,
+                        c: "0"
+                    }, {
+                        pos: t.pos + 1,
+                        c: t.c
+                    } ], t.caret = o.seekNext.call(this, t.pos + 1), t;
+                    return !1;
+                }
+                function S(e, t, i, n) {
+                    var a, o, s = "";
+                    for (P(i).lastIndex = 0; a = P(i).exec(e); ) {
+                        if (void 0 === t) if (o = x(a)) s += "(" + o[0] + ")"; else switch (a[0]) {
+                          case "[":
+                            s += "(";
+                            break;
+
+                          case "]":
+                            s += ")?";
+                            break;
+
+                          default:
+                            s += (0, r.default)(a[0]);
+                        } else if (o = x(a)) if (!0 !== n && o[3]) s += o[3].call(t.date); else o[2] ? s += t["raw" + o[2]] : s += a[0]; else s += a[0];
+                    }
+                    return s;
+                }
+                function M(e, t, i) {
+                    for (e = String(e), t = t || 2; e.length < t; ) e = i ? e + "0" : "0" + e;
+                    return e;
+                }
+                function _(e, t, i) {
+                    return "string" == typeof e ? new h(e, t, i) : e && "object" === u(e) && Object.prototype.hasOwnProperty.call(e, "date") ? e : void 0;
+                }
+                function O(e, t) {
+                    return S(t.inputFormat, {
+                        date: e
+                    }, t);
+                }
+                function E(e, t) {
+                    var i, n, a = 0, r = 0;
+                    for (P(t).lastIndex = 0; n = P(t).exec(t.inputFormat); ) {
+                        var o = new RegExp("\\d+$").exec(n[0]);
+                        if ((a += r = o ? parseInt(o[0]) : n[0].length) >= e + 1) {
+                            i = n, n = P(t).exec(t.inputFormat);
+                            break;
+                        }
+                    }
+                    return {
+                        targetMatchIndex: a - r,
+                        nextMatch: n,
+                        targetMatch: i
+                    };
+                }
+                n.default.extendAliases({
+                    datetime: {
+                        mask: function(e) {
+                            return e.numericInput = !1, g.S = e.i18n.ordinalSuffix.join("|"), e.inputFormat = y[e.inputFormat] || e.inputFormat, 
+                            e.displayFormat = y[e.displayFormat] || e.displayFormat || e.inputFormat, e.outputFormat = y[e.outputFormat] || e.outputFormat || e.inputFormat, 
+                            e.placeholder = "" !== e.placeholder ? e.placeholder : e.inputFormat.replace(/[[\]]/, ""), 
+                            e.regex = S(e.inputFormat, void 0, e), e.min = _(e.min, e.inputFormat, e), e.max = _(e.max, e.inputFormat, e), 
+                            null;
+                        },
+                        placeholder: "",
+                        inputFormat: "isoDateTime",
+                        displayFormat: null,
+                        outputFormat: null,
+                        min: null,
+                        max: null,
+                        skipOptionalPartCharacter: "",
+                        i18n: {
+                            dayNames: [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ],
+                            monthNames: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+                            ordinalSuffix: [ "st", "nd", "rd", "th" ]
+                        },
+                        preValidation: function(e, t, i, n, a, r, o, s) {
+                            if (s) return !0;
+                            if (isNaN(i) && e[t] !== i) {
+                                var l = E(t, a);
+                                if (l.nextMatch && l.nextMatch[0] === i && l.targetMatch[0].length > 1) {
+                                    var c = g[l.targetMatch[0]][0];
+                                    if (new RegExp(c).test("0" + e[t - 1])) return e[t] = e[t - 1], e[t - 1] = "0", 
+                                    {
+                                        fuzzy: !0,
+                                        buffer: e,
+                                        refreshFromBuffer: {
+                                            start: t - 1,
+                                            end: t + 1
+                                        },
+                                        pos: t + 1
+                                    };
+                                }
+                            }
+                            return !0;
+                        },
+                        postValidation: function(e, t, i, n, a, r, o, l) {
+                            var c, u;
+                            if (o) return !0;
+                            if (!1 === n && (((c = E(t + 1, a)).targetMatch && c.targetMatchIndex === t && c.targetMatch[0].length > 1 && void 0 !== g[c.targetMatch[0]] || (c = E(t + 2, a)).targetMatch && c.targetMatchIndex === t + 1 && c.targetMatch[0].length > 1 && void 0 !== g[c.targetMatch[0]]) && (u = g[c.targetMatch[0]][0]), 
+                            void 0 !== u && (void 0 !== r.validPositions[t + 1] && new RegExp(u).test(i + "0") ? (e[t] = i, 
+                            e[t + 1] = "0", n = {
+                                pos: t + 2,
+                                caret: t
+                            }) : new RegExp(u).test("0" + i) && (e[t] = "0", e[t + 1] = i, n = {
+                                pos: t + 2
+                            })), !1 === n)) return n;
+                            if (n.fuzzy && (e = n.buffer, t = n.pos), (c = E(t, a)).targetMatch && c.targetMatch[0] && void 0 !== g[c.targetMatch[0]]) {
+                                var f = g[c.targetMatch[0]];
+                                u = f[0];
+                                var d = e.slice(c.targetMatchIndex, c.targetMatchIndex + c.targetMatch[0].length);
+                                if (!1 === new RegExp(u).test(d.join("")) && 2 === c.targetMatch[0].length && r.validPositions[c.targetMatchIndex] && r.validPositions[c.targetMatchIndex + 1] && (r.validPositions[c.targetMatchIndex + 1].input = "0"), 
+                                "year" == f[2]) for (var p = s.getMaskTemplate.call(this, !1, 1, void 0, !0), h = t + 1; h < e.length; h++) e[h] = p[h], 
+                                delete r.validPositions[h];
+                            }
+                            var m = n, y = _(e.join(""), a.inputFormat, a);
+                            return m && !isNaN(y.date.getTime()) && (a.prefillYear && (m = function(e, t, i) {
+                                if (e.year !== e.rawyear) {
+                                    var n = v.toString(), a = e.rawyear.replace(/[^0-9]/g, ""), r = n.slice(0, a.length), o = n.slice(a.length);
+                                    if (2 === a.length && a === r) {
+                                        var s = new Date(v, e.month - 1, e.day);
+                                        e.day == s.getDate() && (!i.max || i.max.date.getTime() >= s.getTime()) && (e.date.setFullYear(v), 
+                                        e.year = n, t.insert = [ {
+                                            pos: t.pos + 1,
+                                            c: o[0]
+                                        }, {
+                                            pos: t.pos + 2,
+                                            c: o[1]
+                                        } ]);
+                                    }
+                                }
+                                return t;
+                            }(y, m, a)), m = function(e, t, i, n, a) {
+                                if (!t) return t;
+                                if (t && i.min && !isNaN(i.min.date.getTime())) {
+                                    var r;
+                                    for (e.reset(), P(i).lastIndex = 0; r = P(i).exec(i.inputFormat); ) {
+                                        var o;
+                                        if ((o = x(r)) && o[3]) {
+                                            for (var s = o[1], l = e[o[2]], c = i.min[o[2]], u = i.max ? i.max[o[2]] : c, f = [], d = !1, p = 0; p < c.length; p++) void 0 !== n.validPositions[p + r.index] || d ? (f[p] = l[p], 
+                                            d = d || l[p] > c[p]) : (f[p] = c[p], "year" === o[2] && l.length - 1 == p && c != u && (f = (parseInt(f.join("")) + 1).toString().split("")), 
+                                            "ampm" === o[2] && c != u && i.min.date.getTime() > e.date.getTime() && (f[p] = u[p]));
+                                            s.call(e._date, f.join(""));
+                                        }
+                                    }
+                                    t = i.min.date.getTime() <= e.date.getTime(), e.reInit();
+                                }
+                                return t && i.max && (isNaN(i.max.date.getTime()) || (t = i.max.date.getTime() >= e.date.getTime())), 
+                                t;
+                            }(y, m = w.call(this, y, m, a), a, r)), void 0 !== t && m && n.pos !== t ? {
+                                buffer: S(a.inputFormat, y, a).split(""),
+                                refreshFromBuffer: {
+                                    start: t,
+                                    end: n.pos
+                                },
+                                pos: n.caret || n.pos
+                            } : m;
+                        },
+                        onKeyDown: function(e, t, i, n) {
+                            e.ctrlKey && e.key === a.keys.ArrowRight && (this.inputmask._valueSet(O(new Date, n)), 
+                            p(this).trigger("setvalue"));
+                        },
+                        onUnMask: function(e, t, i) {
+                            return t ? S(i.outputFormat, _(e, i.inputFormat, i), i, !0) : t;
+                        },
+                        casing: function(e, t, i, n) {
+                            return 0 == t.nativeDef.indexOf("[ap]") ? e.toLowerCase() : 0 == t.nativeDef.indexOf("[AP]") ? e.toUpperCase() : e;
+                        },
+                        onBeforeMask: function(e, t) {
+                            return "[object Date]" === Object.prototype.toString.call(e) && (e = O(e, t)), e;
+                        },
+                        insertMode: !1,
+                        insertModeVisual: !1,
+                        shiftPositions: !1,
+                        keepStatic: !1,
+                        inputmode: "numeric",
+                        prefillYear: !0
+                    }
+                });
+            },
+            3851: function(e, t, i) {
+                var n, a = (n = i(2394)) && n.__esModule ? n : {
+                    default: n
+                }, r = i(8711), o = i(4713);
+                a.default.extendDefinitions({
+                    A: {
+                        validator: "[A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]",
+                        casing: "upper"
+                    },
+                    "&": {
+                        validator: "[0-9A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]",
+                        casing: "upper"
+                    },
+                    "#": {
+                        validator: "[0-9A-Fa-f]",
+                        casing: "upper"
+                    }
+                });
+                var s = new RegExp("25[0-5]|2[0-4][0-9]|[01][0-9][0-9]");
+                function l(e, t, i, n, a) {
+                    return i - 1 > -1 && "." !== t.buffer[i - 1] ? (e = t.buffer[i - 1] + e, e = i - 2 > -1 && "." !== t.buffer[i - 2] ? t.buffer[i - 2] + e : "0" + e) : e = "00" + e, 
+                    s.test(e);
+                }
+                a.default.extendAliases({
+                    cssunit: {
+                        regex: "[+-]?[0-9]+\\.?([0-9]+)?(px|em|rem|ex|%|in|cm|mm|pt|pc)"
+                    },
+                    url: {
+                        regex: "(https?|ftp)://.*",
+                        autoUnmask: !1,
+                        keepStatic: !1,
+                        tabThrough: !0
+                    },
+                    ip: {
+                        mask: "i{1,3}.j{1,3}.k{1,3}.l{1,3}",
+                        definitions: {
+                            i: {
+                                validator: l
+                            },
+                            j: {
+                                validator: l
+                            },
+                            k: {
+                                validator: l
+                            },
+                            l: {
+                                validator: l
+                            }
+                        },
+                        onUnMask: function(e, t, i) {
+                            return e;
+                        },
+                        inputmode: "decimal",
+                        substitutes: {
+                            ",": "."
+                        }
+                    },
+                    email: {
+                        mask: function(e) {
+                            var t = e.separator, i = e.quantifier, n = "*{1,64}[.*{1,64}][.*{1,64}][.*{1,63}]@-{1,63}.-{1,63}[.-{1,63}][.-{1,63}]", a = n;
+                            if (t) for (var r = 0; r < i; r++) a += "[".concat(t).concat(n, "]");
+                            return a;
+                        },
+                        greedy: !1,
+                        casing: "lower",
+                        separator: null,
+                        quantifier: 5,
+                        skipOptionalPartCharacter: "",
+                        onBeforePaste: function(e, t) {
+                            return (e = e.toLowerCase()).replace("mailto:", "");
+                        },
+                        definitions: {
+                            "*": {
+                                validator: "[0-9\uff11-\uff19A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5!#$%&'*+/=?^_`{|}~-]"
+                            },
+                            "-": {
+                                validator: "[0-9A-Za-z-]"
+                            }
+                        },
+                        onUnMask: function(e, t, i) {
+                            return e;
+                        },
+                        inputmode: "email"
+                    },
+                    mac: {
+                        mask: "##:##:##:##:##:##"
+                    },
+                    vin: {
+                        mask: "V{13}9{4}",
+                        definitions: {
+                            V: {
+                                validator: "[A-HJ-NPR-Za-hj-npr-z\\d]",
+                                casing: "upper"
+                            }
+                        },
+                        clearIncomplete: !0,
+                        autoUnmask: !0
+                    },
+                    ssn: {
+                        mask: "999-99-9999",
+                        postValidation: function(e, t, i, n, a, s, l) {
+                            var c = o.getMaskTemplate.call(this, !0, r.getLastValidPosition.call(this), !0, !0);
+                            return /^(?!219-09-9999|078-05-1120)(?!666|000|9.{2}).{3}-(?!00).{2}-(?!0{4}).{4}$/.test(c.join(""));
+                        }
+                    }
+                });
+            },
+            207: function(e, t, i) {
+                var n = s(i(2394)), a = s(i(7184)), r = i(8711), o = i(2839);
+                function s(e) {
+                    return e && e.__esModule ? e : {
+                        default: e
+                    };
+                }
+                var l = n.default.dependencyLib;
+                function c(e, t) {
+                    for (var i = "", a = 0; a < e.length; a++) n.default.prototype.definitions[e.charAt(a)] || t.definitions[e.charAt(a)] || t.optionalmarker[0] === e.charAt(a) || t.optionalmarker[1] === e.charAt(a) || t.quantifiermarker[0] === e.charAt(a) || t.quantifiermarker[1] === e.charAt(a) || t.groupmarker[0] === e.charAt(a) || t.groupmarker[1] === e.charAt(a) || t.alternatormarker === e.charAt(a) ? i += "\\" + e.charAt(a) : i += e.charAt(a);
+                    return i;
+                }
+                function u(e, t, i, n) {
+                    if (e.length > 0 && t > 0 && (!i.digitsOptional || n)) {
+                        var a = e.indexOf(i.radixPoint), r = !1;
+                        i.negationSymbol.back === e[e.length - 1] && (r = !0, e.length--), -1 === a && (e.push(i.radixPoint), 
+                        a = e.length - 1);
+                        for (var o = 1; o <= t; o++) isFinite(e[a + o]) || (e[a + o] = "0");
+                    }
+                    return r && e.push(i.negationSymbol.back), e;
+                }
+                function f(e, t) {
+                    var i = 0;
+                    for (var n in "+" === e && (i = r.seekNext.call(this, t.validPositions.length - 1)), 
+                    t.tests) if ((n = parseInt(n)) >= i) for (var a = 0, o = t.tests[n].length; a < o; a++) if ((void 0 === t.validPositions[n] || "-" === e) && t.tests[n][a].match.def === e) return n + (void 0 !== t.validPositions[n] && "-" !== e ? 1 : 0);
+                    return i;
+                }
+                function d(e, t) {
+                    for (var i = -1, n = 0, a = t.validPositions.length; n < a; n++) {
+                        var r = t.validPositions[n];
+                        if (r && r.match.def === e) {
+                            i = n;
+                            break;
+                        }
+                    }
+                    return i;
+                }
+                function p(e, t, i, n, a) {
+                    var r = t.buffer ? t.buffer.indexOf(a.radixPoint) : -1, o = (-1 !== r || n && a.jitMasking) && new RegExp(a.definitions[9].validator).test(e);
+                    return a._radixDance && -1 !== r && o && null == t.validPositions[r] ? {
+                        insert: {
+                            pos: r === i ? r + 1 : r,
+                            c: a.radixPoint
+                        },
+                        pos: i
+                    } : o;
+                }
+                n.default.extendAliases({
+                    numeric: {
+                        mask: function(e) {
+                            e.repeat = 0, e.groupSeparator === e.radixPoint && e.digits && "0" !== e.digits && ("." === e.radixPoint ? e.groupSeparator = "," : "," === e.radixPoint ? e.groupSeparator = "." : e.groupSeparator = ""), 
+                            " " === e.groupSeparator && (e.skipOptionalPartCharacter = void 0), e.placeholder.length > 1 && (e.placeholder = e.placeholder.charAt(0)), 
+                            "radixFocus" === e.positionCaretOnClick && "" === e.placeholder && (e.positionCaretOnClick = "lvp");
+                            var t = "0", i = e.radixPoint;
+                            !0 === e.numericInput && void 0 === e.__financeInput ? (t = "1", e.positionCaretOnClick = "radixFocus" === e.positionCaretOnClick ? "lvp" : e.positionCaretOnClick, 
+                            e.digitsOptional = !1, isNaN(e.digits) && (e.digits = 2), e._radixDance = !1, i = "," === e.radixPoint ? "?" : "!", 
+                            "" !== e.radixPoint && void 0 === e.definitions[i] && (e.definitions[i] = {}, e.definitions[i].validator = "[" + e.radixPoint + "]", 
+                            e.definitions[i].placeholder = e.radixPoint, e.definitions[i].static = !0, e.definitions[i].generated = !0)) : (e.__financeInput = !1, 
+                            e.numericInput = !0);
+                            var n, r = "[+]";
+                            if (r += c(e.prefix, e), "" !== e.groupSeparator ? (void 0 === e.definitions[e.groupSeparator] && (e.definitions[e.groupSeparator] = {}, 
+                            e.definitions[e.groupSeparator].validator = "[" + e.groupSeparator + "]", e.definitions[e.groupSeparator].placeholder = e.groupSeparator, 
+                            e.definitions[e.groupSeparator].static = !0, e.definitions[e.groupSeparator].generated = !0), 
+                            r += e._mask(e)) : r += "9{+}", void 0 !== e.digits && 0 !== e.digits) {
+                                var o = e.digits.toString().split(",");
+                                isFinite(o[0]) && o[1] && isFinite(o[1]) ? r += i + t + "{" + e.digits + "}" : (isNaN(e.digits) || parseInt(e.digits) > 0) && (e.digitsOptional || e.jitMasking ? (n = r + i + t + "{0," + e.digits + "}", 
+                                e.keepStatic = !0) : r += i + t + "{" + e.digits + "}");
+                            } else e.inputmode = "numeric";
+                            return r += c(e.suffix, e), r += "[-]", n && (r = [ n + c(e.suffix, e) + "[-]", r ]), 
+                            e.greedy = !1, function(e) {
+                                void 0 === e.parseMinMaxOptions && (null !== e.min && (e.min = e.min.toString().replace(new RegExp((0, 
+                                a.default)(e.groupSeparator), "g"), ""), "," === e.radixPoint && (e.min = e.min.replace(e.radixPoint, ".")), 
+                                e.min = isFinite(e.min) ? parseFloat(e.min) : NaN, isNaN(e.min) && (e.min = Number.MIN_VALUE)), 
+                                null !== e.max && (e.max = e.max.toString().replace(new RegExp((0, a.default)(e.groupSeparator), "g"), ""), 
+                                "," === e.radixPoint && (e.max = e.max.replace(e.radixPoint, ".")), e.max = isFinite(e.max) ? parseFloat(e.max) : NaN, 
+                                isNaN(e.max) && (e.max = Number.MAX_VALUE)), e.parseMinMaxOptions = "done");
+                            }(e), "" !== e.radixPoint && e.substituteRadixPoint && (e.substitutes["." == e.radixPoint ? "," : "."] = e.radixPoint), 
+                            r;
+                        },
+                        _mask: function(e) {
+                            return "(" + e.groupSeparator + "999){+|1}";
+                        },
+                        digits: "*",
+                        digitsOptional: !0,
+                        enforceDigitsOnBlur: !1,
+                        radixPoint: ".",
+                        positionCaretOnClick: "radixFocus",
+                        _radixDance: !0,
+                        groupSeparator: "",
+                        allowMinus: !0,
+                        negationSymbol: {
+                            front: "-",
+                            back: ""
+                        },
+                        prefix: "",
+                        suffix: "",
+                        min: null,
+                        max: null,
+                        SetMaxOnOverflow: !1,
+                        step: 1,
+                        inputType: "text",
+                        unmaskAsNumber: !1,
+                        roundingFN: Math.round,
+                        inputmode: "decimal",
+                        shortcuts: {
+                            k: "1000",
+                            m: "1000000"
+                        },
+                        placeholder: "0",
+                        greedy: !1,
+                        rightAlign: !0,
+                        insertMode: !0,
+                        autoUnmask: !1,
+                        skipOptionalPartCharacter: "",
+                        usePrototypeDefinitions: !1,
+                        stripLeadingZeroes: !0,
+                        substituteRadixPoint: !0,
+                        definitions: {
+                            0: {
+                                validator: p
+                            },
+                            1: {
+                                validator: p,
+                                definitionSymbol: "9"
+                            },
+                            9: {
+                                validator: "[0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]",
+                                definitionSymbol: "*"
+                            },
+                            "+": {
+                                validator: function(e, t, i, n, a) {
+                                    return a.allowMinus && ("-" === e || e === a.negationSymbol.front);
+                                }
+                            },
+                            "-": {
+                                validator: function(e, t, i, n, a) {
+                                    return a.allowMinus && e === a.negationSymbol.back;
+                                }
+                            }
+                        },
+                        preValidation: function(e, t, i, n, a, r, o, s) {
+                            if (!1 !== a.__financeInput && i === a.radixPoint) return !1;
+                            var l = e.indexOf(a.radixPoint), c = t;
+                            if (t = function(e, t, i, n, a) {
+                                return a._radixDance && a.numericInput && t !== a.negationSymbol.back && e <= i && (i > 0 || t == a.radixPoint) && (void 0 === n.validPositions[e - 1] || n.validPositions[e - 1].input !== a.negationSymbol.back) && (e -= 1), 
+                                e;
+                            }(t, i, l, r, a), "-" === i || i === a.negationSymbol.front) {
+                                if (!0 !== a.allowMinus) return !1;
+                                var u = !1, p = d("+", r), h = d("-", r);
+                                return -1 !== p && (u = [ p, h ]), !1 !== u ? {
+                                    remove: u,
+                                    caret: c - a.negationSymbol.back.length
+                                } : {
+                                    insert: [ {
+                                        pos: f.call(this, "+", r),
+                                        c: a.negationSymbol.front,
+                                        fromIsValid: !0
+                                    }, {
+                                        pos: f.call(this, "-", r),
+                                        c: a.negationSymbol.back,
+                                        fromIsValid: void 0
+                                    } ],
+                                    caret: c + a.negationSymbol.back.length
+                                };
+                            }
+                            if (i === a.groupSeparator) return {
+                                caret: c
+                            };
+                            if (s) return !0;
+                            if (-1 !== l && !0 === a._radixDance && !1 === n && i === a.radixPoint && void 0 !== a.digits && (isNaN(a.digits) || parseInt(a.digits) > 0) && l !== t) return {
+                                caret: a._radixDance && t === l - 1 ? l + 1 : l
+                            };
+                            if (!1 === a.__financeInput) if (n) {
+                                if (a.digitsOptional) return {
+                                    rewritePosition: o.end
+                                };
+                                if (!a.digitsOptional) {
+                                    if (o.begin > l && o.end <= l) return i === a.radixPoint ? {
+                                        insert: {
+                                            pos: l + 1,
+                                            c: "0",
+                                            fromIsValid: !0
+                                        },
+                                        rewritePosition: l
+                                    } : {
+                                        rewritePosition: l + 1
+                                    };
+                                    if (o.begin < l) return {
+                                        rewritePosition: o.begin - 1
+                                    };
+                                }
+                            } else if (!a.showMaskOnHover && !a.showMaskOnFocus && !a.digitsOptional && a.digits > 0 && "" === this.__valueGet.call(this.el)) return {
+                                rewritePosition: l
+                            };
+                            return {
+                                rewritePosition: t
+                            };
+                        },
+                        postValidation: function(e, t, i, n, a, r, o) {
+                            if (!1 === n) return n;
+                            if (o) return !0;
+                            if (null !== a.min || null !== a.max) {
+                                var s = a.onUnMask(e.slice().reverse().join(""), void 0, l.extend({}, a, {
+                                    unmaskAsNumber: !0
+                                }));
+                                if (null !== a.min && s < a.min && (s.toString().length > a.min.toString().length || s < 0)) return !1;
+                                if (null !== a.max && s > a.max) return !!a.SetMaxOnOverflow && {
+                                    refreshFromBuffer: !0,
+                                    buffer: u(a.max.toString().replace(".", a.radixPoint).split(""), a.digits, a).reverse()
+                                };
+                            }
+                            return n;
+                        },
+                        onUnMask: function(e, t, i) {
+                            if ("" === t && !0 === i.nullable) return t;
+                            var n = e.replace(i.prefix, "");
+                            return n = (n = n.replace(i.suffix, "")).replace(new RegExp((0, a.default)(i.groupSeparator), "g"), ""), 
+                            "" !== i.placeholder.charAt(0) && (n = n.replace(new RegExp(i.placeholder.charAt(0), "g"), "0")), 
+                            i.unmaskAsNumber ? ("" !== i.radixPoint && -1 !== n.indexOf(i.radixPoint) && (n = n.replace(a.default.call(this, i.radixPoint), ".")), 
+                            n = (n = n.replace(new RegExp("^" + (0, a.default)(i.negationSymbol.front)), "-")).replace(new RegExp((0, 
+                            a.default)(i.negationSymbol.back) + "$"), ""), Number(n)) : n;
+                        },
+                        isComplete: function(e, t) {
+                            var i = (t.numericInput ? e.slice().reverse() : e).join("");
+                            return i = (i = (i = (i = (i = i.replace(new RegExp("^" + (0, a.default)(t.negationSymbol.front)), "-")).replace(new RegExp((0, 
+                            a.default)(t.negationSymbol.back) + "$"), "")).replace(t.prefix, "")).replace(t.suffix, "")).replace(new RegExp((0, 
+                            a.default)(t.groupSeparator) + "([0-9]{3})", "g"), "$1"), "," === t.radixPoint && (i = i.replace((0, 
+                            a.default)(t.radixPoint), ".")), isFinite(i);
+                        },
+                        onBeforeMask: function(e, t) {
+                            var i = t.radixPoint || ",";
+                            isFinite(t.digits) && (t.digits = parseInt(t.digits)), "number" != typeof e && "number" !== t.inputType || "" === i || (e = e.toString().replace(".", i));
+                            var n = "-" === e.charAt(0) || e.charAt(0) === t.negationSymbol.front, r = e.split(i), o = r[0].replace(/[^\-0-9]/g, ""), s = r.length > 1 ? r[1].replace(/[^0-9]/g, "") : "", l = r.length > 1;
+                            e = o + ("" !== s ? i + s : s);
+                            var c = 0;
+                            if ("" !== i && (c = t.digitsOptional ? t.digits < s.length ? t.digits : s.length : t.digits, 
+                            "" !== s || !t.digitsOptional)) {
+                                var f = Math.pow(10, c || 1);
+                                e = e.replace((0, a.default)(i), "."), isNaN(parseFloat(e)) || (e = (t.roundingFN(parseFloat(e) * f) / f).toFixed(c)), 
+                                e = e.toString().replace(".", i);
+                            }
+                            if (0 === t.digits && -1 !== e.indexOf(i) && (e = e.substring(0, e.indexOf(i))), 
+                            null !== t.min || null !== t.max) {
+                                var d = e.toString().replace(i, ".");
+                                null !== t.min && d < t.min ? e = t.min.toString().replace(".", i) : null !== t.max && d > t.max && (e = t.max.toString().replace(".", i));
+                            }
+                            return n && "-" !== e.charAt(0) && (e = "-" + e), u(e.toString().split(""), c, t, l).join("");
+                        },
+                        onBeforeWrite: function(e, t, i, n) {
+                            function r(e, t) {
+                                if (!1 !== n.__financeInput || t) {
+                                    var i = e.indexOf(n.radixPoint);
+                                    -1 !== i && e.splice(i, 1);
+                                }
+                                if ("" !== n.groupSeparator) for (;-1 !== (i = e.indexOf(n.groupSeparator)); ) e.splice(i, 1);
+                                return e;
+                            }
+                            var o, s;
+                            if (n.stripLeadingZeroes && (s = function(e, t) {
+                                var i = new RegExp("(^" + ("" !== t.negationSymbol.front ? (0, a.default)(t.negationSymbol.front) + "?" : "") + (0, 
+                                a.default)(t.prefix) + ")(.*)(" + (0, a.default)(t.suffix) + ("" != t.negationSymbol.back ? (0, 
+                                a.default)(t.negationSymbol.back) + "?" : "") + "$)").exec(e.slice().reverse().join("")), n = i ? i[2] : "", r = !1;
+                                return n && (n = n.split(t.radixPoint.charAt(0))[0], r = new RegExp("^[0" + t.groupSeparator + "]*").exec(n)), 
+                                !(!r || !(r[0].length > 1 || r[0].length > 0 && r[0].length < n.length)) && r;
+                            }(t, n))) for (var c = t.join("").lastIndexOf(s[0].split("").reverse().join("")) - (s[0] == s.input ? 0 : 1), f = s[0] == s.input ? 1 : 0, d = s[0].length - f; d > 0; d--) delete this.maskset.validPositions[c + d], 
+                            delete t[c + d];
+                            if (e) switch (e.type) {
+                              case "blur":
+                              case "checkval":
+                                if (null !== n.min) {
+                                    var p = n.onUnMask(t.slice().reverse().join(""), void 0, l.extend({}, n, {
+                                        unmaskAsNumber: !0
+                                    }));
+                                    if (null !== n.min && p < n.min) return {
+                                        refreshFromBuffer: !0,
+                                        buffer: u(n.min.toString().replace(".", n.radixPoint).split(""), n.digits, n).reverse()
+                                    };
+                                }
+                                if (t[t.length - 1] === n.negationSymbol.front) {
+                                    var h = new RegExp("(^" + ("" != n.negationSymbol.front ? (0, a.default)(n.negationSymbol.front) + "?" : "") + (0, 
+                                    a.default)(n.prefix) + ")(.*)(" + (0, a.default)(n.suffix) + ("" != n.negationSymbol.back ? (0, 
+                                    a.default)(n.negationSymbol.back) + "?" : "") + "$)").exec(r(t.slice(), !0).reverse().join(""));
+                                    0 == (h ? h[2] : "") && (o = {
+                                        refreshFromBuffer: !0,
+                                        buffer: [ 0 ]
+                                    });
+                                } else if ("" !== n.radixPoint) {
+                                    t.indexOf(n.radixPoint) === n.suffix.length && (o && o.buffer ? o.buffer.splice(0, 1 + n.suffix.length) : (t.splice(0, 1 + n.suffix.length), 
+                                    o = {
+                                        refreshFromBuffer: !0,
+                                        buffer: r(t)
+                                    }));
+                                }
+                                if (n.enforceDigitsOnBlur) {
+                                    var v = (o = o || {}) && o.buffer || t.slice().reverse();
+                                    o.refreshFromBuffer = !0, o.buffer = u(v, n.digits, n, !0).reverse();
+                                }
+                            }
+                            return o;
+                        },
+                        onKeyDown: function(e, t, i, n) {
+                            var a, r = l(this);
+                            if (3 != e.location) {
+                                var s, c = e.key;
+                                if ((s = n.shortcuts && n.shortcuts[c]) && s.length > 1) return this.inputmask.__valueSet.call(this, parseFloat(this.inputmask.unmaskedvalue()) * parseInt(s)), 
+                                r.trigger("setvalue"), !1;
+                            }
+                            if (e.ctrlKey) switch (e.key) {
+                              case o.keys.ArrowUp:
+                                return this.inputmask.__valueSet.call(this, parseFloat(this.inputmask.unmaskedvalue()) + parseInt(n.step)), 
+                                r.trigger("setvalue"), !1;
+
+                              case o.keys.ArrowDown:
+                                return this.inputmask.__valueSet.call(this, parseFloat(this.inputmask.unmaskedvalue()) - parseInt(n.step)), 
+                                r.trigger("setvalue"), !1;
+                            }
+                            if (!e.shiftKey && (e.key === o.keys.Delete || e.key === o.keys.Backspace || e.key === o.keys.BACKSPACE_SAFARI) && i.begin !== t.length) {
+                                if (t[e.key === o.keys.Delete ? i.begin - 1 : i.end] === n.negationSymbol.front) return a = t.slice().reverse(), 
+                                "" !== n.negationSymbol.front && a.shift(), "" !== n.negationSymbol.back && a.pop(), 
+                                r.trigger("setvalue", [ a.join(""), i.begin ]), !1;
+                                if (!0 === n._radixDance) {
+                                    var f = t.indexOf(n.radixPoint);
+                                    if (n.digitsOptional) {
+                                        if (0 === f) return (a = t.slice().reverse()).pop(), r.trigger("setvalue", [ a.join(""), i.begin >= a.length ? a.length : i.begin ]), 
+                                        !1;
+                                    } else if (-1 !== f && (i.begin < f || i.end < f || e.key === o.keys.Delete && (i.begin === f || i.begin - 1 === f))) {
+                                        var d = void 0;
+                                        return i.begin === i.end && (e.key === o.keys.Backspace || e.key === o.keys.BACKSPACE_SAFARI ? i.begin++ : e.key === o.keys.Delete && i.begin - 1 === f && (d = l.extend({}, i), 
+                                        i.begin--, i.end--)), (a = t.slice().reverse()).splice(a.length - i.begin, i.begin - i.end + 1), 
+                                        a = u(a, n.digits, n).join(""), d && (i = d), r.trigger("setvalue", [ a, i.begin >= a.length ? f + 1 : i.begin ]), 
+                                        !1;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    currency: {
+                        prefix: "",
+                        groupSeparator: ",",
+                        alias: "numeric",
+                        digits: 2,
+                        digitsOptional: !1
+                    },
+                    decimal: {
+                        alias: "numeric"
+                    },
+                    integer: {
+                        alias: "numeric",
+                        inputmode: "numeric",
+                        digits: 0
+                    },
+                    percentage: {
+                        alias: "numeric",
+                        min: 0,
+                        max: 100,
+                        suffix: " %",
+                        digits: 0,
+                        allowMinus: !1
+                    },
+                    indianns: {
+                        alias: "numeric",
+                        _mask: function(e) {
+                            return "(" + e.groupSeparator + "99){*|1}(" + e.groupSeparator + "999){1|1}";
+                        },
+                        groupSeparator: ",",
+                        radixPoint: ".",
+                        placeholder: "0",
+                        digits: 2,
+                        digitsOptional: !1
+                    }
+                });
+            },
+            9380: function(e, t, i) {
+                var n;
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = void 0;
+                var a = ((n = i(8741)) && n.__esModule ? n : {
+                    default: n
+                }).default ? window : {};
+                t.default = a;
+            },
+            7760: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.HandleNativePlaceholder = function(e, t) {
+                    var i = e ? e.inputmask : this;
+                    if (s.ie) {
+                        if (e.inputmask._valueGet() !== t && (e.placeholder !== t || "" === e.placeholder)) {
+                            var n = r.getBuffer.call(i).slice(), a = e.inputmask._valueGet();
+                            if (a !== t) {
+                                var o = r.getLastValidPosition.call(i);
+                                -1 === o && a === r.getBufferTemplate.call(i).join("") ? n = [] : -1 !== o && u.call(i, n), 
+                                d(e, n);
+                            }
+                        }
+                    } else e.placeholder !== t && (e.placeholder = t, "" === e.placeholder && e.removeAttribute("placeholder"));
+                }, t.applyInputValue = c, t.checkVal = f, t.clearOptionalTail = u, t.unmaskedvalue = function(e) {
+                    var t = e ? e.inputmask : this, i = t.opts, n = t.maskset;
+                    if (e) {
+                        if (void 0 === e.inputmask) return e.value;
+                        e.inputmask && e.inputmask.refreshValue && c(e, e.inputmask._valueGet(!0));
+                    }
+                    for (var a = [], o = n.validPositions, s = 0, l = o.length; s < l; s++) o[s] && o[s].match && (1 != o[s].match.static || Array.isArray(n.metadata) && !0 !== o[s].generatedInput) && a.push(o[s].input);
+                    var u = 0 === a.length ? "" : (t.isRTL ? a.reverse() : a).join("");
+                    if ("function" == typeof i.onUnMask) {
+                        var f = (t.isRTL ? r.getBuffer.call(t).slice().reverse() : r.getBuffer.call(t)).join("");
+                        u = i.onUnMask.call(t, f, u, i);
+                    }
+                    return u;
+                }, t.writeBuffer = d;
+                var n = i(2839), a = i(4713), r = i(8711), o = i(7215), s = i(9845), l = i(6030);
+                function c(e, t) {
+                    var i = e ? e.inputmask : this, n = i.opts;
+                    e.inputmask.refreshValue = !1, "function" == typeof n.onBeforeMask && (t = n.onBeforeMask.call(i, t, n) || t), 
+                    f(e, !0, !1, t = (t || "").toString().split("")), i.undoValue = i._valueGet(!0), 
+                    (n.clearMaskOnLostFocus || n.clearIncomplete) && e.inputmask._valueGet() === r.getBufferTemplate.call(i).join("") && -1 === r.getLastValidPosition.call(i) && e.inputmask._valueSet("");
+                }
+                function u(e) {
+                    e.length = 0;
+                    for (var t, i = a.getMaskTemplate.call(this, !0, 0, !0, void 0, !0); void 0 !== (t = i.shift()); ) e.push(t);
+                    return e;
+                }
+                function f(e, t, i, n, s) {
+                    var c = e ? e.inputmask : this, u = c.maskset, f = c.opts, p = c.dependencyLib, h = n.slice(), v = "", m = -1, g = void 0, y = f.skipOptionalPartCharacter;
+                    f.skipOptionalPartCharacter = "", r.resetMaskSet.call(c), u.tests = {}, m = f.radixPoint ? r.determineNewCaretPosition.call(c, {
+                        begin: 0,
+                        end: 0
+                    }, !1, !1 === f.__financeInput ? "radixFocus" : void 0).begin : 0, u.p = m, c.caretPos = {
+                        begin: m
+                    };
+                    var k = [], b = c.caretPos;
+                    if (h.forEach((function(e, t) {
+                        if (void 0 !== e) {
+                            var n = new p.Event("_checkval");
+                            n.key = e, v += e;
+                            var o = r.getLastValidPosition.call(c, void 0, !0);
+                            !function(e, t) {
+                                for (var i = a.getMaskTemplate.call(c, !0, 0).slice(e, r.seekNext.call(c, e, !1, !1)).join("").replace(/'/g, ""), n = i.indexOf(t); n > 0 && " " === i[n - 1]; ) n--;
+                                var o = 0 === n && !r.isMask.call(c, e) && (a.getTest.call(c, e).match.nativeDef === t.charAt(0) || !0 === a.getTest.call(c, e).match.static && a.getTest.call(c, e).match.nativeDef === "'" + t.charAt(0) || " " === a.getTest.call(c, e).match.nativeDef && (a.getTest.call(c, e + 1).match.nativeDef === t.charAt(0) || !0 === a.getTest.call(c, e + 1).match.static && a.getTest.call(c, e + 1).match.nativeDef === "'" + t.charAt(0)));
+                                if (!o && n > 0 && !r.isMask.call(c, e, !1, !0)) {
+                                    var s = r.seekNext.call(c, e);
+                                    c.caretPos.begin < s && (c.caretPos = {
+                                        begin: s
+                                    });
+                                }
+                                return o;
+                            }(m, v) ? (g = l.EventHandlers.keypressEvent.call(c, n, !0, !1, i, c.caretPos.begin)) && (m = c.caretPos.begin + 1, 
+                            v = "") : g = l.EventHandlers.keypressEvent.call(c, n, !0, !1, i, o + 1), g ? (void 0 !== g.pos && u.validPositions[g.pos] && !0 === u.validPositions[g.pos].match.static && void 0 === u.validPositions[g.pos].alternation && (k.push(g.pos), 
+                            c.isRTL || (g.forwardPosition = g.pos + 1)), d.call(c, void 0, r.getBuffer.call(c), g.forwardPosition, n, !1), 
+                            c.caretPos = {
+                                begin: g.forwardPosition,
+                                end: g.forwardPosition
+                            }, b = c.caretPos) : void 0 === u.validPositions[t] && h[t] === a.getPlaceholder.call(c, t) && r.isMask.call(c, t, !0) ? c.caretPos.begin++ : c.caretPos = b;
+                        }
+                    })), k.length > 0) {
+                        var x, P, w = r.seekNext.call(c, -1, void 0, !1);
+                        if (!o.isComplete.call(c, r.getBuffer.call(c)) && k.length <= w || o.isComplete.call(c, r.getBuffer.call(c)) && k.length > 0 && k.length !== w && 0 === k[0]) for (var S = w; void 0 !== (x = k.shift()); ) {
+                            var M = new p.Event("_checkval");
+                            if ((P = u.validPositions[x]).generatedInput = !0, M.key = P.input, (g = l.EventHandlers.keypressEvent.call(c, M, !0, !1, i, S)) && void 0 !== g.pos && g.pos !== x && u.validPositions[g.pos] && !0 === u.validPositions[g.pos].match.static) k.push(g.pos); else if (!g) break;
+                            S++;
+                        }
+                    }
+                    t && d.call(c, e, r.getBuffer.call(c), g ? g.forwardPosition : c.caretPos.begin, s || new p.Event("checkval"), s && ("input" === s.type && c.undoValue !== r.getBuffer.call(c).join("") || "paste" === s.type)), 
+                    f.skipOptionalPartCharacter = y;
+                }
+                function d(e, t, i, a, s) {
+                    var l = e ? e.inputmask : this, c = l.opts, u = l.dependencyLib;
+                    if (a && "function" == typeof c.onBeforeWrite) {
+                        var f = c.onBeforeWrite.call(l, a, t, i, c);
+                        if (f) {
+                            if (f.refreshFromBuffer) {
+                                var d = f.refreshFromBuffer;
+                                o.refreshFromBuffer.call(l, !0 === d ? d : d.start, d.end, f.buffer || t), t = r.getBuffer.call(l, !0);
+                            }
+                            void 0 !== i && (i = void 0 !== f.caret ? f.caret : i);
+                        }
+                    }
+                    if (void 0 !== e && (e.inputmask._valueSet(t.join("")), void 0 === i || void 0 !== a && "blur" === a.type || r.caret.call(l, e, i, void 0, void 0, void 0 !== a && "keydown" === a.type && (a.key === n.keys.Delete || a.key === n.keys.Backspace)), 
+                    !0 === s)) {
+                        var p = u(e), h = e.inputmask._valueGet();
+                        e.inputmask.skipInputEvent = !0, p.trigger("input"), setTimeout((function() {
+                            h === r.getBufferTemplate.call(l).join("") ? p.trigger("cleared") : !0 === o.isComplete.call(l, t) && p.trigger("complete");
+                        }), 0);
+                    }
+                }
+            },
+            2394: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = void 0;
+                var n = i(157), a = m(i(4963)), r = m(i(9380)), o = i(2391), s = i(4713), l = i(8711), c = i(7215), u = i(7760), f = i(9716), d = m(i(7392)), p = m(i(3976)), h = m(i(8741));
+                function v(e) {
+                    return v = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(e) {
+                        return typeof e;
+                    } : function(e) {
+                        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+                    }, v(e);
+                }
+                function m(e) {
+                    return e && e.__esModule ? e : {
+                        default: e
+                    };
+                }
+                var g = r.default.document, y = "_inputmask_opts";
+                function k(e, t, i) {
+                    if (h.default) {
+                        if (!(this instanceof k)) return new k(e, t, i);
+                        this.dependencyLib = a.default, this.el = void 0, this.events = {}, this.maskset = void 0, 
+                        !0 !== i && ("[object Object]" === Object.prototype.toString.call(e) ? t = e : (t = t || {}, 
+                        e && (t.alias = e)), this.opts = a.default.extend(!0, {}, this.defaults, t), this.noMasksCache = t && void 0 !== t.definitions, 
+                        this.userOptions = t || {}, b(this.opts.alias, t, this.opts)), this.refreshValue = !1, 
+                        this.undoValue = void 0, this.$el = void 0, this.skipInputEvent = !1, this.validationEvent = !1, 
+                        this.ignorable = !1, this.maxLength, this.mouseEnter = !1, this.clicked = 0, this.originalPlaceholder = void 0, 
+                        this.isComposing = !1, this.hasAlternator = !1;
+                    }
+                }
+                function b(e, t, i) {
+                    var n = k.prototype.aliases[e];
+                    return n ? (n.alias && b(n.alias, void 0, i), a.default.extend(!0, i, n), a.default.extend(!0, i, t), 
+                    !0) : (null === i.mask && (i.mask = e), !1);
+                }
+                k.prototype = {
+                    dataAttribute: "data-inputmask",
+                    defaults: p.default,
+                    definitions: d.default,
+                    aliases: {},
+                    masksCache: {},
+                    get isRTL() {
+                        return this.opts.isRTL || this.opts.numericInput;
+                    },
+                    mask: function(e) {
+                        var t = this;
+                        return "string" == typeof e && (e = g.getElementById(e) || g.querySelectorAll(e)), 
+                        (e = e.nodeName ? [ e ] : Array.isArray(e) ? e : [].slice.call(e)).forEach((function(e, i) {
+                            var s = a.default.extend(!0, {}, t.opts);
+                            if (function(e, t, i, n) {
+                                function o(t, a) {
+                                    var o = "" === n ? t : n + "-" + t;
+                                    null !== (a = void 0 !== a ? a : e.getAttribute(o)) && ("string" == typeof a && (0 === t.indexOf("on") ? a = r.default[a] : "false" === a ? a = !1 : "true" === a && (a = !0)), 
+                                    i[t] = a);
+                                }
+                                if (!0 === t.importDataAttributes) {
+                                    var s, l, c, u, f = e.getAttribute(n);
+                                    if (f && "" !== f && (f = f.replace(/'/g, '"'), l = JSON.parse("{" + f + "}")), 
+                                    l) for (u in c = void 0, l) if ("alias" === u.toLowerCase()) {
+                                        c = l[u];
+                                        break;
+                                    }
+                                    for (s in o("alias", c), i.alias && b(i.alias, i, t), t) {
+                                        if (l) for (u in c = void 0, l) if (u.toLowerCase() === s.toLowerCase()) {
+                                            c = l[u];
+                                            break;
+                                        }
+                                        o(s, c);
+                                    }
+                                }
+                                a.default.extend(!0, t, i), ("rtl" === e.dir || t.rightAlign) && (e.style.textAlign = "right");
+                                ("rtl" === e.dir || t.numericInput) && (e.dir = "ltr", e.removeAttribute("dir"), 
+                                t.isRTL = !0);
+                                return Object.keys(i).length;
+                            }(e, s, a.default.extend(!0, {}, t.userOptions), t.dataAttribute)) {
+                                var l = (0, o.generateMaskSet)(s, t.noMasksCache);
+                                void 0 !== l && (void 0 !== e.inputmask && (e.inputmask.opts.autoUnmask = !0, e.inputmask.remove()), 
+                                e.inputmask = new k(void 0, void 0, !0), e.inputmask.opts = s, e.inputmask.noMasksCache = t.noMasksCache, 
+                                e.inputmask.userOptions = a.default.extend(!0, {}, t.userOptions), e.inputmask.el = e, 
+                                e.inputmask.$el = (0, a.default)(e), e.inputmask.maskset = l, a.default.data(e, y, t.userOptions), 
+                                n.mask.call(e.inputmask));
+                            }
+                        })), e && e[0] && e[0].inputmask || this;
+                    },
+                    option: function(e, t) {
+                        return "string" == typeof e ? this.opts[e] : "object" === v(e) ? (a.default.extend(this.userOptions, e), 
+                        this.el && !0 !== t && this.mask(this.el), this) : void 0;
+                    },
+                    unmaskedvalue: function(e) {
+                        if (this.maskset = this.maskset || (0, o.generateMaskSet)(this.opts, this.noMasksCache), 
+                        void 0 === this.el || void 0 !== e) {
+                            var t = ("function" == typeof this.opts.onBeforeMask && this.opts.onBeforeMask.call(this, e, this.opts) || e).split("");
+                            u.checkVal.call(this, void 0, !1, !1, t), "function" == typeof this.opts.onBeforeWrite && this.opts.onBeforeWrite.call(this, void 0, l.getBuffer.call(this), 0, this.opts);
+                        }
+                        return u.unmaskedvalue.call(this, this.el);
+                    },
+                    remove: function() {
+                        if (this.el) {
+                            a.default.data(this.el, y, null);
+                            var e = this.opts.autoUnmask ? (0, u.unmaskedvalue)(this.el) : this._valueGet(this.opts.autoUnmask);
+                            e !== l.getBufferTemplate.call(this).join("") ? this._valueSet(e, this.opts.autoUnmask) : this._valueSet(""), 
+                            f.EventRuler.off(this.el), Object.getOwnPropertyDescriptor && Object.getPrototypeOf ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this.el), "value") && this.__valueGet && Object.defineProperty(this.el, "value", {
+                                get: this.__valueGet,
+                                set: this.__valueSet,
+                                configurable: !0
+                            }) : g.__lookupGetter__ && this.el.__lookupGetter__("value") && this.__valueGet && (this.el.__defineGetter__("value", this.__valueGet), 
+                            this.el.__defineSetter__("value", this.__valueSet)), this.el.inputmask = void 0;
+                        }
+                        return this.el;
+                    },
+                    getemptymask: function() {
+                        return this.maskset = this.maskset || (0, o.generateMaskSet)(this.opts, this.noMasksCache), 
+                        (this.isRTL ? l.getBufferTemplate.call(this).reverse() : l.getBufferTemplate.call(this)).join("");
+                    },
+                    hasMaskedValue: function() {
+                        return !this.opts.autoUnmask;
+                    },
+                    isComplete: function() {
+                        return this.maskset = this.maskset || (0, o.generateMaskSet)(this.opts, this.noMasksCache), 
+                        c.isComplete.call(this, l.getBuffer.call(this));
+                    },
+                    getmetadata: function() {
+                        if (this.maskset = this.maskset || (0, o.generateMaskSet)(this.opts, this.noMasksCache), 
+                        Array.isArray(this.maskset.metadata)) {
+                            var e = s.getMaskTemplate.call(this, !0, 0, !1).join("");
+                            return this.maskset.metadata.forEach((function(t) {
+                                return t.mask !== e || (e = t, !1);
+                            })), e;
+                        }
+                        return this.maskset.metadata;
+                    },
+                    isValid: function(e) {
+                        if (this.maskset = this.maskset || (0, o.generateMaskSet)(this.opts, this.noMasksCache), 
+                        e) {
+                            var t = ("function" == typeof this.opts.onBeforeMask && this.opts.onBeforeMask.call(this, e, this.opts) || e).split("");
+                            u.checkVal.call(this, void 0, !0, !1, t);
+                        } else e = this.isRTL ? l.getBuffer.call(this).slice().reverse().join("") : l.getBuffer.call(this).join("");
+                        for (var i = l.getBuffer.call(this), n = l.determineLastRequiredPosition.call(this), a = i.length - 1; a > n && !l.isMask.call(this, a); a--) ;
+                        return i.splice(n, a + 1 - n), c.isComplete.call(this, i) && e === (this.isRTL ? l.getBuffer.call(this).slice().reverse().join("") : l.getBuffer.call(this).join(""));
+                    },
+                    format: function(e, t) {
+                        this.maskset = this.maskset || (0, o.generateMaskSet)(this.opts, this.noMasksCache);
+                        var i = ("function" == typeof this.opts.onBeforeMask && this.opts.onBeforeMask.call(this, e, this.opts) || e).split("");
+                        u.checkVal.call(this, void 0, !0, !1, i);
+                        var n = this.isRTL ? l.getBuffer.call(this).slice().reverse().join("") : l.getBuffer.call(this).join("");
+                        return t ? {
+                            value: n,
+                            metadata: this.getmetadata()
+                        } : n;
+                    },
+                    setValue: function(e) {
+                        this.el && (0, a.default)(this.el).trigger("setvalue", [ e ]);
+                    },
+                    analyseMask: o.analyseMask
+                }, k.extendDefaults = function(e) {
+                    a.default.extend(!0, k.prototype.defaults, e);
+                }, k.extendDefinitions = function(e) {
+                    a.default.extend(!0, k.prototype.definitions, e);
+                }, k.extendAliases = function(e) {
+                    a.default.extend(!0, k.prototype.aliases, e);
+                }, k.format = function(e, t, i) {
+                    return k(t).format(e, i);
+                }, k.unmask = function(e, t) {
+                    return k(t).unmaskedvalue(e);
+                }, k.isValid = function(e, t) {
+                    return k(t).isValid(e);
+                }, k.remove = function(e) {
+                    "string" == typeof e && (e = g.getElementById(e) || g.querySelectorAll(e)), (e = e.nodeName ? [ e ] : e).forEach((function(e) {
+                        e.inputmask && e.inputmask.remove();
+                    }));
+                }, k.setValue = function(e, t) {
+                    "string" == typeof e && (e = g.getElementById(e) || g.querySelectorAll(e)), (e = e.nodeName ? [ e ] : e).forEach((function(e) {
+                        e.inputmask ? e.inputmask.setValue(t) : (0, a.default)(e).trigger("setvalue", [ t ]);
+                    }));
+                }, k.dependencyLib = a.default, r.default.Inputmask = k;
+                var x = k;
+                t.default = x;
+            },
+            5296: function(e, t, i) {
+                function n(e) {
+                    return n = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(e) {
+                        return typeof e;
+                    } : function(e) {
+                        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+                    }, n(e);
+                }
+                var a = h(i(9380)), r = h(i(2394)), o = h(i(8741));
+                function s(e, t) {
+                    for (var i = 0; i < t.length; i++) {
+                        var a = t[i];
+                        a.enumerable = a.enumerable || !1, a.configurable = !0, "value" in a && (a.writable = !0), 
+                        Object.defineProperty(e, (r = a.key, o = void 0, o = function(e, t) {
+                            if ("object" !== n(e) || null === e) return e;
+                            var i = e[Symbol.toPrimitive];
+                            if (void 0 !== i) {
+                                var a = i.call(e, t || "default");
+                                if ("object" !== n(a)) return a;
+                                throw new TypeError("@@toPrimitive must return a primitive value.");
+                            }
+                            return ("string" === t ? String : Number)(e);
+                        }(r, "string"), "symbol" === n(o) ? o : String(o)), a);
+                    }
+                    var r, o;
+                }
+                function l(e) {
+                    var t = f();
+                    return function() {
+                        var i, a = p(e);
+                        if (t) {
+                            var r = p(this).constructor;
+                            i = Reflect.construct(a, arguments, r);
+                        } else i = a.apply(this, arguments);
+                        return function(e, t) {
+                            if (t && ("object" === n(t) || "function" == typeof t)) return t;
+                            if (void 0 !== t) throw new TypeError("Derived constructors may only return object or undefined");
+                            return function(e) {
+                                if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+                                return e;
+                            }(e);
+                        }(this, i);
+                    };
+                }
+                function c(e) {
+                    var t = "function" == typeof Map ? new Map : void 0;
+                    return c = function(e) {
+                        if (null === e || (i = e, -1 === Function.toString.call(i).indexOf("[native code]"))) return e;
+                        var i;
+                        if ("function" != typeof e) throw new TypeError("Super expression must either be null or a function");
+                        if (void 0 !== t) {
+                            if (t.has(e)) return t.get(e);
+                            t.set(e, n);
+                        }
+                        function n() {
+                            return u(e, arguments, p(this).constructor);
+                        }
+                        return n.prototype = Object.create(e.prototype, {
+                            constructor: {
+                                value: n,
+                                enumerable: !1,
+                                writable: !0,
+                                configurable: !0
+                            }
+                        }), d(n, e);
+                    }, c(e);
+                }
+                function u(e, t, i) {
+                    return u = f() ? Reflect.construct.bind() : function(e, t, i) {
+                        var n = [ null ];
+                        n.push.apply(n, t);
+                        var a = new (Function.bind.apply(e, n));
+                        return i && d(a, i.prototype), a;
+                    }, u.apply(null, arguments);
+                }
+                function f() {
+                    if ("undefined" == typeof Reflect || !Reflect.construct) return !1;
+                    if (Reflect.construct.sham) return !1;
+                    if ("function" == typeof Proxy) return !0;
+                    try {
+                        return Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], (function() {}))), 
+                        !0;
+                    } catch (e) {
+                        return !1;
+                    }
+                }
+                function d(e, t) {
+                    return d = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function(e, t) {
+                        return e.__proto__ = t, e;
+                    }, d(e, t);
+                }
+                function p(e) {
+                    return p = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function(e) {
+                        return e.__proto__ || Object.getPrototypeOf(e);
+                    }, p(e);
+                }
+                function h(e) {
+                    return e && e.__esModule ? e : {
+                        default: e
+                    };
+                }
+                var v = a.default.document;
+                if (o.default && v && v.head && v.head.attachShadow && a.default.customElements && void 0 === a.default.customElements.get("input-mask")) {
+                    var m = function(e) {
+                        !function(e, t) {
+                            if ("function" != typeof t && null !== t) throw new TypeError("Super expression must either be null or a function");
+                            e.prototype = Object.create(t && t.prototype, {
+                                constructor: {
+                                    value: e,
+                                    writable: !0,
+                                    configurable: !0
+                                }
+                            }), Object.defineProperty(e, "prototype", {
+                                writable: !1
+                            }), t && d(e, t);
+                        }(o, e);
+                        var t, i, n, a = l(o);
+                        function o() {
+                            var e;
+                            !function(e, t) {
+                                if (!(e instanceof t)) throw new TypeError("Cannot call a class as a function");
+                            }(this, o);
+                            var t = (e = a.call(this)).getAttributeNames(), i = e.attachShadow({
+                                mode: "closed"
+                            }), n = v.createElement("input");
+                            for (var s in n.type = "text", i.appendChild(n), t) Object.prototype.hasOwnProperty.call(t, s) && n.setAttribute(t[s], e.getAttribute(t[s]));
+                            var l = new r.default;
+                            return l.dataAttribute = "", l.mask(n), n.inputmask.shadowRoot = i, e;
+                        }
+                        return t = o, i && s(t.prototype, i), n && s(t, n), Object.defineProperty(t, "prototype", {
+                            writable: !1
+                        }), t;
+                    }(c(HTMLElement));
+                    a.default.customElements.define("input-mask", m);
+                }
+            },
+            2839: function(e, t) {
+                function i(e, t) {
+                    return function(e) {
+                        if (Array.isArray(e)) return e;
+                    }(e) || function(e, t) {
+                        var i = null == e ? null : "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
+                        if (null != i) {
+                            var n, a, r, o, s = [], l = !0, c = !1;
+                            try {
+                                if (r = (i = i.call(e)).next, 0 === t) {
+                                    if (Object(i) !== i) return;
+                                    l = !1;
+                                } else for (;!(l = (n = r.call(i)).done) && (s.push(n.value), s.length !== t); l = !0) ;
+                            } catch (e) {
+                                c = !0, a = e;
+                            } finally {
+                                try {
+                                    if (!l && null != i.return && (o = i.return(), Object(o) !== o)) return;
+                                } finally {
+                                    if (c) throw a;
+                                }
+                            }
+                            return s;
+                        }
+                    }(e, t) || function(e, t) {
+                        if (!e) return;
+                        if ("string" == typeof e) return n(e, t);
+                        var i = Object.prototype.toString.call(e).slice(8, -1);
+                        "Object" === i && e.constructor && (i = e.constructor.name);
+                        if ("Map" === i || "Set" === i) return Array.from(e);
+                        if ("Arguments" === i || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(i)) return n(e, t);
+                    }(e, t) || function() {
+                        throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+                    }();
+                }
+                function n(e, t) {
+                    (null == t || t > e.length) && (t = e.length);
+                    for (var i = 0, n = new Array(t); i < t; i++) n[i] = e[i];
+                    return n;
+                }
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.keys = t.keyCode = void 0, t.toKey = function(e, t) {
+                    return r[e] || (t ? String.fromCharCode(e) : String.fromCharCode(e).toLowerCase());
+                }, t.toKeyCode = function(e) {
+                    return a[e];
+                };
+                var a = {
+                    AltGraph: 18,
+                    ArrowDown: 40,
+                    ArrowLeft: 37,
+                    ArrowRight: 39,
+                    ArrowUp: 38,
+                    Backspace: 8,
+                    BACKSPACE_SAFARI: 127,
+                    CapsLock: 20,
+                    Delete: 46,
+                    End: 35,
+                    Enter: 13,
+                    Escape: 27,
+                    Home: 36,
+                    Insert: 45,
+                    PageDown: 34,
+                    PageUp: 33,
+                    Space: 32,
+                    Tab: 9,
+                    c: 67,
+                    x: 88,
+                    z: 90,
+                    Shift: 16,
+                    Control: 17,
+                    Alt: 18,
+                    Pause: 19,
+                    Meta_LEFT: 91,
+                    Meta_RIGHT: 92,
+                    ContextMenu: 93,
+                    Process: 229,
+                    Unidentified: 229,
+                    F1: 112,
+                    F2: 113,
+                    F3: 114,
+                    F4: 115,
+                    F5: 116,
+                    F6: 117,
+                    F7: 118,
+                    F8: 119,
+                    F9: 120,
+                    F10: 121,
+                    F11: 122,
+                    F12: 123
+                };
+                t.keyCode = a;
+                var r = Object.entries(a).reduce((function(e, t) {
+                    var n = i(t, 2), a = n[0], r = n[1];
+                    return e[r] = void 0 === e[r] ? a : e[r], e;
+                }), {}), o = Object.entries(a).reduce((function(e, t) {
+                    var n = i(t, 2), a = n[0];
+                    n[1];
+                    return e[a] = "Space" === a ? " " : a, e;
+                }), {});
+                t.keys = o;
+            },
+            2391: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.analyseMask = function(e, t, i) {
+                    var n, o, s, l, c, u, f = /(?:[?*+]|\{[0-9+*]+(?:,[0-9+*]*)?(?:\|[0-9+*]*)?\})|[^.?*+^${[]()|\\]+|./g, d = /\[\^?]?(?:[^\\\]]+|\\[\S\s]?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9][0-9]*|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|c[A-Za-z]|[\S\s]?)|\((?:\?[:=!]?)?|(?:[?*+]|\{[0-9]+(?:,[0-9]*)?\})\??|[^.?*+^${[()|\\]+|./g, p = !1, h = new a.default, v = [], m = [], g = !1;
+                    function y(e, n, a) {
+                        a = void 0 !== a ? a : e.matches.length;
+                        var o = e.matches[a - 1];
+                        if (t) {
+                            if (0 === n.indexOf("[") || p && /\\d|\\s|\\w|\\p/i.test(n) || "." === n) {
+                                var s = i.casing ? "i" : "";
+                                /^\\p\{.*}$/i.test(n) && (s += "u"), e.matches.splice(a++, 0, {
+                                    fn: new RegExp(n, s),
+                                    static: !1,
+                                    optionality: !1,
+                                    newBlockMarker: void 0 === o ? "master" : o.def !== n,
+                                    casing: null,
+                                    def: n,
+                                    placeholder: void 0,
+                                    nativeDef: n
+                                });
+                            } else p && (n = n[n.length - 1]), n.split("").forEach((function(t, n) {
+                                o = e.matches[a - 1], e.matches.splice(a++, 0, {
+                                    fn: /[a-z]/i.test(i.staticDefinitionSymbol || t) ? new RegExp("[" + (i.staticDefinitionSymbol || t) + "]", i.casing ? "i" : "") : null,
+                                    static: !0,
+                                    optionality: !1,
+                                    newBlockMarker: void 0 === o ? "master" : o.def !== t && !0 !== o.static,
+                                    casing: null,
+                                    def: i.staticDefinitionSymbol || t,
+                                    placeholder: void 0 !== i.staticDefinitionSymbol ? t : void 0,
+                                    nativeDef: (p ? "'" : "") + t
+                                });
+                            }));
+                            p = !1;
+                        } else {
+                            var l = i.definitions && i.definitions[n] || i.usePrototypeDefinitions && r.default.prototype.definitions[n];
+                            l && !p ? e.matches.splice(a++, 0, {
+                                fn: l.validator ? "string" == typeof l.validator ? new RegExp(l.validator, i.casing ? "i" : "") : new function() {
+                                    this.test = l.validator;
+                                } : new RegExp("."),
+                                static: l.static || !1,
+                                optionality: l.optional || !1,
+                                defOptionality: l.optional || !1,
+                                newBlockMarker: void 0 === o || l.optional ? "master" : o.def !== (l.definitionSymbol || n),
+                                casing: l.casing,
+                                def: l.definitionSymbol || n,
+                                placeholder: l.placeholder,
+                                nativeDef: n,
+                                generated: l.generated
+                            }) : (e.matches.splice(a++, 0, {
+                                fn: /[a-z]/i.test(i.staticDefinitionSymbol || n) ? new RegExp("[" + (i.staticDefinitionSymbol || n) + "]", i.casing ? "i" : "") : null,
+                                static: !0,
+                                optionality: !1,
+                                newBlockMarker: void 0 === o ? "master" : o.def !== n && !0 !== o.static,
+                                casing: null,
+                                def: i.staticDefinitionSymbol || n,
+                                placeholder: void 0 !== i.staticDefinitionSymbol ? n : void 0,
+                                nativeDef: (p ? "'" : "") + n
+                            }), p = !1);
+                        }
+                    }
+                    function k() {
+                        if (v.length > 0) {
+                            if (y(l = v[v.length - 1], o), l.isAlternator) {
+                                c = v.pop();
+                                for (var e = 0; e < c.matches.length; e++) c.matches[e].isGroup && (c.matches[e].isGroup = !1);
+                                v.length > 0 ? (l = v[v.length - 1]).matches.push(c) : h.matches.push(c);
+                            }
+                        } else y(h, o);
+                    }
+                    function b(e) {
+                        var t = new a.default(!0);
+                        return t.openGroup = !1, t.matches = e, t;
+                    }
+                    function x() {
+                        if ((s = v.pop()).openGroup = !1, void 0 !== s) if (v.length > 0) {
+                            if ((l = v[v.length - 1]).matches.push(s), l.isAlternator) {
+                                for (var e = (c = v.pop()).matches[0].matches ? c.matches[0].matches.length : 1, t = 0; t < c.matches.length; t++) c.matches[t].isGroup = !1, 
+                                c.matches[t].alternatorGroup = !1, null === i.keepStatic && e < (c.matches[t].matches ? c.matches[t].matches.length : 1) && (i.keepStatic = !0), 
+                                e = c.matches[t].matches ? c.matches[t].matches.length : 1;
+                                v.length > 0 ? (l = v[v.length - 1]).matches.push(c) : h.matches.push(c);
+                            }
+                        } else h.matches.push(s); else k();
+                    }
+                    function P(e) {
+                        var t = e.pop();
+                        return t.isQuantifier && (t = b([ e.pop(), t ])), t;
+                    }
+                    t && (i.optionalmarker[0] = void 0, i.optionalmarker[1] = void 0);
+                    for (;n = t ? d.exec(e) : f.exec(e); ) {
+                        if (o = n[0], t) {
+                            switch (o.charAt(0)) {
+                              case "?":
+                                o = "{0,1}";
+                                break;
+
+                              case "+":
+                              case "*":
+                                o = "{" + o + "}";
+                                break;
+
+                              case "|":
+                                if (0 === v.length) {
+                                    var w = b(h.matches);
+                                    w.openGroup = !0, v.push(w), h.matches = [], g = !0;
+                                }
+                            }
+                            switch (o) {
+                              case "\\d":
+                                o = "[0-9]";
+                                break;
+
+                              case "\\p":
+                                o += d.exec(e)[0], o += d.exec(e)[0];
+                            }
+                        }
+                        if (p) k(); else switch (o.charAt(0)) {
+                          case "$":
+                          case "^":
+                            t || k();
+                            break;
+
+                          case i.escapeChar:
+                            p = !0, t && k();
+                            break;
+
+                          case i.optionalmarker[1]:
+                          case i.groupmarker[1]:
+                            x();
+                            break;
+
+                          case i.optionalmarker[0]:
+                            v.push(new a.default(!1, !0));
+                            break;
+
+                          case i.groupmarker[0]:
+                            v.push(new a.default(!0));
+                            break;
+
+                          case i.quantifiermarker[0]:
+                            var S = new a.default(!1, !1, !0), M = (o = o.replace(/[{}?]/g, "")).split("|"), _ = M[0].split(","), O = isNaN(_[0]) ? _[0] : parseInt(_[0]), E = 1 === _.length ? O : isNaN(_[1]) ? _[1] : parseInt(_[1]), T = isNaN(M[1]) ? M[1] : parseInt(M[1]);
+                            "*" !== O && "+" !== O || (O = "*" === E ? 0 : 1), S.quantifier = {
+                                min: O,
+                                max: E,
+                                jit: T
+                            };
+                            var j = v.length > 0 ? v[v.length - 1].matches : h.matches;
+                            (n = j.pop()).isGroup || (n = b([ n ])), j.push(n), j.push(S);
+                            break;
+
+                          case i.alternatormarker:
+                            if (v.length > 0) {
+                                var A = (l = v[v.length - 1]).matches[l.matches.length - 1];
+                                u = l.openGroup && (void 0 === A.matches || !1 === A.isGroup && !1 === A.isAlternator) ? v.pop() : P(l.matches);
+                            } else u = P(h.matches);
+                            if (u.isAlternator) v.push(u); else if (u.alternatorGroup ? (c = v.pop(), u.alternatorGroup = !1) : c = new a.default(!1, !1, !1, !0), 
+                            c.matches.push(u), v.push(c), u.openGroup) {
+                                u.openGroup = !1;
+                                var D = new a.default(!0);
+                                D.alternatorGroup = !0, v.push(D);
+                            }
+                            break;
+
+                          default:
+                            k();
+                        }
+                    }
+                    g && x();
+                    for (;v.length > 0; ) s = v.pop(), h.matches.push(s);
+                    h.matches.length > 0 && (!function e(n) {
+                        n && n.matches && n.matches.forEach((function(a, r) {
+                            var o = n.matches[r + 1];
+                            (void 0 === o || void 0 === o.matches || !1 === o.isQuantifier) && a && a.isGroup && (a.isGroup = !1, 
+                            t || (y(a, i.groupmarker[0], 0), !0 !== a.openGroup && y(a, i.groupmarker[1]))), 
+                            e(a);
+                        }));
+                    }(h), m.push(h));
+                    (i.numericInput || i.isRTL) && function e(t) {
+                        for (var n in t.matches = t.matches.reverse(), t.matches) if (Object.prototype.hasOwnProperty.call(t.matches, n)) {
+                            var a = parseInt(n);
+                            if (t.matches[n].isQuantifier && t.matches[a + 1] && t.matches[a + 1].isGroup) {
+                                var r = t.matches[n];
+                                t.matches.splice(n, 1), t.matches.splice(a + 1, 0, r);
+                            }
+                            void 0 !== t.matches[n].matches ? t.matches[n] = e(t.matches[n]) : t.matches[n] = ((o = t.matches[n]) === i.optionalmarker[0] ? o = i.optionalmarker[1] : o === i.optionalmarker[1] ? o = i.optionalmarker[0] : o === i.groupmarker[0] ? o = i.groupmarker[1] : o === i.groupmarker[1] && (o = i.groupmarker[0]), 
+                            o);
+                        }
+                        var o;
+                        return t;
+                    }(m[0]);
+                    return m;
+                }, t.generateMaskSet = function(e, t) {
+                    var i;
+                    function a(e, t) {
+                        var i = t.repeat, n = t.groupmarker, a = t.quantifiermarker, r = t.keepStatic;
+                        if (i > 0 || "*" === i || "+" === i) {
+                            var l = "*" === i ? 0 : "+" === i ? 1 : i;
+                            e = n[0] + e + n[1] + a[0] + l + "," + i + a[1];
+                        }
+                        if (!0 === r) {
+                            var c = e.match(new RegExp("(.)\\[([^\\]]*)\\]", "g"));
+                            c && c.forEach((function(t, i) {
+                                var n = function(e, t) {
+                                    return function(e) {
+                                        if (Array.isArray(e)) return e;
+                                    }(e) || function(e, t) {
+                                        var i = null == e ? null : "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
+                                        if (null != i) {
+                                            var n, a, r, o, s = [], l = !0, c = !1;
+                                            try {
+                                                if (r = (i = i.call(e)).next, 0 === t) {
+                                                    if (Object(i) !== i) return;
+                                                    l = !1;
+                                                } else for (;!(l = (n = r.call(i)).done) && (s.push(n.value), s.length !== t); l = !0) ;
+                                            } catch (e) {
+                                                c = !0, a = e;
+                                            } finally {
+                                                try {
+                                                    if (!l && null != i.return && (o = i.return(), Object(o) !== o)) return;
+                                                } finally {
+                                                    if (c) throw a;
+                                                }
+                                            }
+                                            return s;
+                                        }
+                                    }(e, t) || function(e, t) {
+                                        if (!e) return;
+                                        if ("string" == typeof e) return s(e, t);
+                                        var i = Object.prototype.toString.call(e).slice(8, -1);
+                                        "Object" === i && e.constructor && (i = e.constructor.name);
+                                        if ("Map" === i || "Set" === i) return Array.from(e);
+                                        if ("Arguments" === i || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(i)) return s(e, t);
+                                    }(e, t) || function() {
+                                        throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+                                    }();
+                                }(t.split("["), 2), a = n[0], r = n[1];
+                                r = r.replace("]", ""), e = e.replace(new RegExp("".concat((0, o.default)(a), "\\[").concat((0, 
+                                o.default)(r), "\\]")), a.charAt(0) === r.charAt(0) ? "(".concat(a, "|").concat(a).concat(r, ")") : "".concat(a, "[").concat(r, "]"));
+                            }));
+                        }
+                        return e;
+                    }
+                    function l(e, i, o) {
+                        var s, l, c = !1;
+                        return null !== e && "" !== e || ((c = null !== o.regex) ? e = (e = o.regex).replace(/^(\^)(.*)(\$)$/, "$2") : (c = !0, 
+                        e = ".*")), 1 === e.length && !1 === o.greedy && 0 !== o.repeat && (o.placeholder = ""), 
+                        e = a(e, o), l = c ? "regex_" + o.regex : o.numericInput ? e.split("").reverse().join("") : e, 
+                        null !== o.keepStatic && (l = "ks_" + o.keepStatic + l), void 0 === r.default.prototype.masksCache[l] || !0 === t ? (s = {
+                            mask: e,
+                            maskToken: r.default.prototype.analyseMask(e, c, o),
+                            validPositions: [],
+                            _buffer: void 0,
+                            buffer: void 0,
+                            tests: {},
+                            excludes: {},
+                            metadata: i,
+                            maskLength: void 0,
+                            jitOffset: {}
+                        }, !0 !== t && (r.default.prototype.masksCache[l] = s, s = n.default.extend(!0, {}, r.default.prototype.masksCache[l]))) : s = n.default.extend(!0, {}, r.default.prototype.masksCache[l]), 
+                        s;
+                    }
+                    "function" == typeof e.mask && (e.mask = e.mask(e));
+                    if (Array.isArray(e.mask)) {
+                        if (e.mask.length > 1) {
+                            null === e.keepStatic && (e.keepStatic = !0);
+                            var c = e.groupmarker[0];
+                            return (e.isRTL ? e.mask.reverse() : e.mask).forEach((function(t) {
+                                c.length > 1 && (c += e.alternatormarker), void 0 !== t.mask && "function" != typeof t.mask ? c += t.mask : c += t;
+                            })), l(c += e.groupmarker[1], e.mask, e);
+                        }
+                        e.mask = e.mask.pop();
+                    }
+                    i = e.mask && void 0 !== e.mask.mask && "function" != typeof e.mask.mask ? l(e.mask.mask, e.mask, e) : l(e.mask, e.mask, e);
+                    null === e.keepStatic && (e.keepStatic = !1);
+                    return i;
+                };
+                var n = l(i(4963)), a = l(i(9695)), r = l(i(2394)), o = l(i(7184));
+                function s(e, t) {
+                    (null == t || t > e.length) && (t = e.length);
+                    for (var i = 0, n = new Array(t); i < t; i++) n[i] = e[i];
+                    return n;
+                }
+                function l(e) {
+                    return e && e.__esModule ? e : {
+                        default: e
+                    };
+                }
+            },
+            157: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.mask = function() {
+                    var e = this, t = this.opts, i = this.el, u = this.dependencyLib;
+                    o.EventRuler.off(i);
+                    var f = function(t, i) {
+                        "textarea" !== t.tagName.toLowerCase() && i.ignorables.push(n.keys.Enter);
+                        var s = t.getAttribute("type"), l = "input" === t.tagName.toLowerCase() && i.supportsInputType.includes(s) || t.isContentEditable || "textarea" === t.tagName.toLowerCase();
+                        if (!l) if ("input" === t.tagName.toLowerCase()) {
+                            var c = document.createElement("input");
+                            c.setAttribute("type", s), l = "text" === c.type, c = null;
+                        } else l = "partial";
+                        return !1 !== l ? function(t) {
+                            var n, s;
+                            function l() {
+                                return this.inputmask ? this.inputmask.opts.autoUnmask ? this.inputmask.unmaskedvalue() : -1 !== a.getLastValidPosition.call(e) || !0 !== i.nullable ? (this.inputmask.shadowRoot || this.ownerDocument).activeElement === this && i.clearMaskOnLostFocus ? (e.isRTL ? r.clearOptionalTail.call(e, a.getBuffer.call(e).slice()).reverse() : r.clearOptionalTail.call(e, a.getBuffer.call(e).slice())).join("") : n.call(this) : "" : n.call(this);
+                            }
+                            function c(e) {
+                                s.call(this, e), this.inputmask && (0, r.applyInputValue)(this, e);
+                            }
+                            if (!t.inputmask.__valueGet) {
+                                if (!0 !== i.noValuePatching) {
+                                    if (Object.getOwnPropertyDescriptor) {
+                                        var f = Object.getPrototypeOf ? Object.getOwnPropertyDescriptor(Object.getPrototypeOf(t), "value") : void 0;
+                                        f && f.get && f.set ? (n = f.get, s = f.set, Object.defineProperty(t, "value", {
+                                            get: l,
+                                            set: c,
+                                            configurable: !0
+                                        })) : "input" !== t.tagName.toLowerCase() && (n = function() {
+                                            return this.textContent;
+                                        }, s = function(e) {
+                                            this.textContent = e;
+                                        }, Object.defineProperty(t, "value", {
+                                            get: l,
+                                            set: c,
+                                            configurable: !0
+                                        }));
+                                    } else document.__lookupGetter__ && t.__lookupGetter__("value") && (n = t.__lookupGetter__("value"), 
+                                    s = t.__lookupSetter__("value"), t.__defineGetter__("value", l), t.__defineSetter__("value", c));
+                                    t.inputmask.__valueGet = n, t.inputmask.__valueSet = s;
+                                }
+                                t.inputmask._valueGet = function(t) {
+                                    return e.isRTL && !0 !== t ? n.call(this.el).split("").reverse().join("") : n.call(this.el);
+                                }, t.inputmask._valueSet = function(t, i) {
+                                    s.call(this.el, null == t ? "" : !0 !== i && e.isRTL ? t.split("").reverse().join("") : t);
+                                }, void 0 === n && (n = function() {
+                                    return this.value;
+                                }, s = function(e) {
+                                    this.value = e;
+                                }, function(t) {
+                                    if (u.valHooks && (void 0 === u.valHooks[t] || !0 !== u.valHooks[t].inputmaskpatch)) {
+                                        var n = u.valHooks[t] && u.valHooks[t].get ? u.valHooks[t].get : function(e) {
+                                            return e.value;
+                                        }, o = u.valHooks[t] && u.valHooks[t].set ? u.valHooks[t].set : function(e, t) {
+                                            return e.value = t, e;
+                                        };
+                                        u.valHooks[t] = {
+                                            get: function(t) {
+                                                if (t.inputmask) {
+                                                    if (t.inputmask.opts.autoUnmask) return t.inputmask.unmaskedvalue();
+                                                    var r = n(t);
+                                                    return -1 !== a.getLastValidPosition.call(e, void 0, void 0, t.inputmask.maskset.validPositions) || !0 !== i.nullable ? r : "";
+                                                }
+                                                return n(t);
+                                            },
+                                            set: function(e, t) {
+                                                var i = o(e, t);
+                                                return e.inputmask && (0, r.applyInputValue)(e, t), i;
+                                            },
+                                            inputmaskpatch: !0
+                                        };
+                                    }
+                                }(t.type), function(e) {
+                                    o.EventRuler.on(e, "mouseenter", (function() {
+                                        var e = this, t = e.inputmask._valueGet(!0);
+                                        t != (e.inputmask.isRTL ? a.getBuffer.call(e.inputmask).slice().reverse() : a.getBuffer.call(e.inputmask)).join("") && (0, 
+                                        r.applyInputValue)(e, t);
+                                    }));
+                                }(t));
+                            }
+                        }(t) : t.inputmask = void 0, l;
+                    }(i, t);
+                    if (!1 !== f) {
+                        e.originalPlaceholder = i.placeholder, e.maxLength = void 0 !== i ? i.maxLength : void 0, 
+                        -1 === e.maxLength && (e.maxLength = void 0), "inputMode" in i && null === i.getAttribute("inputmode") && (i.inputMode = t.inputmode, 
+                        i.setAttribute("inputmode", t.inputmode)), !0 === f && (t.showMaskOnFocus = t.showMaskOnFocus && -1 === [ "cc-number", "cc-exp" ].indexOf(i.autocomplete), 
+                        s.iphone && (t.insertModeVisual = !1, i.setAttribute("autocorrect", "off")), o.EventRuler.on(i, "submit", c.EventHandlers.submitEvent), 
+                        o.EventRuler.on(i, "reset", c.EventHandlers.resetEvent), o.EventRuler.on(i, "blur", c.EventHandlers.blurEvent), 
+                        o.EventRuler.on(i, "focus", c.EventHandlers.focusEvent), o.EventRuler.on(i, "invalid", c.EventHandlers.invalidEvent), 
+                        o.EventRuler.on(i, "click", c.EventHandlers.clickEvent), o.EventRuler.on(i, "mouseleave", c.EventHandlers.mouseleaveEvent), 
+                        o.EventRuler.on(i, "mouseenter", c.EventHandlers.mouseenterEvent), o.EventRuler.on(i, "paste", c.EventHandlers.pasteEvent), 
+                        o.EventRuler.on(i, "cut", c.EventHandlers.cutEvent), o.EventRuler.on(i, "complete", t.oncomplete), 
+                        o.EventRuler.on(i, "incomplete", t.onincomplete), o.EventRuler.on(i, "cleared", t.oncleared), 
+                        !0 !== t.inputEventOnly && o.EventRuler.on(i, "keydown", c.EventHandlers.keyEvent), 
+                        (s.mobile || t.inputEventOnly) && i.removeAttribute("maxLength"), o.EventRuler.on(i, "input", c.EventHandlers.inputFallBackEvent)), 
+                        o.EventRuler.on(i, "setvalue", c.EventHandlers.setValueEvent), a.getBufferTemplate.call(e).join(""), 
+                        e.undoValue = e._valueGet(!0);
+                        var d = (i.inputmask.shadowRoot || i.ownerDocument).activeElement;
+                        if ("" !== i.inputmask._valueGet(!0) || !1 === t.clearMaskOnLostFocus || d === i) {
+                            (0, r.applyInputValue)(i, i.inputmask._valueGet(!0), t);
+                            var p = a.getBuffer.call(e).slice();
+                            !1 === l.isComplete.call(e, p) && t.clearIncomplete && a.resetMaskSet.call(e), t.clearMaskOnLostFocus && d !== i && (-1 === a.getLastValidPosition.call(e) ? p = [] : r.clearOptionalTail.call(e, p)), 
+                            (!1 === t.clearMaskOnLostFocus || t.showMaskOnFocus && d === i || "" !== i.inputmask._valueGet(!0)) && (0, 
+                            r.writeBuffer)(i, p), d === i && a.caret.call(e, i, a.seekNext.call(e, a.getLastValidPosition.call(e)));
+                        }
+                    }
+                };
+                var n = i(2839), a = i(8711), r = i(7760), o = i(9716), s = i(9845), l = i(7215), c = i(6030);
+            },
+            9695: function(e, t) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.default = function(e, t, i, n) {
+                    this.matches = [], this.openGroup = e || !1, this.alternatorGroup = !1, this.isGroup = e || !1, 
+                    this.isOptional = t || !1, this.isQuantifier = i || !1, this.isAlternator = n || !1, 
+                    this.quantifier = {
+                        min: 1,
+                        max: 1
+                    };
+                };
+            },
+            3194: function() {
+                Array.prototype.includes || Object.defineProperty(Array.prototype, "includes", {
+                    value: function(e, t) {
+                        if (null == this) throw new TypeError('"this" is null or not defined');
+                        var i = Object(this), n = i.length >>> 0;
+                        if (0 === n) return !1;
+                        for (var a = 0 | t, r = Math.max(a >= 0 ? a : n - Math.abs(a), 0); r < n; ) {
+                            if (i[r] === e) return !0;
+                            r++;
+                        }
+                        return !1;
+                    }
+                });
+            },
+            9302: function() {
+                var e = Function.bind.call(Function.call, Array.prototype.reduce), t = Function.bind.call(Function.call, Object.prototype.propertyIsEnumerable), i = Function.bind.call(Function.call, Array.prototype.concat), n = Object.keys;
+                Object.entries || (Object.entries = function(a) {
+                    return e(n(a), (function(e, n) {
+                        return i(e, "string" == typeof n && t(a, n) ? [ [ n, a[n] ] ] : []);
+                    }), []);
+                });
+            },
+            7149: function() {
+                function e(t) {
+                    return e = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(e) {
+                        return typeof e;
+                    } : function(e) {
+                        return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e;
+                    }, e(t);
+                }
+                "function" != typeof Object.getPrototypeOf && (Object.getPrototypeOf = "object" === e("test".__proto__) ? function(e) {
+                    return e.__proto__;
+                } : function(e) {
+                    return e.constructor.prototype;
+                });
+            },
+            4013: function() {
+                String.prototype.includes || (String.prototype.includes = function(e, t) {
+                    return "number" != typeof t && (t = 0), !(t + e.length > this.length) && -1 !== this.indexOf(e, t);
+                });
+            },
+            8711: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.caret = function(e, t, i, n, a) {
+                    var r, o = this, s = this.opts;
+                    if (void 0 === t) return "selectionStart" in e && "selectionEnd" in e ? (t = e.selectionStart, 
+                    i = e.selectionEnd) : window.getSelection ? (r = window.getSelection().getRangeAt(0)).commonAncestorContainer.parentNode !== e && r.commonAncestorContainer !== e || (t = r.startOffset, 
+                    i = r.endOffset) : document.selection && document.selection.createRange && (i = (t = 0 - (r = document.selection.createRange()).duplicate().moveStart("character", -e.inputmask._valueGet().length)) + r.text.length), 
+                    {
+                        begin: n ? t : c.call(o, t),
+                        end: n ? i : c.call(o, i)
+                    };
+                    if (Array.isArray(t) && (i = o.isRTL ? t[0] : t[1], t = o.isRTL ? t[1] : t[0]), 
+                    void 0 !== t.begin && (i = o.isRTL ? t.begin : t.end, t = o.isRTL ? t.end : t.begin), 
+                    "number" == typeof t) {
+                        t = n ? t : c.call(o, t), i = "number" == typeof (i = n ? i : c.call(o, i)) ? i : t;
+                        var l = parseInt(((e.ownerDocument.defaultView || window).getComputedStyle ? (e.ownerDocument.defaultView || window).getComputedStyle(e, null) : e.currentStyle).fontSize) * i;
+                        if (e.scrollLeft = l > e.scrollWidth ? l : 0, e.inputmask.caretPos = {
+                            begin: t,
+                            end: i
+                        }, s.insertModeVisual && !1 === s.insertMode && t === i && (a || i++), e === (e.inputmask.shadowRoot || e.ownerDocument).activeElement) if ("setSelectionRange" in e) e.setSelectionRange(t, i); else if (window.getSelection) {
+                            if (r = document.createRange(), void 0 === e.firstChild || null === e.firstChild) {
+                                var u = document.createTextNode("");
+                                e.appendChild(u);
+                            }
+                            r.setStart(e.firstChild, t < e.inputmask._valueGet().length ? t : e.inputmask._valueGet().length), 
+                            r.setEnd(e.firstChild, i < e.inputmask._valueGet().length ? i : e.inputmask._valueGet().length), 
+                            r.collapse(!0);
+                            var f = window.getSelection();
+                            f.removeAllRanges(), f.addRange(r);
+                        } else e.createTextRange && ((r = e.createTextRange()).collapse(!0), r.moveEnd("character", i), 
+                        r.moveStart("character", t), r.select());
+                    }
+                }, t.determineLastRequiredPosition = function(e) {
+                    var t, i, r = this, s = r.maskset, l = r.dependencyLib, c = n.getMaskTemplate.call(r, !0, o.call(r), !0, !0), u = c.length, f = o.call(r), d = {}, p = s.validPositions[f], h = void 0 !== p ? p.locator.slice() : void 0;
+                    for (t = f + 1; t < c.length; t++) h = (i = n.getTestTemplate.call(r, t, h, t - 1)).locator.slice(), 
+                    d[t] = l.extend(!0, {}, i);
+                    var v = p && void 0 !== p.alternation ? p.locator[p.alternation] : void 0;
+                    for (t = u - 1; t > f && (((i = d[t]).match.optionality || i.match.optionalQuantifier && i.match.newBlockMarker || v && (v !== d[t].locator[p.alternation] && 1 != i.match.static || !0 === i.match.static && i.locator[p.alternation] && a.checkAlternationMatch.call(r, i.locator[p.alternation].toString().split(","), v.toString().split(",")) && "" !== n.getTests.call(r, t)[0].def)) && c[t] === n.getPlaceholder.call(r, t, i.match)); t--) u--;
+                    return e ? {
+                        l: u,
+                        def: d[u] ? d[u].match : void 0
+                    } : u;
+                }, t.determineNewCaretPosition = function(e, t, i) {
+                    var a = this, c = a.maskset, u = a.opts;
+                    t && (a.isRTL ? e.end = e.begin : e.begin = e.end);
+                    if (e.begin === e.end) {
+                        switch (i = i || u.positionCaretOnClick) {
+                          case "none":
+                            break;
+
+                          case "select":
+                            e = {
+                                begin: 0,
+                                end: r.call(a).length
+                            };
+                            break;
+
+                          case "ignore":
+                            e.end = e.begin = l.call(a, o.call(a));
+                            break;
+
+                          case "radixFocus":
+                            if (a.clicked > 1 && 0 == c.validPositions.length) break;
+                            if (function(e) {
+                                if ("" !== u.radixPoint && 0 !== u.digits) {
+                                    var t = c.validPositions;
+                                    if (void 0 === t[e] || t[e].input === n.getPlaceholder.call(a, e)) {
+                                        if (e < l.call(a, -1)) return !0;
+                                        var i = r.call(a).indexOf(u.radixPoint);
+                                        if (-1 !== i) {
+                                            for (var o = 0, s = t.length; o < s; o++) if (t[o] && i < o && t[o].input !== n.getPlaceholder.call(a, o)) return !1;
+                                            return !0;
+                                        }
+                                    }
+                                }
+                                return !1;
+                            }(e.begin)) {
+                                var f = r.call(a).join("").indexOf(u.radixPoint);
+                                e.end = e.begin = u.numericInput ? l.call(a, f) : f;
+                                break;
+                            }
+
+                          default:
+                            var d = e.begin, p = o.call(a, d, !0), h = l.call(a, -1 !== p || s.call(a, 0) ? p : -1);
+                            if (d <= h) e.end = e.begin = s.call(a, d, !1, !0) ? d : l.call(a, d); else {
+                                var v = c.validPositions[p], m = n.getTestTemplate.call(a, h, v ? v.match.locator : void 0, v), g = n.getPlaceholder.call(a, h, m.match);
+                                if ("" !== g && r.call(a)[h] !== g && !0 !== m.match.optionalQuantifier && !0 !== m.match.newBlockMarker || !s.call(a, h, u.keepStatic, !0) && m.match.def === g) {
+                                    var y = l.call(a, h);
+                                    (d >= y || d === h) && (h = y);
+                                }
+                                e.end = e.begin = h;
+                            }
+                        }
+                        return e;
+                    }
+                }, t.getBuffer = r, t.getBufferTemplate = function() {
+                    var e = this.maskset;
+                    void 0 === e._buffer && (e._buffer = n.getMaskTemplate.call(this, !1, 1), void 0 === e.buffer && (e.buffer = e._buffer.slice()));
+                    return e._buffer;
+                }, t.getLastValidPosition = o, t.isMask = s, t.resetMaskSet = function(e) {
+                    var t = this.maskset;
+                    t.buffer = void 0, !0 !== e && (t.validPositions = [], t.p = 0);
+                }, t.seekNext = l, t.seekPrevious = function(e, t) {
+                    var i = this, a = e - 1;
+                    if (e <= 0) return 0;
+                    for (;a > 0 && (!0 === t && (!0 !== n.getTest.call(i, a).match.newBlockMarker || !s.call(i, a, void 0, !0)) || !0 !== t && !s.call(i, a, void 0, !0)); ) a--;
+                    return a;
+                }, t.translatePosition = c;
+                var n = i(4713), a = i(7215);
+                function r(e) {
+                    var t = this, i = t.maskset;
+                    return void 0 !== i.buffer && !0 !== e || (i.buffer = n.getMaskTemplate.call(t, !0, o.call(t), !0), 
+                    void 0 === i._buffer && (i._buffer = i.buffer.slice())), i.buffer;
+                }
+                function o(e, t, i) {
+                    var n = this.maskset, a = -1, r = -1, o = i || n.validPositions;
+                    void 0 === e && (e = -1);
+                    for (var s = 0, l = o.length; s < l; s++) o[s] && (t || !0 !== o[s].generatedInput) && (s <= e && (a = s), 
+                    s >= e && (r = s));
+                    return -1 === a || a == e ? r : -1 == r || e - a < r - e ? a : r;
+                }
+                function s(e, t, i) {
+                    var a = this, r = this.maskset, o = n.getTestTemplate.call(a, e).match;
+                    if ("" === o.def && (o = n.getTest.call(a, e).match), !0 !== o.static) return o.fn;
+                    if (!0 === i && void 0 !== r.validPositions[e] && !0 !== r.validPositions[e].generatedInput) return !0;
+                    if (!0 !== t && e > -1) {
+                        if (i) {
+                            var s = n.getTests.call(a, e);
+                            return s.length > 1 + ("" === s[s.length - 1].match.def ? 1 : 0);
+                        }
+                        var l = n.determineTestTemplate.call(a, e, n.getTests.call(a, e)), c = n.getPlaceholder.call(a, e, l.match);
+                        return l.match.def !== c;
+                    }
+                    return !1;
+                }
+                function l(e, t, i) {
+                    var a = this;
+                    void 0 === i && (i = !0);
+                    for (var r = e + 1; "" !== n.getTest.call(a, r).match.def && (!0 === t && (!0 !== n.getTest.call(a, r).match.newBlockMarker || !s.call(a, r, void 0, !0)) || !0 !== t && !s.call(a, r, void 0, i)); ) r++;
+                    return r;
+                }
+                function c(e) {
+                    var t = this.opts, i = this.el;
+                    return !this.isRTL || "number" != typeof e || t.greedy && "" === t.placeholder || !i || (e = this._valueGet().length - e) < 0 && (e = 0), 
+                    e;
+                }
+            },
+            4713: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.determineTestTemplate = c, t.getDecisionTaker = o, t.getMaskTemplate = function(e, t, i, n, a) {
+                    var r = this, o = this.opts, u = this.maskset, f = o.greedy;
+                    a && o.greedy && (o.greedy = !1, r.maskset.tests = {});
+                    t = t || 0;
+                    var p, h, v, m, g = [], y = 0;
+                    do {
+                        if (!0 === e && u.validPositions[y]) h = (v = a && u.validPositions[y].match.optionality && void 0 === u.validPositions[y + 1] && (!0 === u.validPositions[y].generatedInput || u.validPositions[y].input == o.skipOptionalPartCharacter && y > 0) ? c.call(r, y, d.call(r, y, p, y - 1)) : u.validPositions[y]).match, 
+                        p = v.locator.slice(), g.push(!0 === i ? v.input : !1 === i ? h.nativeDef : s.call(r, y, h)); else {
+                            h = (v = l.call(r, y, p, y - 1)).match, p = v.locator.slice();
+                            var k = !0 !== n && (!1 !== o.jitMasking ? o.jitMasking : h.jit);
+                            (m = (m && h.static && h.def !== o.groupSeparator && null === h.fn || u.validPositions[y - 1] && h.static && h.def !== o.groupSeparator && null === h.fn) && u.tests[y]) || !1 === k || void 0 === k || "number" == typeof k && isFinite(k) && k > y ? g.push(!1 === i ? h.nativeDef : s.call(r, g.length, h)) : m = !1;
+                        }
+                        y++;
+                    } while (!0 !== h.static || "" !== h.def || t > y);
+                    "" === g[g.length - 1] && g.pop();
+                    !1 === i && void 0 !== u.maskLength || (u.maskLength = y - 1);
+                    return o.greedy = f, g;
+                }, t.getPlaceholder = s, t.getTest = u, t.getTestTemplate = l, t.getTests = d, t.isSubsetOf = f;
+                var n, a = (n = i(2394)) && n.__esModule ? n : {
+                    default: n
+                };
+                function r(e, t) {
+                    var i = (null != e.alternation ? e.mloc[o(e)] : e.locator).join("");
+                    if ("" !== i) for (;i.length < t; ) i += "0";
+                    return i;
+                }
+                function o(e) {
+                    var t = e.locator[e.alternation];
+                    return "string" == typeof t && t.length > 0 && (t = t.split(",")[0]), void 0 !== t ? t.toString() : "";
+                }
+                function s(e, t, i) {
+                    var n = this.opts, a = this.maskset;
+                    if (void 0 !== (t = t || u.call(this, e).match).placeholder || !0 === i) return "function" == typeof t.placeholder ? t.placeholder(n) : t.placeholder;
+                    if (!0 === t.static) {
+                        if (e > -1 && void 0 === a.validPositions[e]) {
+                            var r, o = d.call(this, e), s = [];
+                            if (o.length > 1 + ("" === o[o.length - 1].match.def ? 1 : 0)) for (var l = 0; l < o.length; l++) if ("" !== o[l].match.def && !0 !== o[l].match.optionality && !0 !== o[l].match.optionalQuantifier && (!0 === o[l].match.static || void 0 === r || !1 !== o[l].match.fn.test(r.match.def, a, e, !0, n)) && (s.push(o[l]), 
+                            !0 === o[l].match.static && (r = o[l]), s.length > 1 && /[0-9a-bA-Z]/.test(s[0].match.def))) return n.placeholder.charAt(e % n.placeholder.length);
+                        }
+                        return t.def;
+                    }
+                    return n.placeholder.charAt(e % n.placeholder.length);
+                }
+                function l(e, t, i) {
+                    return this.maskset.validPositions[e] || c.call(this, e, d.call(this, e, t ? t.slice() : t, i));
+                }
+                function c(e, t) {
+                    var i = this.opts, n = 0, a = function(e, t) {
+                        var i = 0, n = !1;
+                        t.forEach((function(e) {
+                            e.match.optionality && (0 !== i && i !== e.match.optionality && (n = !0), (0 === i || i > e.match.optionality) && (i = e.match.optionality));
+                        })), i && (0 == e || 1 == t.length ? i = 0 : n || (i = 0));
+                        return i;
+                    }(e, t);
+                    e = e > 0 ? e - 1 : 0;
+                    var o, s, l, c = r(u.call(this, e));
+                    i.greedy && t.length > 1 && "" === t[t.length - 1].match.def && (n = 1);
+                    for (var f = 0; f < t.length - n; f++) {
+                        var d = t[f];
+                        o = r(d, c.length);
+                        var p = Math.abs(o - c);
+                        (void 0 === s || "" !== o && p < s || l && !i.greedy && l.match.optionality && l.match.optionality - a > 0 && "master" === l.match.newBlockMarker && (!d.match.optionality || d.match.optionality - a < 1 || !d.match.newBlockMarker) || l && !i.greedy && l.match.optionalQuantifier && !d.match.optionalQuantifier) && (s = p, 
+                        l = d);
+                    }
+                    return l;
+                }
+                function u(e, t) {
+                    var i = this.maskset;
+                    return i.validPositions[e] ? i.validPositions[e] : (t || d.call(this, e))[0];
+                }
+                function f(e, t, i) {
+                    function n(e) {
+                        for (var t, i = [], n = -1, a = 0, r = e.length; a < r; a++) if ("-" === e.charAt(a)) for (t = e.charCodeAt(a + 1); ++n < t; ) i.push(String.fromCharCode(n)); else n = e.charCodeAt(a), 
+                        i.push(e.charAt(a));
+                        return i.join("");
+                    }
+                    return e.match.def === t.match.nativeDef || !(!(i.regex || e.match.fn instanceof RegExp && t.match.fn instanceof RegExp) || !0 === e.match.static || !0 === t.match.static) && -1 !== n(t.match.fn.toString().replace(/[[\]/]/g, "")).indexOf(n(e.match.fn.toString().replace(/[[\]/]/g, "")));
+                }
+                function d(e, t, i) {
+                    var n, r, o = this, s = this.dependencyLib, l = this.maskset, u = this.opts, d = this.el, p = l.maskToken, h = t ? i : 0, v = t ? t.slice() : [ 0 ], m = [], g = !1, y = t ? t.join("") : "";
+                    function k(t, i, r, s) {
+                        function c(r, s, p) {
+                            function v(e, t) {
+                                var i = 0 === t.matches.indexOf(e);
+                                return i || t.matches.every((function(n, a) {
+                                    return !0 === n.isQuantifier ? i = v(e, t.matches[a - 1]) : Object.prototype.hasOwnProperty.call(n, "matches") && (i = v(e, n)), 
+                                    !i;
+                                })), i;
+                            }
+                            function x(e, t, i) {
+                                var n, a;
+                                if ((l.tests[e] || l.validPositions[e]) && (l.tests[e] || [ l.validPositions[e] ]).every((function(e, r) {
+                                    if (e.mloc[t]) return n = e, !1;
+                                    var o = void 0 !== i ? i : e.alternation, s = void 0 !== e.locator[o] ? e.locator[o].toString().indexOf(t) : -1;
+                                    return (void 0 === a || s < a) && -1 !== s && (n = e, a = s), !0;
+                                })), n) {
+                                    var r = n.locator[n.alternation];
+                                    return (n.mloc[t] || n.mloc[r] || n.locator).slice((void 0 !== i ? i : n.alternation) + 1);
+                                }
+                                return void 0 !== i ? x(e, t) : void 0;
+                            }
+                            function P(e, t) {
+                                var i = e.alternation, n = void 0 === t || i === t.alternation && -1 === e.locator[i].toString().indexOf(t.locator[i]);
+                                if (!n && i > t.alternation) for (var a = t.alternation; a < i; a++) if (e.locator[a] !== t.locator[a]) {
+                                    i = a, n = !0;
+                                    break;
+                                }
+                                if (n) {
+                                    e.mloc = e.mloc || {};
+                                    var r = e.locator[i];
+                                    if (void 0 !== r) {
+                                        if ("string" == typeof r && (r = r.split(",")[0]), void 0 === e.mloc[r] && (e.mloc[r] = e.locator.slice()), 
+                                        void 0 !== t) {
+                                            for (var o in t.mloc) "string" == typeof o && (o = o.split(",")[0]), void 0 === e.mloc[o] && (e.mloc[o] = t.mloc[o]);
+                                            e.locator[i] = Object.keys(e.mloc).join(",");
+                                        }
+                                        return !0;
+                                    }
+                                    e.alternation = void 0;
+                                }
+                                return !1;
+                            }
+                            function w(e, t) {
+                                if (e.locator.length !== t.locator.length) return !1;
+                                for (var i = e.alternation + 1; i < e.locator.length; i++) if (e.locator[i] !== t.locator[i]) return !1;
+                                return !0;
+                            }
+                            if (h > e + u._maxTestPos) throw "Inputmask: There is probably an error in your mask definition or in the code. Create an issue on github with an example of the mask you are using. " + l.mask;
+                            if (h === e && void 0 === r.matches) {
+                                if (m.push({
+                                    match: r,
+                                    locator: s.reverse(),
+                                    cd: y,
+                                    mloc: {}
+                                }), !r.optionality || void 0 !== p || !(u.definitions && u.definitions[r.nativeDef] && u.definitions[r.nativeDef].optional || a.default.prototype.definitions[r.nativeDef] && a.default.prototype.definitions[r.nativeDef].optional)) return !0;
+                                g = !0, h = e;
+                            } else if (void 0 !== r.matches) {
+                                if (r.isGroup && p !== r) return function() {
+                                    if (r = c(t.matches[t.matches.indexOf(r) + 1], s, p)) return !0;
+                                }();
+                                if (r.isOptional) return function() {
+                                    var t = r, a = m.length;
+                                    if (r = k(r, i, s, p), m.length > 0) {
+                                        if (m.forEach((function(e, t) {
+                                            t >= a && (e.match.optionality = e.match.optionality ? e.match.optionality + 1 : 1);
+                                        })), n = m[m.length - 1].match, void 0 !== p || !v(n, t)) return r;
+                                        g = !0, h = e;
+                                    }
+                                }();
+                                if (r.isAlternator) return function() {
+                                    o.hasAlternator = !0;
+                                    var n, a, v, y = r, k = [], b = m.slice(), S = s.length, M = !1, _ = i.length > 0 ? i.shift() : -1;
+                                    if (-1 === _ || "string" == typeof _) {
+                                        var O, E = h, T = i.slice(), j = [];
+                                        if ("string" == typeof _) j = _.split(","); else for (O = 0; O < y.matches.length; O++) j.push(O.toString());
+                                        if (void 0 !== l.excludes[e]) {
+                                            for (var A = j.slice(), D = 0, B = l.excludes[e].length; D < B; D++) {
+                                                var C = l.excludes[e][D].toString().split(":");
+                                                s.length == C[1] && j.splice(j.indexOf(C[0]), 1);
+                                            }
+                                            0 === j.length && (delete l.excludes[e], j = A);
+                                        }
+                                        (!0 === u.keepStatic || isFinite(parseInt(u.keepStatic)) && E >= u.keepStatic) && (j = j.slice(0, 1));
+                                        for (var R = 0; R < j.length; R++) {
+                                            O = parseInt(j[R]), m = [], i = "string" == typeof _ && x(h, O, S) || T.slice();
+                                            var L = y.matches[O];
+                                            if (L && c(L, [ O ].concat(s), p)) r = !0; else if (0 === R && (M = !0), L && L.matches && L.matches.length > y.matches[0].matches.length) break;
+                                            n = m.slice(), h = E, m = [];
+                                            for (var F = 0; F < n.length; F++) {
+                                                var I = n[F], N = !1;
+                                                I.match.jit = I.match.jit || M, I.alternation = I.alternation || S, P(I);
+                                                for (var V = 0; V < k.length; V++) {
+                                                    var G = k[V];
+                                                    if ("string" != typeof _ || void 0 !== I.alternation && j.includes(I.locator[I.alternation].toString())) {
+                                                        if (I.match.nativeDef === G.match.nativeDef) {
+                                                            N = !0, P(G, I);
+                                                            break;
+                                                        }
+                                                        if (f(I, G, u)) {
+                                                            P(I, G) && (N = !0, k.splice(k.indexOf(G), 0, I));
+                                                            break;
+                                                        }
+                                                        if (f(G, I, u)) {
+                                                            P(G, I);
+                                                            break;
+                                                        }
+                                                        if (v = G, !0 === (a = I).match.static && !0 !== v.match.static && v.match.fn.test(a.match.def, l, e, !1, u, !1)) {
+                                                            w(I, G) || void 0 !== d.inputmask.userOptions.keepStatic ? P(I, G) && (N = !0, k.splice(k.indexOf(G), 0, I)) : u.keepStatic = !0;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                N || k.push(I);
+                                            }
+                                        }
+                                        m = b.concat(k), h = e, g = m.length > 0, r = k.length > 0, i = T.slice();
+                                    } else r = c(y.matches[_] || t.matches[_], [ _ ].concat(s), p);
+                                    if (r) return !0;
+                                }();
+                                if (r.isQuantifier && p !== t.matches[t.matches.indexOf(r) - 1]) return function() {
+                                    for (var a = r, o = !1, f = i.length > 0 ? i.shift() : 0; f < (isNaN(a.quantifier.max) ? f + 1 : a.quantifier.max) && h <= e; f++) {
+                                        var d = t.matches[t.matches.indexOf(a) - 1];
+                                        if (r = c(d, [ f ].concat(s), d)) {
+                                            if (m.forEach((function(t, i) {
+                                                (n = b(d, t.match) ? t.match : m[m.length - 1].match).optionalQuantifier = f >= a.quantifier.min, 
+                                                n.jit = (f + 1) * (d.matches.indexOf(n) + 1) > a.quantifier.jit, n.optionalQuantifier && v(n, d) && (g = !0, 
+                                                h = e, u.greedy && null == l.validPositions[e - 1] && f > a.quantifier.min && -1 != [ "*", "+" ].indexOf(a.quantifier.max) && (m.pop(), 
+                                                y = void 0), o = !0, r = !1), !o && n.jit && (l.jitOffset[e] = d.matches.length - d.matches.indexOf(n));
+                                            })), o) break;
+                                            return !0;
+                                        }
+                                    }
+                                }();
+                                if (r = k(r, i, s, p)) return !0;
+                            } else h++;
+                        }
+                        for (var p = i.length > 0 ? i.shift() : 0; p < t.matches.length; p++) if (!0 !== t.matches[p].isQuantifier) {
+                            var v = c(t.matches[p], [ p ].concat(r), s);
+                            if (v && h === e) return v;
+                            if (h > e) break;
+                        }
+                    }
+                    function b(e, t) {
+                        var i = -1 != e.matches.indexOf(t);
+                        return i || e.matches.forEach((function(e, n) {
+                            void 0 === e.matches || i || (i = b(e, t));
+                        })), i;
+                    }
+                    if (e > -1) {
+                        if (void 0 === t) {
+                            for (var x, P = e - 1; void 0 === (x = l.validPositions[P] || l.tests[P]) && P > -1; ) P--;
+                            void 0 !== x && P > -1 && (v = function(e, t) {
+                                var i, n = [];
+                                return Array.isArray(t) || (t = [ t ]), t.length > 0 && (void 0 === t[0].alternation || !0 === u.keepStatic ? 0 === (n = c.call(o, e, t.slice()).locator.slice()).length && (n = t[0].locator.slice()) : t.forEach((function(e) {
+                                    "" !== e.def && (0 === n.length ? (i = e.alternation, n = e.locator.slice()) : e.locator[i] && -1 === n[i].toString().indexOf(e.locator[i]) && (n[i] += "," + e.locator[i]));
+                                }))), n;
+                            }(P, x), y = v.join(""), h = P);
+                        }
+                        if (l.tests[e] && l.tests[e][0].cd === y) return l.tests[e];
+                        for (var w = v.shift(); w < p.length; w++) {
+                            if (k(p[w], v, [ w ]) && h === e || h > e) break;
+                        }
+                    }
+                    return (0 === m.length || g) && m.push({
+                        match: {
+                            fn: null,
+                            static: !0,
+                            optionality: !1,
+                            casing: null,
+                            def: "",
+                            placeholder: ""
+                        },
+                        locator: [],
+                        mloc: {},
+                        cd: y
+                    }), void 0 !== t && l.tests[e] ? r = s.extend(!0, [], m) : (l.tests[e] = s.extend(!0, [], m), 
+                    r = l.tests[e]), m.forEach((function(e) {
+                        e.match.optionality = e.match.defOptionality || !1;
+                    })), r;
+                }
+            },
+            7215: function(e, t, i) {
+                Object.defineProperty(t, "__esModule", {
+                    value: !0
+                }), t.alternate = s, t.checkAlternationMatch = function(e, t, i) {
+                    for (var n, a = this.opts.greedy ? t : t.slice(0, 1), r = !1, o = void 0 !== i ? i.split(",") : [], s = 0; s < o.length; s++) -1 !== (n = e.indexOf(o[s])) && e.splice(n, 1);
+                    for (var l = 0; l < e.length; l++) if (a.includes(e[l])) {
+                        r = !0;
+                        break;
+                    }
+                    return r;
+                }, t.handleRemove = function(e, t, i, o, l) {
+                    var c = this, u = this.maskset, f = this.opts;
+                    if ((f.numericInput || c.isRTL) && (t === a.keys.Backspace ? t = a.keys.Delete : t === a.keys.Delete && (t = a.keys.Backspace), 
+                    c.isRTL)) {
+                        var d = i.end;
+                        i.end = i.begin, i.begin = d;
+                    }
+                    var p, h = r.getLastValidPosition.call(c, void 0, !0);
+                    i.end >= r.getBuffer.call(c).length && h >= i.end && (i.end = h + 1);
+                    t === a.keys.Backspace ? i.end - i.begin < 1 && (i.begin = r.seekPrevious.call(c, i.begin)) : t === a.keys.Delete && i.begin === i.end && (i.end = r.isMask.call(c, i.end, !0, !0) ? i.end + 1 : r.seekNext.call(c, i.end) + 1);
+                    if (!1 !== (p = v.call(c, i))) {
+                        if (!0 !== o && !1 !== f.keepStatic || null !== f.regex && -1 !== n.getTest.call(c, i.begin).match.def.indexOf("|")) {
+                            var m = s.call(c, !0);
+                            if (m) {
+                                var g = void 0 !== m.caret ? m.caret : m.pos ? r.seekNext.call(c, m.pos.begin ? m.pos.begin : m.pos) : r.getLastValidPosition.call(c, -1, !0);
+                                (t !== a.keys.Delete || i.begin > g) && i.begin;
+                            }
+                        }
+                        !0 !== o && (u.p = t === a.keys.Delete ? i.begin + p : i.begin, u.p = r.determineNewCaretPosition.call(c, {
+                            begin: u.p,
+                            end: u.p
+                        }, !1, !1 === f.insertMode && t === a.keys.Backspace ? "none" : void 0).begin);
+                    }
+                }, t.isComplete = c, t.isSelection = u, t.isValid = f, t.refreshFromBuffer = p, 
+                t.revalidateMask = v;
+                var n = i(4713), a = i(2839), r = i(8711), o = i(6030);
+                function s(e, t, i, a, o, l) {
+                    var c, u, d, p, h, v, m, g, y, k, b, x = this, P = this.dependencyLib, w = this.opts, S = x.maskset, M = P.extend(!0, [], S.validPositions), _ = P.extend(!0, {}, S.tests), O = !1, E = !1, T = void 0 !== o ? o : r.getLastValidPosition.call(x);
+                    if (l && (k = l.begin, b = l.end, l.begin > l.end && (k = l.end, b = l.begin)), 
+                    -1 === T && void 0 === o) c = 0, u = (p = n.getTest.call(x, c)).alternation; else for (;T >= 0; T--) if ((d = S.validPositions[T]) && void 0 !== d.alternation) {
+                        if (T <= (e || 0) && p && p.locator[d.alternation] !== d.locator[d.alternation]) break;
+                        c = T, u = S.validPositions[c].alternation, p = d;
+                    }
+                    if (void 0 !== u) {
+                        m = parseInt(c), S.excludes[m] = S.excludes[m] || [], !0 !== e && S.excludes[m].push((0, 
+                        n.getDecisionTaker)(p) + ":" + p.alternation);
+                        var j = [], A = -1;
+                        for (h = m; h < r.getLastValidPosition.call(x, void 0, !0) + 1; h++) -1 === A && e <= h && void 0 !== t && (j.push(t), 
+                        A = j.length - 1), (v = S.validPositions[h]) && !0 !== v.generatedInput && (void 0 === l || h < k || h >= b) && j.push(v.input), 
+                        delete S.validPositions[h];
+                        for (-1 === A && void 0 !== t && (j.push(t), A = j.length - 1); void 0 !== S.excludes[m] && S.excludes[m].length < 10; ) {
+                            for (S.tests = {}, r.resetMaskSet.call(x, !0), O = !0, h = 0; h < j.length && (g = O.caret || r.getLastValidPosition.call(x, void 0, !0) + 1, 
+                            y = j[h], O = f.call(x, g, y, !1, a, !0)); h++) h === A && (E = O), 1 == e && O && (E = {
+                                caretPos: h
+                            });
+                            if (O) break;
+                            if (r.resetMaskSet.call(x), p = n.getTest.call(x, m), S.validPositions = P.extend(!0, [], M), 
+                            S.tests = P.extend(!0, {}, _), !S.excludes[m]) {
+                                E = s.call(x, e, t, i, a, m - 1, l);
+                                break;
+                            }
+                            var D = (0, n.getDecisionTaker)(p);
+                            if (-1 !== S.excludes[m].indexOf(D + ":" + p.alternation)) {
+                                E = s.call(x, e, t, i, a, m - 1, l);
+                                break;
+                            }
+                            for (S.excludes[m].push(D + ":" + p.alternation), h = m; h < r.getLastValidPosition.call(x, void 0, !0) + 1; h++) delete S.validPositions[h];
+                        }
+                    }
+                    return E && !1 === w.keepStatic || delete S.excludes[m], E;
+                }
+                function l(e, t, i) {
+                    var n = this.opts, r = this.maskset;
+                    switch (n.casing || t.casing) {
+                      case "upper":
+                        e = e.toUpperCase();
+                        break;
+
+                      case "lower":
+                        e = e.toLowerCase();
+                        break;
+
+                      case "title":
+                        var o = r.validPositions[i - 1];
+                        e = 0 === i || o && o.input === String.fromCharCode(a.keyCode.Space) ? e.toUpperCase() : e.toLowerCase();
+                        break;
+
+                      default:
+                        if ("function" == typeof n.casing) {
+                            var s = Array.prototype.slice.call(arguments);
+                            s.push(r.validPositions), e = n.casing.apply(this, s);
+                        }
+                    }
+                    return e;
+                }
+                function c(e) {
+                    var t = this, i = this.opts, a = this.maskset;
+                    if ("function" == typeof i.isComplete) return i.isComplete(e, i);
+                    if ("*" !== i.repeat) {
+                        var o = !1, s = r.determineLastRequiredPosition.call(t, !0), l = r.seekPrevious.call(t, s.l);
+                        if (void 0 === s.def || s.def.newBlockMarker || s.def.optionality || s.def.optionalQuantifier) {
+                            o = !0;
+                            for (var c = 0; c <= l; c++) {
+                                var u = n.getTestTemplate.call(t, c).match;
+                                if (!0 !== u.static && void 0 === a.validPositions[c] && !0 !== u.optionality && !0 !== u.optionalQuantifier || !0 === u.static && e[c] !== n.getPlaceholder.call(t, c, u)) {
+                                    o = !1;
+                                    break;
+                                }
+                            }
+                        }
+                        return o;
+                    }
+                }
+                function u(e) {
+                    var t = this.opts.insertMode ? 0 : 1;
+                    return this.isRTL ? e.begin - e.end > t : e.end - e.begin > t;
+                }
+                function f(e, t, i, a, o, d, m) {
+                    var g = this, y = this.dependencyLib, k = this.opts, b = g.maskset;
+                    i = !0 === i;
+                    var x = e;
+                    function P(e) {
+                        if (void 0 !== e) {
+                            if (void 0 !== e.remove && (Array.isArray(e.remove) || (e.remove = [ e.remove ]), 
+                            e.remove.sort((function(e, t) {
+                                return g.isRTL ? e.pos - t.pos : t.pos - e.pos;
+                            })).forEach((function(e) {
+                                v.call(g, {
+                                    begin: e,
+                                    end: e + 1
+                                });
+                            })), e.remove = void 0), void 0 !== e.insert && (Array.isArray(e.insert) || (e.insert = [ e.insert ]), 
+                            e.insert.sort((function(e, t) {
+                                return g.isRTL ? t.pos - e.pos : e.pos - t.pos;
+                            })).forEach((function(e) {
+                                "" !== e.c && f.call(g, e.pos, e.c, void 0 === e.strict || e.strict, void 0 !== e.fromIsValid ? e.fromIsValid : a);
+                            })), e.insert = void 0), e.refreshFromBuffer && e.buffer) {
+                                var t = e.refreshFromBuffer;
+                                p.call(g, !0 === t ? t : t.start, t.end, e.buffer), e.refreshFromBuffer = void 0;
+                            }
+                            void 0 !== e.rewritePosition && (x = e.rewritePosition, e = !0);
+                        }
+                        return e;
+                    }
+                    function w(t, i, o) {
+                        var s = !1;
+                        return n.getTests.call(g, t).every((function(c, f) {
+                            var d = c.match;
+                            if (r.getBuffer.call(g, !0), !1 !== (s = (!d.jit || void 0 !== b.validPositions[r.seekPrevious.call(g, t)]) && (null != d.fn ? d.fn.test(i, b, t, o, k, u.call(g, e)) : (i === d.def || i === k.skipOptionalPartCharacter) && "" !== d.def && {
+                                c: n.getPlaceholder.call(g, t, d, !0) || d.def,
+                                pos: t
+                            }))) {
+                                var p = void 0 !== s.c ? s.c : i, h = t;
+                                return p = p === k.skipOptionalPartCharacter && !0 === d.static ? n.getPlaceholder.call(g, t, d, !0) || d.def : p, 
+                                !0 !== (s = P(s)) && void 0 !== s.pos && s.pos !== t && (h = s.pos), !0 !== s && void 0 === s.pos && void 0 === s.c ? !1 : (!1 === v.call(g, e, y.extend({}, c, {
+                                    input: l.call(g, p, d, h)
+                                }), a, h) && (s = !1), !1);
+                            }
+                            return !0;
+                        })), s;
+                    }
+                    void 0 !== e.begin && (x = g.isRTL ? e.end : e.begin);
+                    var S = !0, M = y.extend(!0, {}, b.validPositions);
+                    if (!1 === k.keepStatic && void 0 !== b.excludes[x] && !0 !== o && !0 !== a) for (var _ = x; _ < (g.isRTL ? e.begin : e.end); _++) void 0 !== b.excludes[_] && (b.excludes[_] = void 0, 
+                    delete b.tests[_]);
+                    if ("function" == typeof k.preValidation && !0 !== a && !0 !== d && (S = P(S = k.preValidation.call(g, r.getBuffer.call(g), x, t, u.call(g, e), k, b, e, i || o))), 
+                    !0 === S) {
+                        if (S = w(x, t, i), (!i || !0 === a) && !1 === S && !0 !== d) {
+                            var O = b.validPositions[x];
+                            if (!O || !0 !== O.match.static || O.match.def !== t && t !== k.skipOptionalPartCharacter) {
+                                if (k.insertMode || void 0 === b.validPositions[r.seekNext.call(g, x)] || e.end > x) {
+                                    var E = !1;
+                                    if (b.jitOffset[x] && void 0 === b.validPositions[r.seekNext.call(g, x)] && !1 !== (S = f.call(g, x + b.jitOffset[x], t, !0, !0)) && (!0 !== o && (S.caret = x), 
+                                    E = !0), e.end > x && (b.validPositions[x] = void 0), !E && !r.isMask.call(g, x, k.keepStatic && 0 === x)) for (var T = x + 1, j = r.seekNext.call(g, x, !1, 0 !== x); T <= j; T++) if (!1 !== (S = w(T, t, i))) {
+                                        S = h.call(g, x, void 0 !== S.pos ? S.pos : T) || S, x = T;
+                                        break;
+                                    }
+                                }
+                            } else S = {
+                                caret: r.seekNext.call(g, x)
+                            };
+                        }
+                        g.hasAlternator && !0 !== o && !i && (!1 === S && k.keepStatic && (c.call(g, r.getBuffer.call(g)) || 0 === x) ? S = s.call(g, x, t, i, a, void 0, e) : (u.call(g, e) && b.tests[x] && b.tests[x].length > 1 && k.keepStatic || 1 == S && !0 !== k.numericInput && b.tests[x] && b.tests[x].length > 1 && r.getLastValidPosition.call(g, void 0, !0) > x) && (S = s.call(g, !0))), 
+                        !0 === S && (S = {
+                            pos: x
+                        });
+                    }
+                    if ("function" == typeof k.postValidation && !0 !== a && !0 !== d) {
+                        var A = k.postValidation.call(g, r.getBuffer.call(g, !0), void 0 !== e.begin ? g.isRTL ? e.end : e.begin : e, t, S, k, b, i, m);
+                        void 0 !== A && (S = !0 === A ? S : A);
+                    }
+                    S && void 0 === S.pos && (S.pos = x), !1 === S || !0 === d ? (r.resetMaskSet.call(g, !0), 
+                    b.validPositions = y.extend(!0, [], M)) : h.call(g, void 0, x, !0);
+                    var D = P(S);
+                    void 0 !== g.maxLength && (r.getBuffer.call(g).length > g.maxLength && !a && (r.resetMaskSet.call(g, !0), 
+                    b.validPositions = y.extend(!0, [], M), D = !1));
+                    return D;
+                }
+                function d(e, t, i) {
+                    for (var a = this.maskset, r = !1, o = n.getTests.call(this, e), s = 0; s < o.length; s++) {
+                        if (o[s].match && (o[s].match.nativeDef === t.match[i.shiftPositions ? "def" : "nativeDef"] && (!i.shiftPositions || !t.match.static) || o[s].match.nativeDef === t.match.nativeDef || i.regex && !o[s].match.static && o[s].match.fn.test(t.input, a, e, !1, i))) {
+                            r = !0;
+                            break;
+                        }
+                        if (o[s].match && o[s].match.def === t.match.nativeDef) {
+                            r = void 0;
+                            break;
+                        }
+                    }
+                    return !1 === r && void 0 !== a.jitOffset[e] && (r = d.call(this, e + a.jitOffset[e], t, i)), 
+                    r;
+                }
+                function p(e, t, i) {
+                    var n, a, s = this, l = this.maskset, c = this.opts, u = this.dependencyLib, f = c.skipOptionalPartCharacter, d = s.isRTL ? i.slice().reverse() : i;
+                    if (c.skipOptionalPartCharacter = "", !0 === e) r.resetMaskSet.call(s), l.tests = {}, 
+                    e = 0, t = i.length, a = r.determineNewCaretPosition.call(s, {
+                        begin: 0,
+                        end: 0
+                    }, !1).begin; else {
+                        for (n = e; n < t; n++) delete l.validPositions[n];
+                        a = e;
+                    }
+                    var p = new u.Event("keypress");
+                    for (n = e; n < t; n++) {
+                        p.key = d[n].toString(), s.ignorable = !1;
+                        var h = o.EventHandlers.keypressEvent.call(s, p, !0, !1, !1, a);
+                        !1 !== h && void 0 !== h && (a = h.forwardPosition);
+                    }
+                    c.skipOptionalPartCharacter = f;
+                }
+                function h(e, t, i) {
+                    var a = this, o = this.maskset, s = this.dependencyLib;
+                    if (void 0 === e) for (e = t - 1; e > 0 && !o.validPositions[e]; e--) ;
+                    for (var l = e; l < t; l++) {
+                        if (void 0 === o.validPositions[l] && !r.isMask.call(a, l, !1)) if (0 == l ? n.getTest.call(a, l) : o.validPositions[l - 1]) {
+                            var c = n.getTests.call(a, l).slice();
+                            "" === c[c.length - 1].match.def && c.pop();
+                            var u, d = n.determineTestTemplate.call(a, l, c);
+                            if (d && (!0 !== d.match.jit || "master" === d.match.newBlockMarker && (u = o.validPositions[l + 1]) && !0 === u.match.optionalQuantifier) && ((d = s.extend({}, d, {
+                                input: n.getPlaceholder.call(a, l, d.match, !0) || d.match.def
+                            })).generatedInput = !0, v.call(a, l, d, !0), !0 !== i)) {
+                                var p = o.validPositions[t].input;
+                                return o.validPositions[t] = void 0, f.call(a, t, p, !0, !0);
+                            }
+                        }
+                    }
+                }
+                function v(e, t, i, a) {
+                    var o = this, s = this.maskset, l = this.opts, c = this.dependencyLib;
+                    function u(e, t, i) {
+                        var n = t[e];
+                        if (void 0 !== n && !0 === n.match.static && !0 !== n.match.optionality && (void 0 === t[0] || void 0 === t[0].alternation)) {
+                            var a = i.begin <= e - 1 ? t[e - 1] && !0 === t[e - 1].match.static && t[e - 1] : t[e - 1], r = i.end > e + 1 ? t[e + 1] && !0 === t[e + 1].match.static && t[e + 1] : t[e + 1];
+                            return a && r;
+                        }
+                        return !1;
+                    }
+                    var p = 0, h = void 0 !== e.begin ? e.begin : e, v = void 0 !== e.end ? e.end : e, m = !0;
+                    if (e.begin > e.end && (h = e.end, v = e.begin), a = void 0 !== a ? a : h, void 0 === i && (h !== v || l.insertMode && void 0 !== s.validPositions[a] || void 0 === t || t.match.optionalQuantifier || t.match.optionality)) {
+                        var g, y = c.extend(!0, {}, s.validPositions), k = r.getLastValidPosition.call(o, void 0, !0);
+                        for (s.p = h, g = k; g >= h; g--) delete s.validPositions[g], void 0 === t && delete s.tests[g + 1];
+                        var b, x, P = a, w = P;
+                        for (t && (s.validPositions[a] = c.extend(!0, {}, t), w++, P++), g = t ? v : v - 1; g <= k; g++) {
+                            if (void 0 !== (b = y[g]) && !0 !== b.generatedInput && (g >= v || g >= h && u(g, y, {
+                                begin: h,
+                                end: v
+                            }))) {
+                                for (;"" !== n.getTest.call(o, w).match.def; ) {
+                                    if (!1 !== (x = d.call(o, w, b, l)) || "+" === b.match.def) {
+                                        "+" === b.match.def && r.getBuffer.call(o, !0);
+                                        var S = f.call(o, w, b.input, "+" !== b.match.def, !0);
+                                        if (m = !1 !== S, P = (S.pos || w) + 1, !m && x) break;
+                                    } else m = !1;
+                                    if (m) {
+                                        void 0 === t && b.match.static && g === e.begin && p++;
+                                        break;
+                                    }
+                                    if (!m && r.getBuffer.call(o), w > s.maskLength) break;
+                                    w++;
+                                }
+                                "" == n.getTest.call(o, w).match.def && (m = !1), w = P;
+                            }
+                            if (!m) break;
+                        }
+                        if (!m) return s.validPositions = c.extend(!0, [], y), r.resetMaskSet.call(o, !0), 
+                        !1;
+                    } else t && n.getTest.call(o, a).match.cd === t.match.cd && (s.validPositions[a] = c.extend(!0, {}, t));
+                    return r.resetMaskSet.call(o, !0), p;
+                }
+            }
+        }, t = {};
+        function i(n) {
+            var a = t[n];
+            if (void 0 !== a) return a.exports;
+            var r = t[n] = {
+                exports: {}
+            };
+            return e[n](r, r.exports, i), r.exports;
+        }
+        var n = {};
+        return function() {
+            var e, t = n;
+            Object.defineProperty(t, "__esModule", {
+                value: !0
+            }), t.default = void 0, i(7149), i(3194), i(9302), i(4013), i(3851), i(219), i(207), 
+            i(5296);
+            var a = ((e = i(2394)) && e.__esModule ? e : {
+                default: e
+            }).default;
+            t.default = a;
+        }(), n;
+    }();
+}));
+
+/***/ }),
+
+/***/ "./node_modules/intl-tel-input/build/js/intlTelInput.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/intl-tel-input/build/js/intlTelInput.js ***!
+  \**************************************************************/
+/***/ ((module) => {
+
+/*
+ * International Telephone Input v18.2.1
+ * https://github.com/jackocnr/intl-tel-input.git
+ * Licensed under the MIT license
+ */
+
+// wrap in UMD
+(function(factory) {
+    if ( true && module.exports) module.exports = factory(); else window.intlTelInput = factory();
+})(function(undefined) {
+    "use strict";
+    return function() {
+        // Array of country objects for the flag dropdown.
+        // Here is the criteria for the plugin to support a given country/territory
+        // - It has an iso2 code: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+        // - It has it's own country calling code (it is not a sub-region of another country): https://en.wikipedia.org/wiki/List_of_country_calling_codes
+        // - It has a flag in the region-flags project: https://github.com/behdad/region-flags/tree/gh-pages/png
+        // - It is supported by libphonenumber (it must be listed on this page): https://github.com/googlei18n/libphonenumber/blob/master/resources/ShortNumberMetadata.xml
+        // Each country array has the following information:
+        // [
+        //    Country name,
+        //    iso2 code,
+        //    International dial code,
+        //    Order (if >1 country with same dial code),
+        //    Area codes
+        // ]
+        var allCountries = [ [ "Afghanistan (‫افغانستان‬‎)", "af", "93" ], [ "Albania (Shqipëri)", "al", "355" ], [ "Algeria (‫الجزائر‬‎)", "dz", "213" ], [ "American Samoa", "as", "1", 5, [ "684" ] ], [ "Andorra", "ad", "376" ], [ "Angola", "ao", "244" ], [ "Anguilla", "ai", "1", 6, [ "264" ] ], [ "Antigua and Barbuda", "ag", "1", 7, [ "268" ] ], [ "Argentina", "ar", "54" ], [ "Armenia (Հայաստան)", "am", "374" ], [ "Aruba", "aw", "297" ], [ "Ascension Island", "ac", "247" ], [ "Australia", "au", "61", 0 ], [ "Austria (Österreich)", "at", "43" ], [ "Azerbaijan (Azərbaycan)", "az", "994" ], [ "Bahamas", "bs", "1", 8, [ "242" ] ], [ "Bahrain (‫البحرين‬‎)", "bh", "973" ], [ "Bangladesh (বাংলাদেশ)", "bd", "880" ], [ "Barbados", "bb", "1", 9, [ "246" ] ], [ "Belarus (Беларусь)", "by", "375" ], [ "Belgium (België)", "be", "32" ], [ "Belize", "bz", "501" ], [ "Benin (Bénin)", "bj", "229" ], [ "Bermuda", "bm", "1", 10, [ "441" ] ], [ "Bhutan (འབྲུག)", "bt", "975" ], [ "Bolivia", "bo", "591" ], [ "Bosnia and Herzegovina (Босна и Херцеговина)", "ba", "387" ], [ "Botswana", "bw", "267" ], [ "Brazil (Brasil)", "br", "55" ], [ "British Indian Ocean Territory", "io", "246" ], [ "British Virgin Islands", "vg", "1", 11, [ "284" ] ], [ "Brunei", "bn", "673" ], [ "Bulgaria (България)", "bg", "359" ], [ "Burkina Faso", "bf", "226" ], [ "Burundi (Uburundi)", "bi", "257" ], [ "Cambodia (កម្ពុជា)", "kh", "855" ], [ "Cameroon (Cameroun)", "cm", "237" ], [ "Canada", "ca", "1", 1, [ "204", "226", "236", "249", "250", "263", "289", "306", "343", "354", "365", "367", "368", "382", "387", "403", "416", "418", "428", "431", "437", "438", "450", "584", "468", "474", "506", "514", "519", "548", "579", "581", "584", "587", "604", "613", "639", "647", "672", "683", "705", "709", "742", "753", "778", "780", "782", "807", "819", "825", "867", "873", "902", "905" ] ], [ "Cape Verde (Kabu Verdi)", "cv", "238" ], [ "Caribbean Netherlands", "bq", "599", 1, [ "3", "4", "7" ] ], [ "Cayman Islands", "ky", "1", 12, [ "345" ] ], [ "Central African Republic (République centrafricaine)", "cf", "236" ], [ "Chad (Tchad)", "td", "235" ], [ "Chile", "cl", "56" ], [ "China (中国)", "cn", "86" ], [ "Christmas Island", "cx", "61", 2, [ "89164" ] ], [ "Cocos (Keeling) Islands", "cc", "61", 1, [ "89162" ] ], [ "Colombia", "co", "57" ], [ "Comoros (‫جزر القمر‬‎)", "km", "269" ], [ "Congo (DRC) (Jamhuri ya Kidemokrasia ya Kongo)", "cd", "243" ], [ "Congo (Republic) (Congo-Brazzaville)", "cg", "242" ], [ "Cook Islands", "ck", "682" ], [ "Costa Rica", "cr", "506" ], [ "Côte d’Ivoire", "ci", "225" ], [ "Croatia (Hrvatska)", "hr", "385" ], [ "Cuba", "cu", "53" ], [ "Curaçao", "cw", "599", 0 ], [ "Cyprus (Κύπρος)", "cy", "357" ], [ "Czech Republic (Česká republika)", "cz", "420" ], [ "Denmark (Danmark)", "dk", "45" ], [ "Djibouti", "dj", "253" ], [ "Dominica", "dm", "1", 13, [ "767" ] ], [ "Dominican Republic (República Dominicana)", "do", "1", 2, [ "809", "829", "849" ] ], [ "Ecuador", "ec", "593" ], [ "Egypt (‫مصر‬‎)", "eg", "20" ], [ "El Salvador", "sv", "503" ], [ "Equatorial Guinea (Guinea Ecuatorial)", "gq", "240" ], [ "Eritrea", "er", "291" ], [ "Estonia (Eesti)", "ee", "372" ], [ "Eswatini", "sz", "268" ], [ "Ethiopia", "et", "251" ], [ "Falkland Islands (Islas Malvinas)", "fk", "500" ], [ "Faroe Islands (Føroyar)", "fo", "298" ], [ "Fiji", "fj", "679" ], [ "Finland (Suomi)", "fi", "358", 0 ], [ "France", "fr", "33" ], [ "French Guiana (Guyane française)", "gf", "594" ], [ "French Polynesia (Polynésie française)", "pf", "689" ], [ "Gabon", "ga", "241" ], [ "Gambia", "gm", "220" ], [ "Georgia (საქართველო)", "ge", "995" ], [ "Germany (Deutschland)", "de", "49" ], [ "Ghana (Gaana)", "gh", "233" ], [ "Gibraltar", "gi", "350" ], [ "Greece (Ελλάδα)", "gr", "30" ], [ "Greenland (Kalaallit Nunaat)", "gl", "299" ], [ "Grenada", "gd", "1", 14, [ "473" ] ], [ "Guadeloupe", "gp", "590", 0 ], [ "Guam", "gu", "1", 15, [ "671" ] ], [ "Guatemala", "gt", "502" ], [ "Guernsey", "gg", "44", 1, [ "1481", "7781", "7839", "7911" ] ], [ "Guinea (Guinée)", "gn", "224" ], [ "Guinea-Bissau (Guiné Bissau)", "gw", "245" ], [ "Guyana", "gy", "592" ], [ "Haiti", "ht", "509" ], [ "Honduras", "hn", "504" ], [ "Hong Kong (香港)", "hk", "852" ], [ "Hungary (Magyarország)", "hu", "36" ], [ "Iceland (Ísland)", "is", "354" ], [ "India (भारत)", "in", "91" ], [ "Indonesia", "id", "62" ], [ "Iran (‫ایران‬‎)", "ir", "98" ], [ "Iraq (‫العراق‬‎)", "iq", "964" ], [ "Ireland", "ie", "353" ], [ "Isle of Man", "im", "44", 2, [ "1624", "74576", "7524", "7924", "7624" ] ], [ "Israel (‫ישראל‬‎)", "il", "972" ], [ "Italy (Italia)", "it", "39", 0 ], [ "Jamaica", "jm", "1", 4, [ "876", "658" ] ], [ "Japan (日本)", "jp", "81" ], [ "Jersey", "je", "44", 3, [ "1534", "7509", "7700", "7797", "7829", "7937" ] ], [ "Jordan (‫الأردن‬‎)", "jo", "962" ], [ "Kazakhstan (Казахстан)", "kz", "7", 1, [ "33", "7" ] ], [ "Kenya", "ke", "254" ], [ "Kiribati", "ki", "686" ], [ "Kosovo", "xk", "383" ], [ "Kuwait (‫الكويت‬‎)", "kw", "965" ], [ "Kyrgyzstan (Кыргызстан)", "kg", "996" ], [ "Laos (ລາວ)", "la", "856" ], [ "Latvia (Latvija)", "lv", "371" ], [ "Lebanon (‫لبنان‬‎)", "lb", "961" ], [ "Lesotho", "ls", "266" ], [ "Liberia", "lr", "231" ], [ "Libya (‫ليبيا‬‎)", "ly", "218" ], [ "Liechtenstein", "li", "423" ], [ "Lithuania (Lietuva)", "lt", "370" ], [ "Luxembourg", "lu", "352" ], [ "Macau (澳門)", "mo", "853" ], [ "Madagascar (Madagasikara)", "mg", "261" ], [ "Malawi", "mw", "265" ], [ "Malaysia", "my", "60" ], [ "Maldives", "mv", "960" ], [ "Mali", "ml", "223" ], [ "Malta", "mt", "356" ], [ "Marshall Islands", "mh", "692" ], [ "Martinique", "mq", "596" ], [ "Mauritania (‫موريتانيا‬‎)", "mr", "222" ], [ "Mauritius (Moris)", "mu", "230" ], [ "Mayotte", "yt", "262", 1, [ "269", "639" ] ], [ "Mexico (México)", "mx", "52" ], [ "Micronesia", "fm", "691" ], [ "Moldova (Republica Moldova)", "md", "373" ], [ "Monaco", "mc", "377" ], [ "Mongolia (Монгол)", "mn", "976" ], [ "Montenegro (Crna Gora)", "me", "382" ], [ "Montserrat", "ms", "1", 16, [ "664" ] ], [ "Morocco (‫المغرب‬‎)", "ma", "212", 0 ], [ "Mozambique (Moçambique)", "mz", "258" ], [ "Myanmar (Burma) (မြန်မာ)", "mm", "95" ], [ "Namibia (Namibië)", "na", "264" ], [ "Nauru", "nr", "674" ], [ "Nepal (नेपाल)", "np", "977" ], [ "Netherlands (Nederland)", "nl", "31" ], [ "New Caledonia (Nouvelle-Calédonie)", "nc", "687" ], [ "New Zealand", "nz", "64" ], [ "Nicaragua", "ni", "505" ], [ "Niger (Nijar)", "ne", "227" ], [ "Nigeria", "ng", "234" ], [ "Niue", "nu", "683" ], [ "Norfolk Island", "nf", "672" ], [ "North Korea (조선 민주주의 인민 공화국)", "kp", "850" ], [ "North Macedonia (Северна Македонија)", "mk", "389" ], [ "Northern Mariana Islands", "mp", "1", 17, [ "670" ] ], [ "Norway (Norge)", "no", "47", 0 ], [ "Oman (‫عُمان‬‎)", "om", "968" ], [ "Pakistan (‫پاکستان‬‎)", "pk", "92" ], [ "Palau", "pw", "680" ], [ "Palestine (‫فلسطين‬‎)", "ps", "970" ], [ "Panama (Panamá)", "pa", "507" ], [ "Papua New Guinea", "pg", "675" ], [ "Paraguay", "py", "595" ], [ "Peru (Perú)", "pe", "51" ], [ "Philippines", "ph", "63" ], [ "Poland (Polska)", "pl", "48" ], [ "Portugal", "pt", "351" ], [ "Puerto Rico", "pr", "1", 3, [ "787", "939" ] ], [ "Qatar (‫قطر‬‎)", "qa", "974" ], [ "Réunion (La Réunion)", "re", "262", 0 ], [ "Romania (România)", "ro", "40" ], [ "Russia (Россия)", "ru", "7", 0 ], [ "Rwanda", "rw", "250" ], [ "Saint Barthélemy", "bl", "590", 1 ], [ "Saint Helena", "sh", "290" ], [ "Saint Kitts and Nevis", "kn", "1", 18, [ "869" ] ], [ "Saint Lucia", "lc", "1", 19, [ "758" ] ], [ "Saint Martin (Saint-Martin (partie française))", "mf", "590", 2 ], [ "Saint Pierre and Miquelon (Saint-Pierre-et-Miquelon)", "pm", "508" ], [ "Saint Vincent and the Grenadines", "vc", "1", 20, [ "784" ] ], [ "Samoa", "ws", "685" ], [ "San Marino", "sm", "378" ], [ "São Tomé and Príncipe (São Tomé e Príncipe)", "st", "239" ], [ "Saudi Arabia (‫المملكة العربية السعودية‬‎)", "sa", "966" ], [ "Senegal (Sénégal)", "sn", "221" ], [ "Serbia (Србија)", "rs", "381" ], [ "Seychelles", "sc", "248" ], [ "Sierra Leone", "sl", "232" ], [ "Singapore", "sg", "65" ], [ "Sint Maarten", "sx", "1", 21, [ "721" ] ], [ "Slovakia (Slovensko)", "sk", "421" ], [ "Slovenia (Slovenija)", "si", "386" ], [ "Solomon Islands", "sb", "677" ], [ "Somalia (Soomaaliya)", "so", "252" ], [ "South Africa", "za", "27" ], [ "South Korea (대한민국)", "kr", "82" ], [ "South Sudan (‫جنوب السودان‬‎)", "ss", "211" ], [ "Spain (España)", "es", "34" ], [ "Sri Lanka (ශ්‍රී ලංකාව)", "lk", "94" ], [ "Sudan (‫السودان‬‎)", "sd", "249" ], [ "Suriname", "sr", "597" ], [ "Svalbard and Jan Mayen", "sj", "47", 1, [ "79" ] ], [ "Sweden (Sverige)", "se", "46" ], [ "Switzerland (Schweiz)", "ch", "41" ], [ "Syria (‫سوريا‬‎)", "sy", "963" ], [ "Taiwan (台灣)", "tw", "886" ], [ "Tajikistan", "tj", "992" ], [ "Tanzania", "tz", "255" ], [ "Thailand (ไทย)", "th", "66" ], [ "Timor-Leste", "tl", "670" ], [ "Togo", "tg", "228" ], [ "Tokelau", "tk", "690" ], [ "Tonga", "to", "676" ], [ "Trinidad and Tobago", "tt", "1", 22, [ "868" ] ], [ "Tunisia (‫تونس‬‎)", "tn", "216" ], [ "Turkey (Türkiye)", "tr", "90" ], [ "Turkmenistan", "tm", "993" ], [ "Turks and Caicos Islands", "tc", "1", 23, [ "649" ] ], [ "Tuvalu", "tv", "688" ], [ "U.S. Virgin Islands", "vi", "1", 24, [ "340" ] ], [ "Uganda", "ug", "256" ], [ "Ukraine (Україна)", "ua", "380" ], [ "United Arab Emirates (‫الإمارات العربية المتحدة‬‎)", "ae", "971" ], [ "United Kingdom", "gb", "44", 0 ], [ "United States", "us", "1", 0 ], [ "Uruguay", "uy", "598" ], [ "Uzbekistan (Oʻzbekiston)", "uz", "998" ], [ "Vanuatu", "vu", "678" ], [ "Vatican City (Città del Vaticano)", "va", "39", 1, [ "06698" ] ], [ "Venezuela", "ve", "58" ], [ "Vietnam (Việt Nam)", "vn", "84" ], [ "Wallis and Futuna (Wallis-et-Futuna)", "wf", "681" ], [ "Western Sahara (‫الصحراء الغربية‬‎)", "eh", "212", 1, [ "5288", "5289" ] ], [ "Yemen (‫اليمن‬‎)", "ye", "967" ], [ "Zambia", "zm", "260" ], [ "Zimbabwe", "zw", "263" ], [ "Åland Islands", "ax", "358", 1, [ "18" ] ] ];
+        // loop over all of the countries above, restructuring the data to be objects with named keys
+        for (var i = 0; i < allCountries.length; i++) {
+            var c = allCountries[i];
+            allCountries[i] = {
+                name: c[0],
+                iso2: c[1],
+                dialCode: c[2],
+                priority: c[3] || 0,
+                areaCodes: c[4] || null
+            };
+        }
+        "use strict";
+        function _objectSpread(target) {
+            for (var i = 1; i < arguments.length; i++) {
+                var source = arguments[i] != null ? Object(arguments[i]) : {};
+                var ownKeys = Object.keys(source);
+                if (typeof Object.getOwnPropertySymbols === "function") {
+                    ownKeys.push.apply(ownKeys, Object.getOwnPropertySymbols(source).filter(function(sym) {
+                        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+                    }));
+                }
+                ownKeys.forEach(function(key) {
+                    _defineProperty(target, key, source[key]);
+                });
+            }
+            return target;
+        }
+        function _defineProperty(obj, key, value) {
+            key = _toPropertyKey(key);
+            if (key in obj) {
+                Object.defineProperty(obj, key, {
+                    value: value,
+                    enumerable: true,
+                    configurable: true,
+                    writable: true
+                });
+            } else {
+                obj[key] = value;
+            }
+            return obj;
+        }
+        function _classCallCheck(instance, Constructor) {
+            if (!(instance instanceof Constructor)) {
+                throw new TypeError("Cannot call a class as a function");
+            }
+        }
+        function _defineProperties(target, props) {
+            for (var i = 0; i < props.length; i++) {
+                var descriptor = props[i];
+                descriptor.enumerable = descriptor.enumerable || false;
+                descriptor.configurable = true;
+                if ("value" in descriptor) descriptor.writable = true;
+                Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor);
+            }
+        }
+        function _createClass(Constructor, protoProps, staticProps) {
+            if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) _defineProperties(Constructor, staticProps);
+            Object.defineProperty(Constructor, "prototype", {
+                writable: false
+            });
+            return Constructor;
+        }
+        function _toPropertyKey(arg) {
+            var key = _toPrimitive(arg, "string");
+            return typeof key === "symbol" ? key : String(key);
+        }
+        function _toPrimitive(input, hint) {
+            if (typeof input !== "object" || input === null) return input;
+            var prim = input[Symbol.toPrimitive];
+            if (prim !== undefined) {
+                var res = prim.call(input, hint || "default");
+                if (typeof res !== "object") return res;
+                throw new TypeError("@@toPrimitive must return a primitive value.");
+            }
+            return (hint === "string" ? String : Number)(input);
+        }
+        var intlTelInputGlobals = {
+            getInstance: function getInstance(input) {
+                var id = input.getAttribute("data-intl-tel-input-id");
+                return window.intlTelInputGlobals.instances[id];
+            },
+            instances: {},
+            // using a global like this allows us to mock it in the tests
+            documentReady: function documentReady() {
+                return document.readyState === "complete";
+            }
+        };
+        if (typeof window === "object") {
+            window.intlTelInputGlobals = intlTelInputGlobals;
+        }
+        // these vars persist through all instances of the plugin
+        var id = 0;
+        var defaults = {
+            // whether or not to allow the dropdown
+            allowDropdown: true,
+            // auto insert dial code (A) on init, (B) on user selecting a country, (C) on calling setCountry
+            // also listen for blur/submit and auto remove dial code if that's all there is
+            autoInsertDialCode: false,
+            // add a placeholder in the input with an example number for the selected country
+            autoPlaceholder: "polite",
+            // modify the parentClass
+            customContainer: "",
+            // modify the auto placeholder
+            customPlaceholder: null,
+            // append menu to specified element
+            dropdownContainer: null,
+            // don't display these countries
+            excludeCountries: [],
+            // format the input value during initialisation and on setNumber
+            formatOnDisplay: true,
+            // geoIp lookup function
+            geoIpLookup: null,
+            // inject a hidden input with this name, and on submit, populate it with the result of getNumber
+            hiddenInput: "",
+            // initial country
+            initialCountry: "",
+            // localized country names e.g. { 'de': 'Deutschland' }
+            localizedCountries: null,
+            // national vs international formatting for numbers e.g. placeholders and displaying existing numbers
+            nationalMode: true,
+            // display only these countries
+            onlyCountries: [],
+            // number type to use for placeholders
+            placeholderNumberType: "MOBILE",
+            // the countries at the top of the list. defaults to united states and united kingdom
+            preferredCountries: [ "us", "gb" ],
+            // display the country dial code next to the selected flag
+            separateDialCode: false,
+            // option to hide the flags - must be used with separateDialCode, or allowDropdown=false
+            showFlags: true,
+            // specify the path to the libphonenumber script to enable validation/formatting
+            utilsScript: ""
+        };
+        // https://en.wikipedia.org/wiki/List_of_North_American_Numbering_Plan_area_codes#Non-geographic_area_codes
+        var regionlessNanpNumbers = [ "800", "822", "833", "844", "855", "866", "877", "880", "881", "882", "883", "884", "885", "886", "887", "888", "889" ];
+        // utility function to iterate over an object. can't use Object.entries or native forEach because
+        // of IE11
+        var forEachProp = function forEachProp(obj, callback) {
+            var keys = Object.keys(obj);
+            for (var i = 0; i < keys.length; i++) {
+                callback(keys[i], obj[keys[i]]);
+            }
+        };
+        // run a method on each instance of the plugin
+        var forEachInstance = function forEachInstance(method) {
+            forEachProp(window.intlTelInputGlobals.instances, function(key) {
+                window.intlTelInputGlobals.instances[key][method]();
+            });
+        };
+        // this is our plugin class that we will create an instance of
+        // eslint-disable-next-line no-unused-vars
+        var Iti = /*#__PURE__*/ function() {
+            function Iti(input, options) {
+                var _this = this;
+                _classCallCheck(this, Iti);
+                this.id = id++;
+                this.telInput = input;
+                this.activeItem = null;
+                this.highlightedItem = null;
+                // process specified options / defaults
+                // alternative to Object.assign, which isn't supported by IE11
+                var customOptions = options || {};
+                this.options = {};
+                forEachProp(defaults, function(key, value) {
+                    _this.options[key] = customOptions.hasOwnProperty(key) ? customOptions[key] : value;
+                });
+                this.hadInitialPlaceholder = Boolean(input.getAttribute("placeholder"));
+            }
+            _createClass(Iti, [ {
+                key: "_init",
+                value: function _init() {
+                    var _this2 = this;
+                    // if in nationalMode, do not insert dial codes
+                    if (this.options.nationalMode) {
+                        this.options.autoInsertDialCode = false;
+                    }
+                    // if separateDialCode enabled, do not insert dial codes
+                    if (this.options.separateDialCode) {
+                        this.options.autoInsertDialCode = false;
+                    }
+                    // force showFlags=true if there's a dropdown and we're not displaying the dial code,
+                    // as otherwise you just have a down arrow on it's own which doesn't make sense
+                    var forceShowFlags = this.options.allowDropdown && !this.options.separateDialCode;
+                    if (!this.options.showFlags && forceShowFlags) {
+                        this.options.showFlags = true;
+                    }
+                    // we cannot just test screen size as some smartphones/website meta tags will report desktop
+                    // resolutions
+                    // Note: for some reason jasmine breaks if you put this in the main Plugin function with the
+                    // rest of these declarations
+                    // Note: to target Android Mobiles (and not Tablets), we must find 'Android' and 'Mobile'
+                    this.isMobile = /Android.+Mobile|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                    if (this.isMobile) {
+                        // trigger the mobile dropdown css
+                        document.body.classList.add("iti-mobile");
+                        // on mobile, we want a full screen dropdown, so we must append it to the body
+                        if (!this.options.dropdownContainer) {
+                            this.options.dropdownContainer = document.body;
+                        }
+                    }
+                    // check if input has one parent with RTL
+                    this.isRTL = !!this.telInput.closest("[dir=rtl]");
+                    // these promises get resolved when their individual requests complete
+                    // this way the dev can do something like iti.promise.then(...) to know when all requests are
+                    // complete
+                    if (typeof Promise !== "undefined") {
+                        var autoCountryPromise = new Promise(function(resolve, reject) {
+                            _this2.resolveAutoCountryPromise = resolve;
+                            _this2.rejectAutoCountryPromise = reject;
+                        });
+                        var utilsScriptPromise = new Promise(function(resolve, reject) {
+                            _this2.resolveUtilsScriptPromise = resolve;
+                            _this2.rejectUtilsScriptPromise = reject;
+                        });
+                        this.promise = Promise.all([ autoCountryPromise, utilsScriptPromise ]);
+                    } else {
+                        // prevent errors when Promise doesn't exist
+                        this.resolveAutoCountryPromise = this.rejectAutoCountryPromise = function() {};
+                        this.resolveUtilsScriptPromise = this.rejectUtilsScriptPromise = function() {};
+                    }
+                    // in various situations there could be no country selected initially, but we need to be able
+                    // to assume this variable exists
+                    this.selectedCountryData = {};
+                    // process all the data: onlyCountries, excludeCountries, preferredCountries etc
+                    this._processCountryData();
+                    // generate the markup
+                    this._generateMarkup();
+                    // set the initial state of the input value and the selected flag
+                    this._setInitialState();
+                    // start all of the event listeners: autoInsertDialCode, input keydown, selectedFlag click
+                    this._initListeners();
+                    // utils script, and auto country
+                    this._initRequests();
+                }
+            }, {
+                key: "_processCountryData",
+                value: function _processCountryData() {
+                    // process onlyCountries or excludeCountries array if present
+                    this._processAllCountries();
+                    // process the countryCodes map
+                    this._processCountryCodes();
+                    // process the preferredCountries
+                    this._processPreferredCountries();
+                    // translate countries according to localizedCountries option
+                    if (this.options.localizedCountries) {
+                        this._translateCountriesByLocale();
+                    }
+                    // sort countries by name
+                    if (this.options.onlyCountries.length || this.options.localizedCountries) {
+                        this.countries.sort(this._countryNameSort);
+                    }
+                }
+            }, {
+                key: "_addCountryCode",
+                value: function _addCountryCode(iso2, countryCode, priority) {
+                    if (countryCode.length > this.countryCodeMaxLen) {
+                        this.countryCodeMaxLen = countryCode.length;
+                    }
+                    if (!this.countryCodes.hasOwnProperty(countryCode)) {
+                        this.countryCodes[countryCode] = [];
+                    }
+                    // bail if we already have this country for this countryCode
+                    for (var i = 0; i < this.countryCodes[countryCode].length; i++) {
+                        if (this.countryCodes[countryCode][i] === iso2) {
+                            return;
+                        }
+                    }
+                    // check for undefined as 0 is falsy
+                    var index = priority !== undefined ? priority : this.countryCodes[countryCode].length;
+                    this.countryCodes[countryCode][index] = iso2;
+                }
+            }, {
+                key: "_processAllCountries",
+                value: function _processAllCountries() {
+                    if (this.options.onlyCountries.length) {
+                        var lowerCaseOnlyCountries = this.options.onlyCountries.map(function(country) {
+                            return country.toLowerCase();
+                        });
+                        this.countries = allCountries.filter(function(country) {
+                            return lowerCaseOnlyCountries.indexOf(country.iso2) > -1;
+                        });
+                    } else if (this.options.excludeCountries.length) {
+                        var lowerCaseExcludeCountries = this.options.excludeCountries.map(function(country) {
+                            return country.toLowerCase();
+                        });
+                        this.countries = allCountries.filter(function(country) {
+                            return lowerCaseExcludeCountries.indexOf(country.iso2) === -1;
+                        });
+                    } else {
+                        this.countries = allCountries;
+                    }
+                }
+            }, {
+                key: "_translateCountriesByLocale",
+                value: function _translateCountriesByLocale() {
+                    for (var i = 0; i < this.countries.length; i++) {
+                        var iso = this.countries[i].iso2.toLowerCase();
+                        if (this.options.localizedCountries.hasOwnProperty(iso)) {
+                            this.countries[i].name = this.options.localizedCountries[iso];
+                        }
+                    }
+                }
+            }, {
+                key: "_countryNameSort",
+                value: function _countryNameSort(a, b) {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            }, {
+                key: "_processCountryCodes",
+                value: function _processCountryCodes() {
+                    this.countryCodeMaxLen = 0;
+                    // here we store just dial codes
+                    this.dialCodes = {};
+                    // here we store "country codes" (both dial codes and their area codes)
+                    this.countryCodes = {};
+                    // first: add dial codes
+                    for (var i = 0; i < this.countries.length; i++) {
+                        var c = this.countries[i];
+                        if (!this.dialCodes[c.dialCode]) {
+                            this.dialCodes[c.dialCode] = true;
+                        }
+                        this._addCountryCode(c.iso2, c.dialCode, c.priority);
+                    }
+                    // next: add area codes
+                    // this is a second loop over countries, to make sure we have all of the "root" countries
+                    // already in the map, so that we can access them, as each time we add an area code substring
+                    // to the map, we also need to include the "root" country's code, as that also matches
+                    for (var _i = 0; _i < this.countries.length; _i++) {
+                        var _c = this.countries[_i];
+                        // area codes
+                        if (_c.areaCodes) {
+                            var rootCountryCode = this.countryCodes[_c.dialCode][0];
+                            // for each area code
+                            for (var j = 0; j < _c.areaCodes.length; j++) {
+                                var areaCode = _c.areaCodes[j];
+                                // for each digit in the area code to add all partial matches as well
+                                for (var k = 1; k < areaCode.length; k++) {
+                                    var partialDialCode = _c.dialCode + areaCode.substr(0, k);
+                                    // start with the root country, as that also matches this dial code
+                                    this._addCountryCode(rootCountryCode, partialDialCode);
+                                    this._addCountryCode(_c.iso2, partialDialCode);
+                                }
+                                // add the full area code
+                                this._addCountryCode(_c.iso2, _c.dialCode + areaCode);
+                            }
+                        }
+                    }
+                }
+            }, {
+                key: "_processPreferredCountries",
+                value: function _processPreferredCountries() {
+                    this.preferredCountries = [];
+                    for (var i = 0; i < this.options.preferredCountries.length; i++) {
+                        var countryCode = this.options.preferredCountries[i].toLowerCase();
+                        var countryData = this._getCountryData(countryCode, false, true);
+                        if (countryData) {
+                            this.preferredCountries.push(countryData);
+                        }
+                    }
+                }
+            }, {
+                key: "_createEl",
+                value: function _createEl(name, attrs, container) {
+                    var el = document.createElement(name);
+                    if (attrs) {
+                        forEachProp(attrs, function(key, value) {
+                            return el.setAttribute(key, value);
+                        });
+                    }
+                    if (container) {
+                        container.appendChild(el);
+                    }
+                    return el;
+                }
+            }, {
+                key: "_generateMarkup",
+                value: function _generateMarkup() {
+                    // if autocomplete does not exist on the element and its form, then
+                    // prevent autocomplete as there's no safe, cross-browser event we can react to, so it can
+                    // easily put the plugin in an inconsistent state e.g. the wrong flag selected for the
+                    // autocompleted number, which on submit could mean wrong number is saved
+                    if (!this.telInput.hasAttribute("autocomplete") && !(this.telInput.form && this.telInput.form.hasAttribute("autocomplete"))) {
+                        this.telInput.setAttribute("autocomplete", "off");
+                    }
+                    var _this$options = this.options, allowDropdown = _this$options.allowDropdown, separateDialCode = _this$options.separateDialCode, showFlags = _this$options.showFlags, customContainer = _this$options.customContainer, hiddenInput = _this$options.hiddenInput, dropdownContainer = _this$options.dropdownContainer;
+                    // containers (mostly for positioning)
+                    var parentClass = "iti";
+                    if (allowDropdown) {
+                        parentClass += " iti--allow-dropdown";
+                    }
+                    if (separateDialCode) {
+                        parentClass += " iti--separate-dial-code";
+                    }
+                    if (showFlags) {
+                        parentClass += " iti--show-flags";
+                    }
+                    if (customContainer) {
+                        parentClass += " ".concat(customContainer);
+                    }
+                    var wrapper = this._createEl("div", {
+                        "class": parentClass
+                    });
+                    this.telInput.parentNode.insertBefore(wrapper, this.telInput);
+                    // only hide the flagsContainer if allowDropdown, showFlags and separateDialCode are all false
+                    var showFlagsContainer = allowDropdown || showFlags || separateDialCode;
+                    if (showFlagsContainer) {
+                        this.flagsContainer = this._createEl("div", {
+                            "class": "iti__flag-container"
+                        }, wrapper);
+                    }
+                    wrapper.appendChild(this.telInput);
+                    // selected flag (displayed to left of input)
+                    // using Aria tags for "Select-Only Combobox Example"
+                    // https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/
+                    if (showFlagsContainer) {
+                        this.selectedFlag = this._createEl("div", _objectSpread({
+                            "class": "iti__selected-flag"
+                        }, allowDropdown && {
+                            role: "combobox",
+                            "aria-haspopup": "listbox",
+                            "aria-controls": "iti-".concat(this.id, "__country-listbox"),
+                            "aria-expanded": "false",
+                            "aria-label": "Telephone country code"
+                        }), this.flagsContainer);
+                    }
+                    if (showFlags) {
+                        this.selectedFlagInner = this._createEl("div", {
+                            "class": "iti__flag"
+                        }, this.selectedFlag);
+                    }
+                    if (this.selectedFlag && this.telInput.disabled) {
+                        this.selectedFlag.setAttribute("aria-disabled", "true");
+                    }
+                    if (separateDialCode) {
+                        this.selectedDialCode = this._createEl("div", {
+                            "class": "iti__selected-dial-code"
+                        }, this.selectedFlag);
+                    }
+                    if (allowDropdown) {
+                        if (!this.telInput.disabled) {
+                            // make element focusable and tab navigable
+                            this.selectedFlag.setAttribute("tabindex", "0");
+                        }
+                        this.dropdownArrow = this._createEl("div", {
+                            "class": "iti__arrow"
+                        }, this.selectedFlag);
+                        // country dropdown: preferred countries, then divider, then all countries
+                        this.countryList = this._createEl("ul", {
+                            "class": "iti__country-list iti__hide",
+                            id: "iti-".concat(this.id, "__country-listbox"),
+                            role: "listbox",
+                            "aria-label": "List of countries"
+                        });
+                        if (this.preferredCountries.length) {
+                            this._appendListItems(this.preferredCountries, "iti__preferred", true);
+                            this._createEl("li", {
+                                "class": "iti__divider",
+                                role: "separator",
+                                "aria-disabled": "true"
+                            }, this.countryList);
+                        }
+                        this._appendListItems(this.countries, "iti__standard");
+                        // create dropdownContainer markup
+                        if (dropdownContainer) {
+                            this.dropdown = this._createEl("div", {
+                                "class": "iti iti--container"
+                            });
+                            this.dropdown.appendChild(this.countryList);
+                        } else {
+                            this.flagsContainer.appendChild(this.countryList);
+                        }
+                    }
+                    if (hiddenInput) {
+                        var hiddenInputName = hiddenInput;
+                        var name = this.telInput.getAttribute("name");
+                        if (name) {
+                            var i = name.lastIndexOf("[");
+                            // if input name contains square brackets, then give the hidden input the same name,
+                            // replacing the contents of the last set of brackets with the given hiddenInput name
+                            if (i !== -1) {
+                                hiddenInputName = "".concat(name.substr(0, i), "[").concat(hiddenInputName, "]");
+                            }
+                        }
+                        this.hiddenInput = this._createEl("input", {
+                            type: "hidden",
+                            name: hiddenInputName
+                        });
+                        wrapper.appendChild(this.hiddenInput);
+                    }
+                }
+            }, {
+                key: "_appendListItems",
+                value: function _appendListItems(countries, className, preferred) {
+                    // we create so many DOM elements, it is faster to build a temp string
+                    // and then add everything to the DOM in one go at the end
+                    var tmp = "";
+                    // for each country
+                    for (var i = 0; i < countries.length; i++) {
+                        var c = countries[i];
+                        var idSuffix = preferred ? "-preferred" : "";
+                        // open the list item
+                        tmp += "<li class='iti__country ".concat(className, "' tabIndex='-1' id='iti-").concat(this.id, "__item-").concat(c.iso2).concat(idSuffix, "' role='option' data-dial-code='").concat(c.dialCode, "' data-country-code='").concat(c.iso2, "' aria-selected='false'>");
+                        // add the flag
+                        if (this.options.showFlags) {
+                            tmp += "<div class='iti__flag-box'><div class='iti__flag iti__".concat(c.iso2, "'></div></div>");
+                        }
+                        // and the country name and dial code
+                        tmp += "<span class='iti__country-name'>".concat(c.name, "</span>");
+                        tmp += "<span class='iti__dial-code'>+".concat(c.dialCode, "</span>");
+                        // close the list item
+                        tmp += "</li>";
+                    }
+                    this.countryList.insertAdjacentHTML("beforeend", tmp);
+                }
+            }, {
+                key: "_setInitialState",
+                value: function _setInitialState() {
+                    // fix firefox bug: when first load page (with input with value set to number with intl dial
+                    // code) and initialising plugin removes the dial code from the input, then refresh page,
+                    // and we try to init plugin again but this time on number without dial code so get grey flag
+                    var attributeValue = this.telInput.getAttribute("value");
+                    var inputValue = this.telInput.value;
+                    var useAttribute = attributeValue && attributeValue.charAt(0) === "+" && (!inputValue || inputValue.charAt(0) !== "+");
+                    var val = useAttribute ? attributeValue : inputValue;
+                    var dialCode = this._getDialCode(val);
+                    var isRegionlessNanp = this._isRegionlessNanp(val);
+                    var _this$options2 = this.options, initialCountry = _this$options2.initialCountry, autoInsertDialCode = _this$options2.autoInsertDialCode;
+                    // if we already have a dial code, and it's not a regionlessNanp, we can go ahead and set the
+                    // flag, else fall back to the default country
+                    if (dialCode && !isRegionlessNanp) {
+                        this._updateFlagFromNumber(val);
+                    } else if (initialCountry !== "auto") {
+                        // see if we should select a flag
+                        if (initialCountry) {
+                            this._setFlag(initialCountry.toLowerCase());
+                        } else {
+                            if (dialCode && isRegionlessNanp) {
+                                // has intl dial code, is regionless nanp, and no initialCountry, so default to US
+                                this._setFlag("us");
+                            } else {
+                                // no dial code and no initialCountry, so default to first in list
+                                this.defaultCountry = this.preferredCountries.length ? this.preferredCountries[0].iso2 : this.countries[0].iso2;
+                                if (!val) {
+                                    this._setFlag(this.defaultCountry);
+                                }
+                            }
+                        }
+                        // if empty and autoInsertDialCode then insert the dial code
+                        if (!val && autoInsertDialCode) {
+                            this.telInput.value = "+".concat(this.selectedCountryData.dialCode);
+                        }
+                    }
+                    // NOTE: if initialCountry is set to auto, that will be handled separately
+                    // format - note this wont be run after _updateDialCode as that's only called if no val
+                    if (val) {
+                        this._updateValFromNumber(val);
+                    }
+                }
+            }, {
+                key: "_initListeners",
+                value: function _initListeners() {
+                    this._initKeyListeners();
+                    if (this.options.autoInsertDialCode) {
+                        this._initBlurListeners();
+                    }
+                    if (this.options.allowDropdown) {
+                        this._initDropdownListeners();
+                    }
+                    if (this.hiddenInput) {
+                        this._initHiddenInputListener();
+                    }
+                }
+            }, {
+                key: "_initHiddenInputListener",
+                value: function _initHiddenInputListener() {
+                    var _this3 = this;
+                    this._handleHiddenInputSubmit = function() {
+                        _this3.hiddenInput.value = _this3.getNumber();
+                    };
+                    if (this.telInput.form) {
+                        this.telInput.form.addEventListener("submit", this._handleHiddenInputSubmit);
+                    }
+                }
+            }, {
+                key: "_getClosestLabel",
+                value: function _getClosestLabel() {
+                    var el = this.telInput;
+                    while (el && el.tagName !== "LABEL") {
+                        el = el.parentNode;
+                    }
+                    return el;
+                }
+            }, {
+                key: "_initDropdownListeners",
+                value: function _initDropdownListeners() {
+                    var _this4 = this;
+                    // hack for input nested inside label (which is valid markup): clicking the selected-flag to
+                    // open the dropdown would then automatically trigger a 2nd click on the input which would
+                    // close it again
+                    this._handleLabelClick = function(e) {
+                        // if the dropdown is closed, then focus the input, else ignore the click
+                        if (_this4.countryList.classList.contains("iti__hide")) {
+                            _this4.telInput.focus();
+                        } else {
+                            e.preventDefault();
+                        }
+                    };
+                    var label = this._getClosestLabel();
+                    if (label) {
+                        label.addEventListener("click", this._handleLabelClick);
+                    }
+                    // toggle country dropdown on click
+                    this._handleClickSelectedFlag = function() {
+                        // only intercept this event if we're opening the dropdown
+                        // else let it bubble up to the top ("click-off-to-close" listener)
+                        // we cannot just stopPropagation as it may be needed to close another instance
+                        if (_this4.countryList.classList.contains("iti__hide") && !_this4.telInput.disabled && !_this4.telInput.readOnly) {
+                            _this4._showDropdown();
+                        }
+                    };
+                    this.selectedFlag.addEventListener("click", this._handleClickSelectedFlag);
+                    // open dropdown list if currently focused
+                    this._handleFlagsContainerKeydown = function(e) {
+                        var isDropdownHidden = _this4.countryList.classList.contains("iti__hide");
+                        if (isDropdownHidden && [ "ArrowUp", "Up", "ArrowDown", "Down", " ", "Enter" ].indexOf(e.key) !== -1) {
+                            // prevent form from being submitted if "ENTER" was pressed
+                            e.preventDefault();
+                            // prevent event from being handled again by document
+                            e.stopPropagation();
+                            _this4._showDropdown();
+                        }
+                        // allow navigation from dropdown to input on TAB
+                        if (e.key === "Tab") {
+                            _this4._closeDropdown();
+                        }
+                    };
+                    this.flagsContainer.addEventListener("keydown", this._handleFlagsContainerKeydown);
+                }
+            }, {
+                key: "_initRequests",
+                value: function _initRequests() {
+                    var _this5 = this;
+                    // if the user has specified the path to the utils script, fetch it on window.load, else resolve
+                    if (this.options.utilsScript && !window.intlTelInputUtils) {
+                        // if the plugin is being initialised after the window.load event has already been fired
+                        if (window.intlTelInputGlobals.documentReady()) {
+                            window.intlTelInputGlobals.loadUtils(this.options.utilsScript);
+                        } else {
+                            // wait until the load event so we don't block any other requests e.g. the flags image
+                            window.addEventListener("load", function() {
+                                window.intlTelInputGlobals.loadUtils(_this5.options.utilsScript);
+                            });
+                        }
+                    } else {
+                        this.resolveUtilsScriptPromise();
+                    }
+                    if (this.options.initialCountry === "auto") {
+                        this._loadAutoCountry();
+                    } else {
+                        this.resolveAutoCountryPromise();
+                    }
+                }
+            }, {
+                key: "_loadAutoCountry",
+                value: function _loadAutoCountry() {
+                    // 3 options:
+                    // 1) already loaded (we're done)
+                    // 2) not already started loading (start)
+                    // 3) already started loading (do nothing - just wait for loading callback to fire)
+                    if (window.intlTelInputGlobals.autoCountry) {
+                        this.handleAutoCountry();
+                    } else if (!window.intlTelInputGlobals.startedLoadingAutoCountry) {
+                        // don't do this twice!
+                        window.intlTelInputGlobals.startedLoadingAutoCountry = true;
+                        if (typeof this.options.geoIpLookup === "function") {
+                            this.options.geoIpLookup(function(countryCode) {
+                                window.intlTelInputGlobals.autoCountry = countryCode.toLowerCase();
+                                // tell all instances the auto country is ready
+                                // TODO: this should just be the current instances
+                                // UPDATE: use setTimeout in case their geoIpLookup function calls this callback straight
+                                // away (e.g. if they have already done the geo ip lookup somewhere else). Using
+                                // setTimeout means that the current thread of execution will finish before executing
+                                // this, which allows the plugin to finish initialising.
+                                setTimeout(function() {
+                                    return forEachInstance("handleAutoCountry");
+                                });
+                            }, function() {
+                                return forEachInstance("rejectAutoCountryPromise");
+                            });
+                        }
+                    }
+                }
+            }, {
+                key: "_initKeyListeners",
+                value: function _initKeyListeners() {
+                    var _this6 = this;
+                    // update flag on keyup
+                    this._handleKeyupEvent = function() {
+                        if (_this6._updateFlagFromNumber(_this6.telInput.value)) {
+                            _this6._triggerCountryChange();
+                        }
+                    };
+                    this.telInput.addEventListener("keyup", this._handleKeyupEvent);
+                    // update flag on cut/paste events (now supported in all major browsers)
+                    this._handleClipboardEvent = function() {
+                        // hack because "paste" event is fired before input is updated
+                        setTimeout(_this6._handleKeyupEvent);
+                    };
+                    this.telInput.addEventListener("cut", this._handleClipboardEvent);
+                    this.telInput.addEventListener("paste", this._handleClipboardEvent);
+                }
+            }, {
+                key: "_cap",
+                value: function _cap(number) {
+                    var max = this.telInput.getAttribute("maxlength");
+                    return max && number.length > max ? number.substr(0, max) : number;
+                }
+            }, {
+                key: "_initBlurListeners",
+                value: function _initBlurListeners() {
+                    var _this7 = this;
+                    // on blur or form submit: if just a dial code then remove it
+                    this._handleSubmitOrBlurEvent = function() {
+                        _this7._removeEmptyDialCode();
+                    };
+                    if (this.telInput.form) {
+                        this.telInput.form.addEventListener("submit", this._handleSubmitOrBlurEvent);
+                    }
+                    this.telInput.addEventListener("blur", this._handleSubmitOrBlurEvent);
+                }
+            }, {
+                key: "_removeEmptyDialCode",
+                value: function _removeEmptyDialCode() {
+                    if (this.telInput.value.charAt(0) === "+") {
+                        var numeric = this._getNumeric(this.telInput.value);
+                        // if just a plus, or if just a dial code
+                        if (!numeric || this.selectedCountryData.dialCode === numeric) {
+                            this.telInput.value = "";
+                        }
+                    }
+                }
+            }, {
+                key: "_getNumeric",
+                value: function _getNumeric(s) {
+                    return s.replace(/\D/g, "");
+                }
+            }, {
+                key: "_trigger",
+                value: function _trigger(name) {
+                    // have to use old school document.createEvent as IE11 doesn't support `new Event()` syntax
+                    var e = document.createEvent("Event");
+                    e.initEvent(name, true, true);
+                    // can bubble, and is cancellable
+                    this.telInput.dispatchEvent(e);
+                }
+            }, {
+                key: "_showDropdown",
+                value: function _showDropdown() {
+                    this.countryList.classList.remove("iti__hide");
+                    this.selectedFlag.setAttribute("aria-expanded", "true");
+                    this._setDropdownPosition();
+                    // update highlighting and scroll to active list item
+                    if (this.activeItem) {
+                        this._highlightListItem(this.activeItem, false);
+                        this._scrollTo(this.activeItem, true);
+                    }
+                    // bind all the dropdown-related listeners: mouseover, click, click-off, keydown
+                    this._bindDropdownListeners();
+                    // update the arrow
+                    this.dropdownArrow.classList.add("iti__arrow--up");
+                    this._trigger("open:countrydropdown");
+                }
+            }, {
+                key: "_toggleClass",
+                value: function _toggleClass(el, className, shouldHaveClass) {
+                    if (shouldHaveClass && !el.classList.contains(className)) {
+                        el.classList.add(className);
+                    } else if (!shouldHaveClass && el.classList.contains(className)) {
+                        el.classList.remove(className);
+                    }
+                }
+            }, {
+                key: "_setDropdownPosition",
+                value: function _setDropdownPosition() {
+                    var _this8 = this;
+                    if (this.options.dropdownContainer) {
+                        this.options.dropdownContainer.appendChild(this.dropdown);
+                    }
+                    if (!this.isMobile) {
+                        var pos = this.telInput.getBoundingClientRect();
+                        // windowTop from https://stackoverflow.com/a/14384091/217866
+                        var windowTop = window.pageYOffset || document.documentElement.scrollTop;
+                        var inputTop = pos.top + windowTop;
+                        var dropdownHeight = this.countryList.offsetHeight;
+                        // dropdownFitsBelow = (dropdownBottom < windowBottom)
+                        var dropdownFitsBelow = inputTop + this.telInput.offsetHeight + dropdownHeight < windowTop + window.innerHeight;
+                        var dropdownFitsAbove = inputTop - dropdownHeight > windowTop;
+                        // by default, the dropdown will be below the input. If we want to position it above the
+                        // input, we add the dropup class.
+                        this._toggleClass(this.countryList, "iti__country-list--dropup", !dropdownFitsBelow && dropdownFitsAbove);
+                        // if dropdownContainer is enabled, calculate postion
+                        if (this.options.dropdownContainer) {
+                            // by default the dropdown will be directly over the input because it's not in the flow.
+                            // If we want to position it below, we need to add some extra top value.
+                            var extraTop = !dropdownFitsBelow && dropdownFitsAbove ? 0 : this.telInput.offsetHeight;
+                            // calculate placement
+                            this.dropdown.style.top = "".concat(inputTop + extraTop, "px");
+                            this.dropdown.style.left = "".concat(pos.left + document.body.scrollLeft, "px");
+                            // close menu on window scroll
+                            this._handleWindowScroll = function() {
+                                return _this8._closeDropdown();
+                            };
+                            window.addEventListener("scroll", this._handleWindowScroll);
+                        }
+                    }
+                }
+            }, {
+                key: "_getClosestListItem",
+                value: function _getClosestListItem(target) {
+                    var el = target;
+                    while (el && el !== this.countryList && !el.classList.contains("iti__country")) {
+                        el = el.parentNode;
+                    }
+                    // if we reached the countryList element, then return null
+                    return el === this.countryList ? null : el;
+                }
+            }, {
+                key: "_bindDropdownListeners",
+                value: function _bindDropdownListeners() {
+                    var _this9 = this;
+                    // when mouse over a list item, just highlight that one
+                    // we add the class "highlight", so if they hit "enter" we know which one to select
+                    this._handleMouseoverCountryList = function(e) {
+                        // handle event delegation, as we're listening for this event on the countryList
+                        var listItem = _this9._getClosestListItem(e.target);
+                        if (listItem) {
+                            _this9._highlightListItem(listItem, false);
+                        }
+                    };
+                    this.countryList.addEventListener("mouseover", this._handleMouseoverCountryList);
+                    // listen for country selection
+                    this._handleClickCountryList = function(e) {
+                        var listItem = _this9._getClosestListItem(e.target);
+                        if (listItem) {
+                            _this9._selectListItem(listItem);
+                        }
+                    };
+                    this.countryList.addEventListener("click", this._handleClickCountryList);
+                    // click off to close
+                    // (except when this initial opening click is bubbling up)
+                    // we cannot just stopPropagation as it may be needed to close another instance
+                    var isOpening = true;
+                    this._handleClickOffToClose = function() {
+                        if (!isOpening) {
+                            _this9._closeDropdown();
+                        }
+                        isOpening = false;
+                    };
+                    document.documentElement.addEventListener("click", this._handleClickOffToClose);
+                    // listen for up/down scrolling, enter to select, or letters to jump to country name.
+                    // use keydown as keypress doesn't fire for non-char keys and we want to catch if they
+                    // just hit down and hold it to scroll down (no keyup event).
+                    // listen on the document because that's where key events are triggered if no input has focus
+                    var query = "";
+                    var queryTimer = null;
+                    this._handleKeydownOnDropdown = function(e) {
+                        // prevent down key from scrolling the whole page,
+                        // and enter key from submitting a form etc
+                        e.preventDefault();
+                        // up and down to navigate
+                        if (e.key === "ArrowUp" || e.key === "Up" || e.key === "ArrowDown" || e.key === "Down") {
+                            _this9._handleUpDownKey(e.key);
+                        } else if (e.key === "Enter") {
+                            _this9._handleEnterKey();
+                        } else if (e.key === "Escape") {
+                            _this9._closeDropdown();
+                        } else if (/^[a-zA-ZÀ-ÿа-яА-Я ]$/.test(e.key)) {
+                            // jump to countries that start with the query string
+                            if (queryTimer) {
+                                clearTimeout(queryTimer);
+                            }
+                            query += e.key.toLowerCase();
+                            _this9._searchForCountry(query);
+                            // if the timer hits 1 second, reset the query
+                            queryTimer = setTimeout(function() {
+                                query = "";
+                            }, 1e3);
+                        }
+                    };
+                    document.addEventListener("keydown", this._handleKeydownOnDropdown);
+                }
+            }, {
+                key: "_handleUpDownKey",
+                value: function _handleUpDownKey(key) {
+                    var next = key === "ArrowUp" || key === "Up" ? this.highlightedItem.previousElementSibling : this.highlightedItem.nextElementSibling;
+                    if (next) {
+                        // skip the divider
+                        if (next.classList.contains("iti__divider")) {
+                            next = key === "ArrowUp" || key === "Up" ? next.previousElementSibling : next.nextElementSibling;
+                        }
+                        this._highlightListItem(next, true);
+                    }
+                }
+            }, {
+                key: "_handleEnterKey",
+                value: function _handleEnterKey() {
+                    if (this.highlightedItem) {
+                        this._selectListItem(this.highlightedItem);
+                    }
+                }
+            }, {
+                key: "_searchForCountry",
+                value: function _searchForCountry(query) {
+                    for (var i = 0; i < this.countries.length; i++) {
+                        if (this._startsWith(this.countries[i].name, query)) {
+                            var listItem = this.countryList.querySelector("#iti-".concat(this.id, "__item-").concat(this.countries[i].iso2));
+                            // update highlighting and scroll
+                            this._highlightListItem(listItem, false);
+                            this._scrollTo(listItem, true);
+                            break;
+                        }
+                    }
+                }
+            }, {
+                key: "_startsWith",
+                value: function _startsWith(a, b) {
+                    return a.substr(0, b.length).toLowerCase() === b;
+                }
+            }, {
+                key: "_updateValFromNumber",
+                value: function _updateValFromNumber(originalNumber) {
+                    var number = originalNumber;
+                    if (this.options.formatOnDisplay && window.intlTelInputUtils && this.selectedCountryData) {
+                        var useNational = this.options.nationalMode || number.charAt(0) !== "+" && !this.options.separateDialCode;
+                        var _intlTelInputUtils$nu = intlTelInputUtils.numberFormat, NATIONAL = _intlTelInputUtils$nu.NATIONAL, INTERNATIONAL = _intlTelInputUtils$nu.INTERNATIONAL;
+                        var format = useNational ? NATIONAL : INTERNATIONAL;
+                        number = intlTelInputUtils.formatNumber(number, this.selectedCountryData.iso2, format);
+                    }
+                    number = this._beforeSetNumber(number);
+                    this.telInput.value = number;
+                }
+            }, {
+                key: "_updateFlagFromNumber",
+                value: function _updateFlagFromNumber(originalNumber) {
+                    // if we already have US/Canada selected, make sure the number starts
+                    // with a +1 so _getDialCode will be able to extract the area code
+                    // update: if we dont yet have selectedCountryData, but we're here (trying to update the flag
+                    // from the number), that means we're initialising the plugin with a number that already has a
+                    // dial code, so fine to ignore this bit
+                    var number = originalNumber;
+                    var selectedDialCode = this.selectedCountryData.dialCode;
+                    var isNanp = selectedDialCode === "1";
+                    if (number && isNanp && number.charAt(0) !== "+") {
+                        if (number.charAt(0) !== "1") {
+                            number = "1".concat(number);
+                        }
+                        number = "+".concat(number);
+                    }
+                    // if separateDialCode enabled, then consider the selected dial code to be part of the number
+                    if (this.options.separateDialCode && selectedDialCode && number.charAt(0) !== "+") {
+                        number = "+".concat(selectedDialCode).concat(number);
+                    }
+                    // try and extract valid dial code from input
+                    var dialCode = this._getDialCode(number, true);
+                    var numeric = this._getNumeric(number);
+                    var countryCode = null;
+                    if (dialCode) {
+                        var countryCodes = this.countryCodes[this._getNumeric(dialCode)];
+                        // check if the right country is already selected. this should be false if the number is
+                        // longer than the matched dial code because in this case we need to make sure that if
+                        // there are multiple country matches, that the first one is selected (note: we could
+                        // just check that here, but it requires the same loop that we already have later)
+                        var alreadySelected = countryCodes.indexOf(this.selectedCountryData.iso2) !== -1 && numeric.length <= dialCode.length - 1;
+                        var isRegionlessNanpNumber = selectedDialCode === "1" && this._isRegionlessNanp(numeric);
+                        // only update the flag if:
+                        // A) NOT (we currently have a NANP flag selected, and the number is a regionlessNanp)
+                        // AND
+                        // B) the right country is not already selected
+                        if (!isRegionlessNanpNumber && !alreadySelected) {
+                            // if using onlyCountries option, countryCodes[0] may be empty, so we must find the first
+                            // non-empty index
+                            for (var j = 0; j < countryCodes.length; j++) {
+                                if (countryCodes[j]) {
+                                    countryCode = countryCodes[j];
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (number.charAt(0) === "+" && numeric.length) {
+                        // invalid dial code, so empty
+                        // Note: use getNumeric here because the number has not been formatted yet, so could contain
+                        // bad chars
+                        countryCode = "";
+                    } else if (!number || number === "+") {
+                        // empty, or just a plus, so default
+                        countryCode = this.defaultCountry;
+                    }
+                    if (countryCode !== null) {
+                        return this._setFlag(countryCode);
+                    }
+                    return false;
+                }
+            }, {
+                key: "_isRegionlessNanp",
+                value: function _isRegionlessNanp(number) {
+                    var numeric = this._getNumeric(number);
+                    if (numeric.charAt(0) === "1") {
+                        var areaCode = numeric.substr(1, 3);
+                        return regionlessNanpNumbers.indexOf(areaCode) !== -1;
+                    }
+                    return false;
+                }
+            }, {
+                key: "_highlightListItem",
+                value: function _highlightListItem(listItem, shouldFocus) {
+                    var prevItem = this.highlightedItem;
+                    if (prevItem) {
+                        prevItem.classList.remove("iti__highlight");
+                    }
+                    this.highlightedItem = listItem;
+                    this.highlightedItem.classList.add("iti__highlight");
+                    this.selectedFlag.setAttribute("aria-activedescendant", listItem.getAttribute("id"));
+                    if (shouldFocus) {
+                        this.highlightedItem.focus();
+                    }
+                }
+            }, {
+                key: "_getCountryData",
+                value: function _getCountryData(countryCode, ignoreOnlyCountriesOption, allowFail) {
+                    var countryList = ignoreOnlyCountriesOption ? allCountries : this.countries;
+                    for (var i = 0; i < countryList.length; i++) {
+                        if (countryList[i].iso2 === countryCode) {
+                            return countryList[i];
+                        }
+                    }
+                    if (allowFail) {
+                        return null;
+                    }
+                    throw new Error("No country data for '".concat(countryCode, "'"));
+                }
+            }, {
+                key: "_setFlag",
+                value: function _setFlag(countryCode) {
+                    var _this$options3 = this.options, allowDropdown = _this$options3.allowDropdown, separateDialCode = _this$options3.separateDialCode, showFlags = _this$options3.showFlags;
+                    var prevCountry = this.selectedCountryData.iso2 ? this.selectedCountryData : {};
+                    // do this first as it will throw an error and stop if countryCode is invalid
+                    this.selectedCountryData = countryCode ? this._getCountryData(countryCode, false, false) : {};
+                    // update the defaultCountry - we only need the iso2 from now on, so just store that
+                    if (this.selectedCountryData.iso2) {
+                        this.defaultCountry = this.selectedCountryData.iso2;
+                    }
+                    if (showFlags) {
+                        this.selectedFlagInner.setAttribute("class", "iti__flag iti__".concat(countryCode));
+                    }
+                    this._setSelectedCountryFlagTitleAttribute(countryCode, separateDialCode);
+                    if (separateDialCode) {
+                        var dialCode = this.selectedCountryData.dialCode ? "+".concat(this.selectedCountryData.dialCode) : "";
+                        this.selectedDialCode.innerHTML = dialCode;
+                        // offsetWidth is zero if input is in a hidden container during initialisation
+                        var selectedFlagWidth = this.selectedFlag.offsetWidth || this._getHiddenSelectedFlagWidth();
+                        // add 6px of padding after the grey selected-dial-code box, as this is what we use in the css
+                        if (this.isRTL) {
+                            this.telInput.style.paddingRight = "".concat(selectedFlagWidth + 6, "px");
+                        } else {
+                            this.telInput.style.paddingLeft = "".concat(selectedFlagWidth + 6, "px");
+                        }
+                    }
+                    // and the input's placeholder
+                    this._updatePlaceholder();
+                    // update the active list item
+                    if (allowDropdown) {
+                        var prevItem = this.activeItem;
+                        if (prevItem) {
+                            prevItem.classList.remove("iti__active");
+                            prevItem.setAttribute("aria-selected", "false");
+                        }
+                        if (countryCode) {
+                            // check if there is a preferred item first, else fall back to standard
+                            var nextItem = this.countryList.querySelector("#iti-".concat(this.id, "__item-").concat(countryCode, "-preferred")) || this.countryList.querySelector("#iti-".concat(this.id, "__item-").concat(countryCode));
+                            nextItem.setAttribute("aria-selected", "true");
+                            nextItem.classList.add("iti__active");
+                            this.activeItem = nextItem;
+                        }
+                    }
+                    // return if the flag has changed or not
+                    return prevCountry.iso2 !== countryCode;
+                }
+            }, {
+                key: "_setSelectedCountryFlagTitleAttribute",
+                value: function _setSelectedCountryFlagTitleAttribute(countryCode, separateDialCode) {
+                    if (!this.selectedFlag) {
+                        return;
+                    }
+                    var title;
+                    if (countryCode && !separateDialCode) {
+                        title = "".concat(this.selectedCountryData.name, ": +").concat(this.selectedCountryData.dialCode);
+                    } else if (countryCode) {
+                        // For screen reader output, we don't want to include the dial code in the reader output twice
+                        // so just use the selected country name here:
+                        title = this.selectedCountryData.name;
+                    } else {
+                        title = "Unknown";
+                    }
+                    this.selectedFlag.setAttribute("title", title);
+                }
+            }, {
+                key: "_getHiddenSelectedFlagWidth",
+                value: function _getHiddenSelectedFlagWidth() {
+                    // to get the right styling to apply, all we need is a shallow clone of the container,
+                    // and then to inject a deep clone of the selectedFlag element
+                    var containerClone = this.telInput.parentNode.cloneNode();
+                    containerClone.style.visibility = "hidden";
+                    document.body.appendChild(containerClone);
+                    var flagsContainerClone = this.flagsContainer.cloneNode();
+                    containerClone.appendChild(flagsContainerClone);
+                    var selectedFlagClone = this.selectedFlag.cloneNode(true);
+                    flagsContainerClone.appendChild(selectedFlagClone);
+                    var width = selectedFlagClone.offsetWidth;
+                    containerClone.parentNode.removeChild(containerClone);
+                    return width;
+                }
+            }, {
+                key: "_updatePlaceholder",
+                value: function _updatePlaceholder() {
+                    var shouldSetPlaceholder = this.options.autoPlaceholder === "aggressive" || !this.hadInitialPlaceholder && this.options.autoPlaceholder === "polite";
+                    if (window.intlTelInputUtils && shouldSetPlaceholder) {
+                        var numberType = intlTelInputUtils.numberType[this.options.placeholderNumberType];
+                        var placeholder = this.selectedCountryData.iso2 ? intlTelInputUtils.getExampleNumber(this.selectedCountryData.iso2, this.options.nationalMode, numberType) : "";
+                        placeholder = this._beforeSetNumber(placeholder);
+                        if (typeof this.options.customPlaceholder === "function") {
+                            placeholder = this.options.customPlaceholder(placeholder, this.selectedCountryData);
+                        }
+                        this.telInput.setAttribute("placeholder", placeholder);
+                    }
+                }
+            }, {
+                key: "_selectListItem",
+                value: function _selectListItem(listItem) {
+                    // update selected flag and active list item
+                    var flagChanged = this._setFlag(listItem.getAttribute("data-country-code"));
+                    this._closeDropdown();
+                    this._updateDialCode(listItem.getAttribute("data-dial-code"));
+                    // focus the input
+                    this.telInput.focus();
+                    // put cursor at end - this fix is required for FF and IE11 (with auto inserting dial code),
+                    // who try to put the cursor at the beginning the first time
+                    var len = this.telInput.value.length;
+                    this.telInput.setSelectionRange(len, len);
+                    if (flagChanged) {
+                        this._triggerCountryChange();
+                    }
+                }
+            }, {
+                key: "_closeDropdown",
+                value: function _closeDropdown() {
+                    this.countryList.classList.add("iti__hide");
+                    this.selectedFlag.setAttribute("aria-expanded", "false");
+                    this.selectedFlag.removeAttribute("aria-activedescendant");
+                    // update the arrow
+                    this.dropdownArrow.classList.remove("iti__arrow--up");
+                    // unbind key events
+                    document.removeEventListener("keydown", this._handleKeydownOnDropdown);
+                    document.documentElement.removeEventListener("click", this._handleClickOffToClose);
+                    this.countryList.removeEventListener("mouseover", this._handleMouseoverCountryList);
+                    this.countryList.removeEventListener("click", this._handleClickCountryList);
+                    // remove menu from container
+                    if (this.options.dropdownContainer) {
+                        if (!this.isMobile) {
+                            window.removeEventListener("scroll", this._handleWindowScroll);
+                        }
+                        if (this.dropdown.parentNode) {
+                            this.dropdown.parentNode.removeChild(this.dropdown);
+                        }
+                    }
+                    this._trigger("close:countrydropdown");
+                }
+            }, {
+                key: "_scrollTo",
+                value: function _scrollTo(element, middle) {
+                    var container = this.countryList;
+                    // windowTop from https://stackoverflow.com/a/14384091/217866
+                    var windowTop = window.pageYOffset || document.documentElement.scrollTop;
+                    var containerHeight = container.offsetHeight;
+                    var containerTop = container.getBoundingClientRect().top + windowTop;
+                    var containerBottom = containerTop + containerHeight;
+                    var elementHeight = element.offsetHeight;
+                    var elementTop = element.getBoundingClientRect().top + windowTop;
+                    var elementBottom = elementTop + elementHeight;
+                    var newScrollTop = elementTop - containerTop + container.scrollTop;
+                    var middleOffset = containerHeight / 2 - elementHeight / 2;
+                    if (elementTop < containerTop) {
+                        // scroll up
+                        if (middle) {
+                            newScrollTop -= middleOffset;
+                        }
+                        container.scrollTop = newScrollTop;
+                    } else if (elementBottom > containerBottom) {
+                        // scroll down
+                        if (middle) {
+                            newScrollTop += middleOffset;
+                        }
+                        var heightDifference = containerHeight - elementHeight;
+                        container.scrollTop = newScrollTop - heightDifference;
+                    }
+                }
+            }, {
+                key: "_updateDialCode",
+                value: function _updateDialCode(newDialCodeBare) {
+                    var inputVal = this.telInput.value;
+                    // save having to pass this every time
+                    var newDialCode = "+".concat(newDialCodeBare);
+                    var newNumber;
+                    if (inputVal.charAt(0) === "+") {
+                        // there's a plus so we're dealing with a replacement
+                        var prevDialCode = this._getDialCode(inputVal);
+                        if (prevDialCode) {
+                            // current number contains a valid dial code, so replace it
+                            newNumber = inputVal.replace(prevDialCode, newDialCode);
+                        } else {
+                            // current number contains an invalid dial code, so ditch it
+                            // (no way to determine where the invalid dial code ends and the rest of the number begins)
+                            newNumber = newDialCode;
+                        }
+                        this.telInput.value = newNumber;
+                    } else if (this.options.autoInsertDialCode) {
+                        if (inputVal) {
+                            // there is an existing value with no dial code: prefix the new dial code
+                            newNumber = newDialCode + inputVal;
+                        } else {
+                            newNumber = newDialCode;
+                        }
+                        this.telInput.value = newNumber;
+                    }
+                }
+            }, {
+                key: "_getDialCode",
+                value: function _getDialCode(number, includeAreaCode) {
+                    var dialCode = "";
+                    // only interested in international numbers (starting with a plus)
+                    if (number.charAt(0) === "+") {
+                        var numericChars = "";
+                        // iterate over chars
+                        for (var i = 0; i < number.length; i++) {
+                            var c = number.charAt(i);
+                            // if char is number (https://stackoverflow.com/a/8935649/217866)
+                            if (!isNaN(parseInt(c, 10))) {
+                                numericChars += c;
+                                // if current numericChars make a valid dial code
+                                if (includeAreaCode) {
+                                    if (this.countryCodes[numericChars]) {
+                                        // store the actual raw string (useful for matching later)
+                                        dialCode = number.substr(0, i + 1);
+                                    }
+                                } else {
+                                    if (this.dialCodes[numericChars]) {
+                                        dialCode = number.substr(0, i + 1);
+                                        // if we're just looking for a dial code, we can break as soon as we find one
+                                        break;
+                                    }
+                                }
+                                // stop searching as soon as we can - in this case when we hit max len
+                                if (numericChars.length === this.countryCodeMaxLen) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    return dialCode;
+                }
+            }, {
+                key: "_getFullNumber",
+                value: function _getFullNumber() {
+                    var val = this.telInput.value.trim();
+                    var dialCode = this.selectedCountryData.dialCode;
+                    var prefix;
+                    var numericVal = this._getNumeric(val);
+                    if (this.options.separateDialCode && val.charAt(0) !== "+" && dialCode && numericVal) {
+                        // when using separateDialCode, it is visible so is effectively part of the typed number
+                        prefix = "+".concat(dialCode);
+                    } else {
+                        prefix = "";
+                    }
+                    return prefix + val;
+                }
+            }, {
+                key: "_beforeSetNumber",
+                value: function _beforeSetNumber(originalNumber) {
+                    var number = originalNumber;
+                    if (this.options.separateDialCode) {
+                        var dialCode = this._getDialCode(number);
+                        // if there is a valid dial code
+                        if (dialCode) {
+                            // in case _getDialCode returned an area code as well
+                            dialCode = "+".concat(this.selectedCountryData.dialCode);
+                            // a lot of numbers will have a space separating the dial code and the main number, and
+                            // some NANP numbers will have a hyphen e.g. +1 684-733-1234 - in both cases we want to get
+                            // rid of it
+                            // NOTE: don't just trim all non-numerics as may want to preserve an open parenthesis etc
+                            var start = number[dialCode.length] === " " || number[dialCode.length] === "-" ? dialCode.length + 1 : dialCode.length;
+                            number = number.substr(start);
+                        }
+                    }
+                    return this._cap(number);
+                }
+            }, {
+                key: "_triggerCountryChange",
+                value: function _triggerCountryChange() {
+                    this._trigger("countrychange");
+                }
+            }, {
+                key: "handleAutoCountry",
+                value: function handleAutoCountry() {
+                    if (this.options.initialCountry === "auto") {
+                        // we must set this even if there is an initial val in the input: in case the initial val is
+                        // invalid and they delete it - they should see their auto country
+                        this.defaultCountry = window.intlTelInputGlobals.autoCountry;
+                        // if there's no initial value in the input, then update the flag
+                        if (!this.telInput.value) {
+                            this.setCountry(this.defaultCountry);
+                        }
+                        this.resolveAutoCountryPromise();
+                    }
+                }
+            }, {
+                key: "handleUtils",
+                value: function handleUtils() {
+                    // if the request was successful
+                    if (window.intlTelInputUtils) {
+                        // if there's an initial value in the input, then format it
+                        if (this.telInput.value) {
+                            this._updateValFromNumber(this.telInput.value);
+                        }
+                        this._updatePlaceholder();
+                    }
+                    this.resolveUtilsScriptPromise();
+                }
+            }, {
+                key: "destroy",
+                value: function destroy() {
+                    var form = this.telInput.form;
+                    if (this.options.allowDropdown) {
+                        // make sure the dropdown is closed (and unbind listeners)
+                        this._closeDropdown();
+                        this.selectedFlag.removeEventListener("click", this._handleClickSelectedFlag);
+                        this.flagsContainer.removeEventListener("keydown", this._handleFlagsContainerKeydown);
+                        // label click hack
+                        var label = this._getClosestLabel();
+                        if (label) {
+                            label.removeEventListener("click", this._handleLabelClick);
+                        }
+                    }
+                    // unbind hiddenInput listeners
+                    if (this.hiddenInput && form) {
+                        form.removeEventListener("submit", this._handleHiddenInputSubmit);
+                    }
+                    // unbind autoInsertDialCode listeners
+                    if (this.options.autoInsertDialCode) {
+                        if (form) {
+                            form.removeEventListener("submit", this._handleSubmitOrBlurEvent);
+                        }
+                        this.telInput.removeEventListener("blur", this._handleSubmitOrBlurEvent);
+                    }
+                    // unbind key events, and cut/paste events
+                    this.telInput.removeEventListener("keyup", this._handleKeyupEvent);
+                    this.telInput.removeEventListener("cut", this._handleClipboardEvent);
+                    this.telInput.removeEventListener("paste", this._handleClipboardEvent);
+                    // remove attribute of id instance: data-intl-tel-input-id
+                    this.telInput.removeAttribute("data-intl-tel-input-id");
+                    // remove markup (but leave the original input)
+                    var wrapper = this.telInput.parentNode;
+                    wrapper.parentNode.insertBefore(this.telInput, wrapper);
+                    wrapper.parentNode.removeChild(wrapper);
+                    delete window.intlTelInputGlobals.instances[this.id];
+                }
+            }, {
+                key: "getExtension",
+                value: function getExtension() {
+                    if (window.intlTelInputUtils) {
+                        return intlTelInputUtils.getExtension(this._getFullNumber(), this.selectedCountryData.iso2);
+                    }
+                    return "";
+                }
+            }, {
+                key: "getNumber",
+                value: function getNumber(format) {
+                    if (window.intlTelInputUtils) {
+                        var iso2 = this.selectedCountryData.iso2;
+                        return intlTelInputUtils.formatNumber(this._getFullNumber(), iso2, format);
+                    }
+                    return "";
+                }
+            }, {
+                key: "getNumberType",
+                value: function getNumberType() {
+                    if (window.intlTelInputUtils) {
+                        return intlTelInputUtils.getNumberType(this._getFullNumber(), this.selectedCountryData.iso2);
+                    }
+                    return -99;
+                }
+            }, {
+                key: "getSelectedCountryData",
+                value: function getSelectedCountryData() {
+                    return this.selectedCountryData;
+                }
+            }, {
+                key: "getValidationError",
+                value: function getValidationError() {
+                    if (window.intlTelInputUtils) {
+                        var iso2 = this.selectedCountryData.iso2;
+                        return intlTelInputUtils.getValidationError(this._getFullNumber(), iso2);
+                    }
+                    return -99;
+                }
+            }, {
+                key: "isValidNumber",
+                value: function isValidNumber() {
+                    var val = this._getFullNumber().trim();
+                    return window.intlTelInputUtils ? intlTelInputUtils.isValidNumber(val, this.selectedCountryData.iso2) : null;
+                }
+            }, {
+                key: "isPossibleNumber",
+                value: function isPossibleNumber() {
+                    var val = this._getFullNumber().trim();
+                    return window.intlTelInputUtils ? intlTelInputUtils.isPossibleNumber(val, this.selectedCountryData.iso2) : null;
+                }
+            }, {
+                key: "setCountry",
+                value: function setCountry(originalCountryCode) {
+                    var countryCode = originalCountryCode.toLowerCase();
+                    // check if already selected
+                    if (this.selectedCountryData.iso2 !== countryCode) {
+                        this._setFlag(countryCode);
+                        this._updateDialCode(this.selectedCountryData.dialCode);
+                        this._triggerCountryChange();
+                    }
+                }
+            }, {
+                key: "setNumber",
+                value: function setNumber(number) {
+                    // we must update the flag first, which updates this.selectedCountryData, which is used for
+                    // formatting the number before displaying it
+                    var flagChanged = this._updateFlagFromNumber(number);
+                    this._updateValFromNumber(number);
+                    if (flagChanged) {
+                        this._triggerCountryChange();
+                    }
+                }
+            }, {
+                key: "setPlaceholderNumberType",
+                value: function setPlaceholderNumberType(type) {
+                    this.options.placeholderNumberType = type;
+                    this._updatePlaceholder();
+                }
+            } ]);
+            return Iti;
+        }();
+        /********************
+ *  STATIC METHODS
+ ********************/
+        // get the country data object
+        intlTelInputGlobals.getCountryData = function() {
+            return allCountries;
+        };
+        // inject a <script> element to load utils.js
+        var injectScript = function injectScript(path, handleSuccess, handleFailure) {
+            // inject a new script element into the page
+            var script = document.createElement("script");
+            script.onload = function() {
+                forEachInstance("handleUtils");
+                if (handleSuccess) {
+                    handleSuccess();
+                }
+            };
+            script.onerror = function() {
+                forEachInstance("rejectUtilsScriptPromise");
+                if (handleFailure) {
+                    handleFailure();
+                }
+            };
+            script.className = "iti-load-utils";
+            script.async = true;
+            script.src = path;
+            document.body.appendChild(script);
+        };
+        // load the utils script
+        intlTelInputGlobals.loadUtils = function(path) {
+            // 2 options:
+            // 1) not already started loading (start)
+            // 2) already started loading (do nothing - just wait for the onload callback to fire, which will
+            // trigger handleUtils on all instances, invoking their resolveUtilsScriptPromise functions)
+            if (!window.intlTelInputUtils && !window.intlTelInputGlobals.startedLoadingUtilsScript) {
+                // only do this once
+                window.intlTelInputGlobals.startedLoadingUtilsScript = true;
+                // if we have promises, then return a promise
+                if (typeof Promise !== "undefined") {
+                    return new Promise(function(resolve, reject) {
+                        return injectScript(path, resolve, reject);
+                    });
+                }
+                injectScript(path);
+            }
+            return null;
+        };
+        // default options
+        intlTelInputGlobals.defaults = defaults;
+        // version
+        intlTelInputGlobals.version = "18.2.1";
+        // convenience wrapper
+        return function(input, options) {
+            var iti = new Iti(input, options);
+            iti._init();
+            input.setAttribute("data-intl-tel-input-id", iti.id);
+            window.intlTelInputGlobals.instances[iti.id] = iti;
+            return iti;
+        };
+    }();
+});
+
+/***/ }),
+
+/***/ "./node_modules/intl-tel-input/build/js/utils.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/intl-tel-input/build/js/utils.js ***!
+  \*******************************************************/
+/***/ (() => {
+
+(function(){/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+var aa=this||self;function k(a,b){a=a.split(".");var c=aa;a[0]in c||"undefined"==typeof c.execScript||c.execScript("var "+a[0]);for(var d;a.length&&(d=a.shift());)a.length||void 0===b?c[d]&&c[d]!==Object.prototype[d]?c=c[d]:c=c[d]={}:c[d]=b}function m(a,b){function c(){}c.prototype=b.prototype;a.$=b.prototype;a.prototype=new c;a.prototype.constructor=a;a.fa=function(d,f,e){for(var g=Array(arguments.length-2),h=2;h<arguments.length;h++)g[h-2]=arguments[h];return b.prototype[f].apply(d,g)}};function ba(a){const b=[];let c=0;for(const d in a)b[c++]=a[d];return b};function ca(a,b){this.g=a;this.m=!!b.o;this.i=b.h;this.v=b.type;this.u=!1;switch(this.i){case da:case ea:case fa:case ha:case ia:case ja:case ka:this.u=!0}this.l=b.defaultValue}var ka=1,ja=2,da=3,ea=4,fa=6,ha=16,ia=18;function la(a,b){this.i=a;this.g={};for(a=0;a<b.length;a++){var c=b[a];this.g[c.g]=c}}function ma(a){a=ba(a.g);a.sort(function(b,c){return b.g-c.g});return a};function n(){this.g={};this.l=this.j().g;this.i=this.m=null}n.prototype.has=function(a){return null!=this.g[a.g]};n.prototype.get=function(a,b){return p(this,a.g,b)};n.prototype.set=function(a,b){q(this,a.g,b)};n.prototype.add=function(a,b){r(this,a.g,b)};
+function na(a,b){for(var c=ma(a.j()),d=0;d<c.length;d++){var f=c[d],e=f.g;if(null!=b.g[e]){a.i&&delete a.i[f.g];var g=11==f.i||10==f.i;if(f.m){f=t(b,e);for(var h=0;h<f.length;h++)r(a,e,g?f[h].clone():f[h])}else f=u(b,e),g?(g=u(a,e))?na(g,f):q(a,e,f.clone()):q(a,e,f)}}}n.prototype.clone=function(){var a=new this.constructor;a!=this&&(a.g={},a.i&&(a.i={}),na(a,this));return a};
+function u(a,b){var c=a.g[b];if(null==c)return null;if(a.m){if(!(b in a.i)){var d=a.m,f=a.l[b];if(null!=c)if(f.m){for(var e=[],g=0;g<c.length;g++)e[g]=d.i(f,c[g]);c=e}else c=d.i(f,c);return a.i[b]=c}return a.i[b]}return c}function p(a,b,c){var d=u(a,b);return a.l[b].m?d[c||0]:d}function v(a,b){if(null!=a.g[b])a=p(a,b);else a:{a=a.l[b];if(void 0===a.l)if(b=a.v,b===Boolean)a.l=!1;else if(b===Number)a.l=0;else if(b===String)a.l=a.u?"0":"";else{a=new b;break a}a=a.l}return a}
+function t(a,b){return u(a,b)||[]}function w(a,b){return a.l[b].m?null!=a.g[b]?a.g[b].length:0:null!=a.g[b]?1:0}function q(a,b,c){a.g[b]=c;a.i&&(a.i[b]=c)}function r(a,b,c){a.g[b]||(a.g[b]=[]);a.g[b].push(c);a.i&&delete a.i[b]}function x(a,b){var c=[],d;for(d in b)0!=d&&c.push(new ca(d,b[d]));return new la(a,c)};function y(){}y.prototype.g=function(a){new a.i;throw Error("Unimplemented");};y.prototype.i=function(a,b){if(11==a.i||10==a.i)return b instanceof n?b:this.g(a.v.prototype.j(),b);if(14==a.i)return"string"===typeof b&&oa.test(b)&&(a=Number(b),0<a)?a:b;if(!a.u)return b;a=a.v;if(a===String){if("number"===typeof b)return String(b)}else if(a===Number&&"string"===typeof b&&("Infinity"===b||"-Infinity"===b||"NaN"===b||oa.test(b)))return Number(b);return b};var oa=/^-?[0-9]+$/;function z(){}m(z,y);z.prototype.g=function(a,b){a=new a.i;a.m=this;a.g=b;a.i={};return a};function B(){}m(B,z);B.prototype.i=function(a,b){return 8==a.i?!!b:y.prototype.i.apply(this,arguments)};B.prototype.g=function(a,b){return B.$.g.call(this,a,b)};function C(a,b){null!=a&&this.g.apply(this,arguments)}C.prototype.i="";C.prototype.set=function(a){this.i=""+a};C.prototype.g=function(a,b,c){this.i+=String(a);if(null!=b)for(let d=1;d<arguments.length;d++)this.i+=arguments[d];return this};C.prototype.toString=function(){return this.i};/*
+
+ Protocol Buffer 2 Copyright 2008 Google Inc.
+ All other code copyright its respective owners.
+ Copyright (C) 2010 The Libphonenumber Authors
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+function D(){n.call(this)}m(D,n);var pa=null;function E(){n.call(this)}m(E,n);var qa=null;function F(){n.call(this)}m(F,n);var ra=null;
+D.prototype.j=function(){var a=pa;a||(pa=a=x(D,{0:{name:"NumberFormat",s:"i18n.phonenumbers.NumberFormat"},1:{name:"pattern",required:!0,h:9,type:String},2:{name:"format",required:!0,h:9,type:String},3:{name:"leading_digits_pattern",o:!0,h:9,type:String},4:{name:"national_prefix_formatting_rule",h:9,type:String},6:{name:"national_prefix_optional_when_formatting",h:8,defaultValue:!1,type:Boolean},5:{name:"domestic_carrier_code_formatting_rule",h:9,type:String}}));return a};D.j=D.prototype.j;
+E.prototype.j=function(){var a=qa;a||(qa=a=x(E,{0:{name:"PhoneNumberDesc",s:"i18n.phonenumbers.PhoneNumberDesc"},2:{name:"national_number_pattern",h:9,type:String},9:{name:"possible_length",o:!0,h:5,type:Number},10:{name:"possible_length_local_only",o:!0,h:5,type:Number},6:{name:"example_number",h:9,type:String}}));return a};E.j=E.prototype.j;
+F.prototype.j=function(){var a=ra;a||(ra=a=x(F,{0:{name:"PhoneMetadata",s:"i18n.phonenumbers.PhoneMetadata"},1:{name:"general_desc",h:11,type:E},2:{name:"fixed_line",h:11,type:E},3:{name:"mobile",h:11,type:E},4:{name:"toll_free",h:11,type:E},5:{name:"premium_rate",h:11,type:E},6:{name:"shared_cost",h:11,type:E},7:{name:"personal_number",h:11,type:E},8:{name:"voip",h:11,type:E},21:{name:"pager",h:11,type:E},25:{name:"uan",h:11,type:E},27:{name:"emergency",h:11,type:E},28:{name:"voicemail",h:11,type:E},
+29:{name:"short_code",h:11,type:E},30:{name:"standard_rate",h:11,type:E},31:{name:"carrier_specific",h:11,type:E},33:{name:"sms_services",h:11,type:E},24:{name:"no_international_dialling",h:11,type:E},9:{name:"id",required:!0,h:9,type:String},10:{name:"country_code",h:5,type:Number},11:{name:"international_prefix",h:9,type:String},17:{name:"preferred_international_prefix",h:9,type:String},12:{name:"national_prefix",h:9,type:String},13:{name:"preferred_extn_prefix",h:9,type:String},15:{name:"national_prefix_for_parsing",
+h:9,type:String},16:{name:"national_prefix_transform_rule",h:9,type:String},18:{name:"same_mobile_and_fixed_line_pattern",h:8,defaultValue:!1,type:Boolean},19:{name:"number_format",o:!0,h:11,type:D},20:{name:"intl_number_format",o:!0,h:11,type:D},22:{name:"main_country_for_code",h:8,defaultValue:!1,type:Boolean},23:{name:"leading_digits",h:9,type:String}}));return a};F.j=F.prototype.j;function H(){n.call(this)}m(H,n);var sa=null,ta={ea:0,da:1,ca:5,ba:10,aa:20};
+H.prototype.j=function(){var a=sa;a||(sa=a=x(H,{0:{name:"PhoneNumber",s:"i18n.phonenumbers.PhoneNumber"},1:{name:"country_code",required:!0,h:5,type:Number},2:{name:"national_number",required:!0,h:4,type:Number},3:{name:"extension",h:9,type:String},4:{name:"italian_leading_zero",h:8,type:Boolean},8:{name:"number_of_leading_zeros",h:5,defaultValue:1,type:Number},5:{name:"raw_input",h:9,type:String},6:{name:"country_code_source",h:14,defaultValue:0,type:ta},7:{name:"preferred_domestic_carrier_code",
+h:9,type:String}}));return a};H.ctor=H;H.ctor.j=H.prototype.j;/*
+
+ Copyright (C) 2010 The Libphonenumber Authors
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+var I={1:"US AG AI AS BB BM BS CA DM DO GD GU JM KN KY LC MP MS PR SX TC TT VC VG VI".split(" "),7:["RU","KZ"],20:["EG"],27:["ZA"],30:["GR"],31:["NL"],32:["BE"],33:["FR"],34:["ES"],36:["HU"],39:["IT","VA"],40:["RO"],41:["CH"],43:["AT"],44:["GB","GG","IM","JE"],45:["DK"],46:["SE"],47:["NO","SJ"],48:["PL"],49:["DE"],51:["PE"],52:["MX"],53:["CU"],54:["AR"],55:["BR"],56:["CL"],57:["CO"],58:["VE"],60:["MY"],61:["AU","CC","CX"],62:["ID"],63:["PH"],64:["NZ"],65:["SG"],66:["TH"],81:["JP"],82:["KR"],84:["VN"],
+86:["CN"],90:["TR"],91:["IN"],92:["PK"],93:["AF"],94:["LK"],95:["MM"],98:["IR"],211:["SS"],212:["MA","EH"],213:["DZ"],216:["TN"],218:["LY"],220:["GM"],221:["SN"],222:["MR"],223:["ML"],224:["GN"],225:["CI"],226:["BF"],227:["NE"],228:["TG"],229:["BJ"],230:["MU"],231:["LR"],232:["SL"],233:["GH"],234:["NG"],235:["TD"],236:["CF"],237:["CM"],238:["CV"],239:["ST"],240:["GQ"],241:["GA"],242:["CG"],243:["CD"],244:["AO"],245:["GW"],246:["IO"],247:["AC"],248:["SC"],249:["SD"],250:["RW"],251:["ET"],252:["SO"],
+253:["DJ"],254:["KE"],255:["TZ"],256:["UG"],257:["BI"],258:["MZ"],260:["ZM"],261:["MG"],262:["RE","YT"],263:["ZW"],264:["NA"],265:["MW"],266:["LS"],267:["BW"],268:["SZ"],269:["KM"],290:["SH","TA"],291:["ER"],297:["AW"],298:["FO"],299:["GL"],350:["GI"],351:["PT"],352:["LU"],353:["IE"],354:["IS"],355:["AL"],356:["MT"],357:["CY"],358:["FI","AX"],359:["BG"],370:["LT"],371:["LV"],372:["EE"],373:["MD"],374:["AM"],375:["BY"],376:["AD"],377:["MC"],378:["SM"],380:["UA"],381:["RS"],382:["ME"],383:["XK"],385:["HR"],
+386:["SI"],387:["BA"],389:["MK"],420:["CZ"],421:["SK"],423:["LI"],500:["FK"],501:["BZ"],502:["GT"],503:["SV"],504:["HN"],505:["NI"],506:["CR"],507:["PA"],508:["PM"],509:["HT"],590:["GP","BL","MF"],591:["BO"],592:["GY"],593:["EC"],594:["GF"],595:["PY"],596:["MQ"],597:["SR"],598:["UY"],599:["CW","BQ"],670:["TL"],672:["NF"],673:["BN"],674:["NR"],675:["PG"],676:["TO"],677:["SB"],678:["VU"],679:["FJ"],680:["PW"],681:["WF"],682:["CK"],683:["NU"],685:["WS"],686:["KI"],687:["NC"],688:["TV"],689:["PF"],690:["TK"],
+691:["FM"],692:["MH"],800:["001"],808:["001"],850:["KP"],852:["HK"],853:["MO"],855:["KH"],856:["LA"],870:["001"],878:["001"],880:["BD"],881:["001"],882:["001"],883:["001"],886:["TW"],888:["001"],960:["MV"],961:["LB"],962:["JO"],963:["SY"],964:["IQ"],965:["KW"],966:["SA"],967:["YE"],968:["OM"],970:["PS"],971:["AE"],972:["IL"],973:["BH"],974:["QA"],975:["BT"],976:["MN"],977:["NP"],979:["001"],992:["TJ"],993:["TM"],994:["AZ"],995:["GE"],996:["KG"],998:["UZ"]},ua={AC:[,[,,"(?:[01589]\\d|[46])\\d{4}",
+,,,,,,[5,6]],[,,"6[2-467]\\d{3}",,,,"62889",,,[5]],[,,"4\\d{4}",,,,"40123",,,[5]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AC",247,"00",,,,,,,,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"(?:0[1-9]|[1589]\\d)\\d{4}",,,,"542011",,,[6]],,,[,,,,,,,,,[-1]]],AD:[,[,,"(?:1|6\\d)\\d{7}|[135-9]\\d{5}",,,,,,,[6,8,9]],[,,"[78]\\d{5}",,,,"712345",,,[6]],[,,"690\\d{6}|[356]\\d{5}",,,,"312345",,,[6,9]],[,,"180[02]\\d{4}",,,,"18001234",,,[8]],[,,"[19]\\d{5}",,,,"912345",,,[6]],
+[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AD",376,"00",,,,,,,,[[,"(\\d{3})(\\d{3})","$1 $2",["[135-9]"]],[,"(\\d{4})(\\d{4})","$1 $2",["1"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["6"]]],,[,,,,,,,,,[-1]],,,[,,"1800\\d{4}",,,,,,,[8]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AE:[,[,,"(?:[4-7]\\d|9[0-689])\\d{7}|800\\d{2,9}|[2-4679]\\d{7}",,,,,,,[5,6,7,8,9,10,11,12]],[,,"[2-4679][2-8]\\d{6}",,,,"22345678",,,[8],[7]],[,,"5[024-68]\\d{7}",,,,"501234567",,,[9]],[,,"400\\d{6}|800\\d{2,9}",,,,"800123456"],
+[,,"900[02]\\d{5}",,,,"900234567",,,[9]],[,,"700[05]\\d{5}",,,,"700012345",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AE",971,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{2,9})","$1 $2",["60|8"]],[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["[236]|[479][2-8]"],"0$1"],[,"(\\d{3})(\\d)(\\d{5})","$1 $2 $3",["[479]"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["5"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"600[25]\\d{5}",,,,"600212345",,,[9]],,,[,,,,,,,,,[-1]]],AF:[,[,,"[2-7]\\d{8}",,,,,,,[9],[7]],[,,"(?:[25][0-8]|[34][0-4]|6[0-5])[2-9]\\d{6}",
+,,,"234567890",,,,[7]],[,,"7\\d{8}",,,,"701234567",,,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AF",93,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[1-9]"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[2-7]"],"0$1"]],[[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[2-7]"],"0$1"]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AG:[,[,,"(?:268|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"268(?:4(?:6[0-38]|84)|56[0-2])\\d{4}",,,,"2684601234",
+,,,[7]],[,,"268(?:464|7(?:1[3-9]|[28]\\d|3[0246]|64|7[0-689]))\\d{4}",,,,"2684641234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,"26848[01]\\d{4}",,,,"2684801234",,,,[7]],
+"AG",1,"011","1",,,"([457]\\d{6})$|1","268$1",,,,,[,,"26840[69]\\d{4}",,,,"2684061234",,,,[7]],,"268",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AI:[,[,,"(?:264|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"264(?:292|4(?:6[12]|9[78]))\\d{4}",,,,"2644612345",,,,[7]],[,,"264(?:235|4(?:69|76)|5(?:3[6-9]|8[1-4])|7(?:29|72))\\d{4}",,,,"2642351234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"AI",1,"011","1",,,"([2457]\\d{6})$|1","264$1",,,,,[,,"264724\\d{4}",,,,"2647241234",,,,[7]],,"264",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AL:[,[,,"(?:700\\d\\d|900)\\d{3}|8\\d{5,7}|(?:[2-5]|6\\d)\\d{7}",,,,,,,[6,7,8,9],[5]],[,,"4505[0-2]\\d{3}|(?:[2358][16-9]\\d[2-9]|4410)\\d{4}|(?:[2358][2-5][2-9]|4(?:[2-57-9][2-9]|6\\d))\\d{5}",,,,"22345678",,,[8],[5,6,7]],[,,"6(?:[78][2-9]|9\\d)\\d{6}",,,,"672123456",,,[9]],[,,"800\\d{4}",,,,"8001234",,,[7]],[,,"900[1-9]\\d\\d",
+,,,"900123",,,[6]],[,,"808[1-9]\\d\\d",,,,"808123",,,[6]],[,,"700[2-9]\\d{4}",,,,"70021234",,,[8]],[,,,,,,,,,[-1]],"AL",355,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3,4})","$1 $2",["80|9"],"0$1"],[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["4[2-6]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[2358][2-5]|4"],"0$1"],[,"(\\d{3})(\\d{5})","$1 $2",["[23578]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["6"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AM:[,[,,"(?:[1-489]\\d|55|60|77)\\d{6}",
+,,,,,,[8],[5,6]],[,,"(?:(?:1[0-25]|47)\\d|2(?:2[2-46]|3[1-8]|4[2-69]|5[2-7]|6[1-9]|8[1-7])|3[12]2)\\d{5}",,,,"10123456",,,,[5,6]],[,,"(?:33|4[1349]|55|77|88|9[13-9])\\d{6}",,,,"77123456"],[,,"800\\d{5}",,,,"80012345"],[,,"90[016]\\d{5}",,,,"90012345"],[,,"80[1-4]\\d{5}",,,,"80112345"],[,,,,,,,,,[-1]],[,,"60(?:2[78]|3[5-9]|4[02-9]|5[0-46-9]|[6-8]\\d|9[01])\\d{4}",,,,"60271234"],"AM",374,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["[89]0"],"0 $1"],[,"(\\d{3})(\\d{5})","$1 $2",["2|3[12]"],
+"(0$1)"],[,"(\\d{2})(\\d{6})","$1 $2",["1|47"],"(0$1)"],[,"(\\d{2})(\\d{6})","$1 $2",["[3-9]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AO:[,[,,"[29]\\d{8}",,,,,,,[9]],[,,"2\\d(?:[0134][25-9]|[25-9]\\d)\\d{5}",,,,"222123456"],[,,"9[1-59]\\d{7}",,,,"923123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AO",244,"00",,,,,,,,[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[29]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],
+,,[,,,,,,,,,[-1]]],AR:[,[,,"(?:11|[89]\\d\\d)\\d{8}|[2368]\\d{9}",,,,,,,[10,11],[6,7,8]],[,,"3888[013-9]\\d{5}|3(?:7(?:1[15]|81)|8(?:21|4[16]|69|9[12]))[46]\\d{5}|(?:29(?:54|66)|3(?:7(?:55|77)|865))[2-8]\\d{5}|(?:2(?:2(?:2[59]|44|52)|3(?:26|44)|473|9(?:[07]2|2[26]|34|46))|3327)[45]\\d{5}|(?:2(?:284|3(?:02|23)|657|920)|3(?:4(?:8[27]|92)|541|878))[2-7]\\d{5}|(?:2(?:(?:26|62)2|320|477|9(?:42|83))|3(?:329|4(?:[47]6|62|89)|564))[2-6]\\d{5}|(?:(?:11[1-8]|670)\\d|2(?:2(?:0[45]|1[2-6]|3[3-6])|3(?:[06]4|7[45])|494|6(?:04|1[2-8]|[36][45]|4[3-6])|80[45]|9(?:[17][4-6]|[48][45]|9[3-6]))|3(?:364|4(?:1[2-7]|[235][4-6]|84)|5(?:1[2-9]|[38][4-6])|6(?:2[45]|44)|7[069][45]|8(?:0[45]|[17][2-6]|3[4-6]|[58][3-6])))\\d{6}|2(?:2(?:21|4[23]|6[145]|7[1-4]|8[356]|9[267])|3(?:16|3[13-8]|43|5[346-8]|9[3-5])|475|6(?:2[46]|4[78]|5[1568])|9(?:03|2[1457-9]|3[1356]|4[08]|[56][23]|82))4\\d{5}|(?:2(?:2(?:57|81)|3(?:24|46|92)|9(?:01|23|64))|3(?:4(?:42|71)|5(?:25|37|4[347]|71)|7(?:18|5[17])))[3-6]\\d{5}|(?:2(?:2(?:02|2[3467]|4[156]|5[45]|6[6-8]|91)|3(?:1[47]|25|[45][25]|96)|47[48]|625|932)|3(?:38[2578]|4(?:0[0-24-9]|3[78]|4[457]|58|6[03-9]|72|83|9[136-8])|5(?:2[124]|[368][23]|4[2689]|7[2-6])|7(?:16|2[15]|3[145]|4[13]|5[468]|7[2-5]|8[26])|8(?:2[5-7]|3[278]|4[3-5]|5[78]|6[1-378]|[78]7|94)))[4-6]\\d{5}",
+,,,"1123456789",,,[10],[6,7,8]],[,,"93(?:7(?:1[15]|81)[46]|8(?:(?:21|4[16]|69|9[12])[46]|88[013-9]))\\d{5}|9(?:29(?:54|66)|3(?:7(?:55|77)|865))[2-8]\\d{5}|9(?:2(?:2(?:2[59]|44|52)|3(?:26|44)|473|9(?:[07]2|2[26]|34|46))|3327)[45]\\d{5}|9(?:2(?:284|3(?:02|23)|657|920)|3(?:4(?:8[27]|92)|541|878))[2-7]\\d{5}|9(?:2(?:(?:26|62)2|320|477|9(?:42|83))|3(?:329|4(?:[47]6|62|89)|564))[2-6]\\d{5}|(?:675\\d|9(?:11[1-8]\\d|2(?:2(?:0[45]|1[2-6]|3[3-6])|3(?:[06]4|7[45])|494|6(?:04|1[2-8]|[36][45]|4[3-6])|80[45]|9(?:[17][4-6]|[48][45]|9[3-6]))|3(?:364|4(?:1[2-7]|[235][4-6]|84)|5(?:1[2-9]|[38][4-6])|6(?:2[45]|44)|7[069][45]|8(?:0[45]|[17][2-6]|3[4-6]|[58][3-6]))))\\d{6}|92(?:2(?:21|4[23]|6[145]|7[1-4]|8[356]|9[267])|3(?:16|3[13-8]|43|5[346-8]|9[3-5])|475|6(?:2[46]|4[78]|5[1568])|9(?:03|2[1457-9]|3[1356]|4[08]|[56][23]|82))4\\d{5}|9(?:2(?:2(?:57|81)|3(?:24|46|92)|9(?:01|23|64))|3(?:4(?:42|71)|5(?:25|37|4[347]|71)|7(?:18|5[17])))[3-6]\\d{5}|9(?:2(?:2(?:02|2[3467]|4[156]|5[45]|6[6-8]|91)|3(?:1[47]|25|[45][25]|96)|47[48]|625|932)|3(?:38[2578]|4(?:0[0-24-9]|3[78]|4[457]|58|6[03-9]|72|83|9[136-8])|5(?:2[124]|[368][23]|4[2689]|7[2-6])|7(?:16|2[15]|3[145]|4[13]|5[468]|7[2-5]|8[26])|8(?:2[5-7]|3[278]|4[3-5]|5[78]|6[1-378]|[78]7|94)))[4-6]\\d{5}",
+,,,"91123456789",,,,[6,7,8]],[,,"800\\d{7,8}",,,,"8001234567"],[,,"60[04579]\\d{7}",,,,"6001234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AR",54,"00","0",,,"0?(?:(11|2(?:2(?:02?|[13]|2[13-79]|4[1-6]|5[2457]|6[124-8]|7[1-4]|8[13-6]|9[1267])|3(?:02?|1[467]|2[03-6]|3[13-8]|[49][2-6]|5[2-8]|[67])|4(?:7[3-578]|9)|6(?:[0136]|2[24-6]|4[6-8]?|5[15-8])|80|9(?:0[1-3]|[19]|2\\d|3[1-6]|4[02568]?|5[2-4]|6[2-46]|72?|8[23]?))|3(?:3(?:2[79]|6|8[2578])|4(?:0[0-24-9]|[12]|3[5-8]?|4[24-7]|5[4-68]?|6[02-9]|7[126]|8[2379]?|9[1-36-8])|5(?:1|2[1245]|3[237]?|4[1-46-9]|6[2-4]|7[1-6]|8[2-5]?)|6[24]|7(?:[069]|1[1568]|2[15]|3[145]|4[13]|5[14-8]|7[2-57]|8[126])|8(?:[01]|2[15-7]|3[2578]?|4[13-6]|5[4-8]?|6[1-357-9]|7[36-8]?|8[5-8]?|9[124])))15)?",
+"9$1",,,[[,"(\\d{3})","$1",["0|1(?:0[0-35-7]|1[02-5]|2[015]|3[47]|4[478])|911"]],[,"(\\d{2})(\\d{4})","$1-$2",["[1-9]"]],[,"(\\d{3})(\\d{4})","$1-$2",["[2-9]"]],[,"(\\d{4})(\\d{4})","$1-$2",["[1-8]"]],[,"(\\d{4})(\\d{2})(\\d{4})","$1 $2-$3",["2(?:2[024-9]|3[0-59]|47|6[245]|9[02-8])|3(?:3[28]|4[03-9]|5[2-46-8]|7[1-578]|8[2-9])","2(?:[23]02|6(?:[25]|4[6-8])|9(?:[02356]|4[02568]|72|8[23]))|3(?:3[28]|4(?:[04679]|3[5-8]|5[4-68]|8[2379])|5(?:[2467]|3[237]|8[2-5])|7[1-578]|8(?:[2469]|3[2578]|5[4-8]|7[36-8]|8[5-8]))|2(?:2[24-9]|3[1-59]|47)",
+"2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3[78]|5(?:4[46]|8)|8[2379])|5(?:[2467]|3[237]|8[23])|7[1-578]|8(?:[2469]|3[278]|5[56][46]|86[3-6]))|2(?:2[24-9]|3[1-59]|47)|38(?:[58][78]|7[378])|3(?:4[35][56]|58[45]|8(?:[38]5|54|76))[4-6]","2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3(?:5(?:4[0-25689]|[56])|[78])|58|8[2379])|5(?:[2467]|3[237]|8(?:[23]|4(?:[45]|60)|5(?:4[0-39]|5|64)))|7[1-578]|8(?:[2469]|3[278]|54(?:4|5[13-7]|6[89])|86[3-6]))|2(?:2[24-9]|3[1-59]|47)|38(?:[58][78]|7[378])|3(?:454|85[56])[46]|3(?:4(?:36|5[56])|8(?:[38]5|76))[4-6]"],
+"0$1",,1],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2-$3",["1"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1-$2-$3",["[68]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2-$3",["[23]"],"0$1",,1],[,"(\\d)(\\d{4})(\\d{2})(\\d{4})","$2 15-$3-$4",["9(?:2[2-469]|3[3-578])","9(?:2(?:2[024-9]|3[0-59]|47|6[245]|9[02-8])|3(?:3[28]|4[03-9]|5[2-46-8]|7[1-578]|8[2-9]))","9(?:2(?:[23]02|6(?:[25]|4[6-8])|9(?:[02356]|4[02568]|72|8[23]))|3(?:3[28]|4(?:[04679]|3[5-8]|5[4-68]|8[2379])|5(?:[2467]|3[237]|8[2-5])|7[1-578]|8(?:[2469]|3[2578]|5[4-8]|7[36-8]|8[5-8])))|92(?:2[24-9]|3[1-59]|47)",
+"9(?:2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3[78]|5(?:4[46]|8)|8[2379])|5(?:[2467]|3[237]|8[23])|7[1-578]|8(?:[2469]|3[278]|5(?:[56][46]|[78])|7[378]|8(?:6[3-6]|[78]))))|92(?:2[24-9]|3[1-59]|47)|93(?:4[35][56]|58[45]|8(?:[38]5|54|76))[4-6]","9(?:2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3(?:5(?:4[0-25689]|[56])|[78])|5(?:4[46]|8)|8[2379])|5(?:[2467]|3[237]|8(?:[23]|4(?:[45]|60)|5(?:4[0-39]|5|64)))|7[1-578]|8(?:[2469]|3[278]|5(?:4(?:4|5[13-7]|6[89])|[56][46]|[78])|7[378]|8(?:6[3-6]|[78]))))|92(?:2[24-9]|3[1-59]|47)|93(?:4(?:36|5[56])|8(?:[38]5|76))[4-6]"],
+"0$1"],[,"(\\d)(\\d{2})(\\d{4})(\\d{4})","$2 15-$3-$4",["91"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{5})","$1-$2-$3",["8"],"0$1"],[,"(\\d)(\\d{3})(\\d{3})(\\d{4})","$2 15-$3-$4",["9"],"0$1"]],[[,"(\\d{4})(\\d{2})(\\d{4})","$1 $2-$3",["2(?:2[024-9]|3[0-59]|47|6[245]|9[02-8])|3(?:3[28]|4[03-9]|5[2-46-8]|7[1-578]|8[2-9])","2(?:[23]02|6(?:[25]|4[6-8])|9(?:[02356]|4[02568]|72|8[23]))|3(?:3[28]|4(?:[04679]|3[5-8]|5[4-68]|8[2379])|5(?:[2467]|3[237]|8[2-5])|7[1-578]|8(?:[2469]|3[2578]|5[4-8]|7[36-8]|8[5-8]))|2(?:2[24-9]|3[1-59]|47)",
+"2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3[78]|5(?:4[46]|8)|8[2379])|5(?:[2467]|3[237]|8[23])|7[1-578]|8(?:[2469]|3[278]|5[56][46]|86[3-6]))|2(?:2[24-9]|3[1-59]|47)|38(?:[58][78]|7[378])|3(?:4[35][56]|58[45]|8(?:[38]5|54|76))[4-6]","2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3(?:5(?:4[0-25689]|[56])|[78])|58|8[2379])|5(?:[2467]|3[237]|8(?:[23]|4(?:[45]|60)|5(?:4[0-39]|5|64)))|7[1-578]|8(?:[2469]|3[278]|54(?:4|5[13-7]|6[89])|86[3-6]))|2(?:2[24-9]|3[1-59]|47)|38(?:[58][78]|7[378])|3(?:454|85[56])[46]|3(?:4(?:36|5[56])|8(?:[38]5|76))[4-6]"],
+"0$1",,1],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2-$3",["1"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1-$2-$3",["[68]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2-$3",["[23]"],"0$1",,1],[,"(\\d)(\\d{4})(\\d{2})(\\d{4})","$1 $2 $3-$4",["9(?:2[2-469]|3[3-578])","9(?:2(?:2[024-9]|3[0-59]|47|6[245]|9[02-8])|3(?:3[28]|4[03-9]|5[2-46-8]|7[1-578]|8[2-9]))","9(?:2(?:[23]02|6(?:[25]|4[6-8])|9(?:[02356]|4[02568]|72|8[23]))|3(?:3[28]|4(?:[04679]|3[5-8]|5[4-68]|8[2379])|5(?:[2467]|3[237]|8[2-5])|7[1-578]|8(?:[2469]|3[2578]|5[4-8]|7[36-8]|8[5-8])))|92(?:2[24-9]|3[1-59]|47)",
+"9(?:2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3[78]|5(?:4[46]|8)|8[2379])|5(?:[2467]|3[237]|8[23])|7[1-578]|8(?:[2469]|3[278]|5(?:[56][46]|[78])|7[378]|8(?:6[3-6]|[78]))))|92(?:2[24-9]|3[1-59]|47)|93(?:4[35][56]|58[45]|8(?:[38]5|54|76))[4-6]","9(?:2(?:[23]02|6(?:[25]|4(?:64|[78]))|9(?:[02356]|4(?:[0268]|5[2-6])|72|8[23]))|3(?:3[28]|4(?:[04679]|3(?:5(?:4[0-25689]|[56])|[78])|5(?:4[46]|8)|8[2379])|5(?:[2467]|3[237]|8(?:[23]|4(?:[45]|60)|5(?:4[0-39]|5|64)))|7[1-578]|8(?:[2469]|3[278]|5(?:4(?:4|5[13-7]|6[89])|[56][46]|[78])|7[378]|8(?:6[3-6]|[78]))))|92(?:2[24-9]|3[1-59]|47)|93(?:4(?:36|5[56])|8(?:[38]5|76))[4-6]"]],
+[,"(\\d)(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3-$4",["91"]],[,"(\\d{3})(\\d{3})(\\d{5})","$1-$2-$3",["8"],"0$1"],[,"(\\d)(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3-$4",["9"]]],[,,,,,,,,,[-1]],,,[,,"810\\d{7}",,,,,,,[10]],[,,"810\\d{7}",,,,"8101234567",,,[10]],,,[,,,,,,,,,[-1]]],AS:[,[,,"(?:[58]\\d\\d|684|900)\\d{7}",,,,,,,[10],[7]],[,,"6846(?:22|33|44|55|77|88|9[19])\\d{4}",,,,"6846221234",,,,[7]],[,,"684(?:2(?:48|5[2468]|7[26])|7(?:3[13]|70|82))\\d{4}",,,,"6847331234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",
+,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"AS",1,"011","1",,,"([267]\\d{6})$|1","684$1",,,,,[,,,,,,,,,[-1]],,"684",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AT:[,[,,"1\\d{3,12}|2\\d{6,12}|43(?:(?:0\\d|5[02-9])\\d{3,9}|2\\d{4,5}|[3467]\\d{4}|8\\d{4,6}|9\\d{4,7})|5\\d{4,12}|8\\d{7,12}|9\\d{8,12}|(?:[367]\\d|4[0-24-9])\\d{4,11}",
+,,,,,,[4,5,6,7,8,9,10,11,12,13],[3]],[,,"1(?:11\\d|[2-9]\\d{3,11})|(?:316|463|(?:51|66|73)2)\\d{3,10}|(?:2(?:1[467]|2[13-8]|5[2357]|6[1-46-8]|7[1-8]|8[124-7]|9[1458])|3(?:1[1-578]|3[23568]|4[5-7]|5[1378]|6[1-38]|8[3-68])|4(?:2[1-8]|35|7[1368]|8[2457])|5(?:2[1-8]|3[357]|4[147]|5[12578]|6[37])|6(?:13|2[1-47]|4[135-8]|5[468])|7(?:2[1-8]|35|4[13478]|5[68]|6[16-8]|7[1-6]|9[45]))\\d{4,10}",,,,"1234567890",,,,[3]],[,,"6(?:5[0-3579]|6[013-9]|[7-9]\\d)\\d{4,10}",,,,"664123456",,,[7,8,9,10,11,12,13]],[,,"800\\d{6,10}",
+,,,"800123456",,,[9,10,11,12,13]],[,,"(?:8[69][2-68]|9(?:0[01]|3[019]))\\d{6,10}",,,,"900123456",,,[9,10,11,12,13]],[,,"8(?:10|2[018])\\d{6,10}|828\\d{5}",,,,"810123456",,,[8,9,10,11,12,13]],[,,,,,,,,,[-1]],[,,"5(?:0[1-9]|17|[79]\\d)\\d{2,10}|7[28]0\\d{6,10}",,,,"780123456",,,[5,6,7,8,9,10,11,12,13]],"AT",43,"00","0",,,"0",,,,[[,"(\\d{4})","$1",["14"]],[,"(\\d)(\\d{3,12})","$1 $2",["1(?:11|[2-9])"],"0$1"],[,"(\\d{3})(\\d{2})","$1 $2",["517"],"0$1"],[,"(\\d{2})(\\d{3,5})","$1 $2",["5[079]"],"0$1"],
+[,"(\\d{6})","$1",["[18]"]],[,"(\\d{3})(\\d{3,10})","$1 $2",["(?:31|4)6|51|6(?:5[0-3579]|[6-9])|7(?:20|32|8)|[89]"],"0$1"],[,"(\\d{4})(\\d{3,9})","$1 $2",["[2-467]|5[2-6]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["5"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4,7})","$1 $2 $3",["5"],"0$1"]],[[,"(\\d)(\\d{3,12})","$1 $2",["1(?:11|[2-9])"],"0$1"],[,"(\\d{3})(\\d{2})","$1 $2",["517"],"0$1"],[,"(\\d{2})(\\d{3,5})","$1 $2",["5[079]"],"0$1"],[,"(\\d{3})(\\d{3,10})","$1 $2",["(?:31|4)6|51|6(?:5[0-3579]|[6-9])|7(?:20|32|8)|[89]"],
+"0$1"],[,"(\\d{4})(\\d{3,9})","$1 $2",["[2-467]|5[2-6]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["5"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4,7})","$1 $2 $3",["5"],"0$1"]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AU:[,[,,"1(?:[0-79]\\d{7}(?:\\d(?:\\d{2})?)?|8[0-24-9]\\d{7})|[2-478]\\d{8}|1\\d{4,7}",,,,,,,[5,6,7,8,9,10,12]],[,,"(?:(?:2(?:[0-26-9]\\d|3[0-8]|4[02-9]|5[0135-9])|3(?:[0-3589]\\d|4[0-578]|6[1-9]|7[0-35-9])|7(?:[013-57-9]\\d|2[0-8]))\\d{3}|8(?:51(?:0(?:0[03-9]|[12479]\\d|3[2-9]|5[0-8]|6[1-9]|8[0-7])|1(?:[0235689]\\d|1[0-69]|4[0-589]|7[0-47-9])|2(?:0[0-79]|[18][13579]|2[14-9]|3[0-46-9]|[4-6]\\d|7[89]|9[0-4]))|(?:6[0-8]|[78]\\d)\\d{3}|9(?:[02-9]\\d{3}|1(?:(?:[0-58]\\d|6[0135-9])\\d|7(?:0[0-24-9]|[1-9]\\d)|9(?:[0-46-9]\\d|5[0-79])))))\\d{3}",
+,,,"212345678",,,[9],[8]],[,,"4(?:(?:79|94)[01]|83[0-389])\\d{5}|4(?:[0-3]\\d|4[047-9]|5[0-25-9]|6[016-9]|7[02-8]|8[0-24-9]|9[0-37-9])\\d{6}",,,,"412345678",,,[9]],[,,"180(?:0\\d{3}|2)\\d{3}",,,,"1800123456",,,[7,10]],[,,"190[0-26]\\d{6}",,,,"1900123456",,,[10]],[,,"13(?:00\\d{6}(?:\\d{2})?|45[0-4]\\d{3})|13\\d{4}",,,,"1300123456",,,[6,8,10,12]],[,,,,,,,,,[-1]],[,,"14(?:5(?:1[0458]|[23][458])|71\\d)\\d{4}",,,,"147101234",,,[9]],"AU",61,"001[14-689]|14(?:1[14]|34|4[17]|[56]6|7[47]|88)0011","0",,,"(183[12])|0",
+,"0011",,[[,"(\\d{2})(\\d{3,4})","$1 $2",["16"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3",["13"]],[,"(\\d{3})(\\d{3})","$1 $2",["19"]],[,"(\\d{3})(\\d{4})","$1 $2",["180","1802"]],[,"(\\d{4})(\\d{3,4})","$1 $2",["19"]],[,"(\\d{2})(\\d{3})(\\d{2,4})","$1 $2 $3",["16"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["14|4"],"0$1"],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["[2378]"],"(0$1)","$CC ($1)"],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1(?:30|[89])"]],[,"(\\d{4})(\\d{4})(\\d{4})","$1 $2 $3",
+["130"]]],[[,"(\\d{2})(\\d{3,4})","$1 $2",["16"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2,4})","$1 $2 $3",["16"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["14|4"],"0$1"],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["[2378]"],"(0$1)","$CC ($1)"],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1(?:30|[89])"]]],[,,"163\\d{2,6}",,,,"1631234",,,[5,6,7,8,9]],1,,[,,"1(?:3(?:00\\d{5}|45[0-4])|802)\\d{3}|1[38]00\\d{6}|13\\d{4}",,,,,,,[6,7,8,10,12]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AW:[,[,,"(?:[25-79]\\d\\d|800)\\d{4}",
+,,,,,,[7]],[,,"5(?:2\\d|8[1-9])\\d{4}",,,,"5212345"],[,,"(?:290|5[69]\\d|6(?:[03]0|22|4[0-2]|[69]\\d)|7(?:[34]\\d|7[07])|9(?:6[45]|9[4-8]))\\d{4}",,,,"5601234"],[,,"800\\d{4}",,,,"8001234"],[,,"900\\d{4}",,,,"9001234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:28\\d|501)\\d{4}",,,,"5011234"],"AW",297,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[25-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],AX:[,[,,"2\\d{4,9}|35\\d{4,5}|(?:60\\d\\d|800)\\d{4,6}|7\\d{5,11}|(?:[14]\\d|3[0-46-9]|50)\\d{4,8}",
+,,,,,,[5,6,7,8,9,10,11,12]],[,,"18[1-8]\\d{3,6}",,,,"181234567",,,[6,7,8,9]],[,,"4946\\d{2,6}|(?:4[0-8]|50)\\d{4,8}",,,,"412345678",,,[6,7,8,9,10]],[,,"800\\d{4,6}",,,,"800123456",,,[7,8,9]],[,,"[67]00\\d{5,6}",,,,"600123456",,,[8,9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AX",358,"00|99(?:[01469]|5(?:[14]1|3[23]|5[59]|77|88|9[09]))","0",,,"0",,"00",,,,[,,,,,,,,,[-1]],,"18",[,,,,,,,,,[-1]],[,,"20\\d{4,8}|60[12]\\d{5,6}|7(?:099\\d{4,5}|5[03-9]\\d{3,7})|20[2-59]\\d\\d|(?:606|7(?:0[78]|1|3\\d))\\d{7}|(?:10|29|3[09]|70[1-5]\\d)\\d{4,8}",
+,,,"10112345"],,,[,,,,,,,,,[-1]]],AZ:[,[,,"365\\d{6}|(?:[124579]\\d|60|88)\\d{7}",,,,,,,[9],[7]],[,,"(?:2[12]428|3655[02])\\d{4}|(?:2(?:22[0-79]|63[0-28])|3654)\\d{5}|(?:(?:1[28]|46)\\d|2(?:[014-6]2|[23]3))\\d{6}",,,,"123123456",,,,[7]],[,,"36554\\d{4}|(?:[16]0|4[04]|5[015]|7[07]|99)\\d{7}",,,,"401234567"],[,,"88\\d{7}",,,,"881234567"],[,,"900200\\d{3}",,,,"900200123"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"AZ",994,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3",["[1-9]"]],[,
+"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["90"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["1[28]|2|365|46","1[28]|2|365[45]|46","1[28]|2|365(?:4|5[02])|46"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[13-9]"],"0$1"]],[[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["90"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["1[28]|2|365|46","1[28]|2|365[45]|46","1[28]|2|365(?:4|5[02])|46"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",
+["[13-9]"],"0$1"]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BA:[,[,,"6\\d{8}|(?:[35689]\\d|49|70)\\d{6}",,,,,,,[8,9],[6]],[,,"(?:3(?:[05-79][2-9]|1[4579]|[23][24-9]|4[2-4689]|8[2457-9])|49[2-579]|5(?:0[2-49]|[13][2-9]|[268][2-4679]|4[4689]|5[2-79]|7[2-69]|9[2-4689]))\\d{5}",,,,"30212345",,,[8],[6]],[,,"6040\\d{5}|6(?:03|[1-356]|44|7\\d)\\d{6}",,,,"61123456"],[,,"8[08]\\d{6}",,,,"80123456",,,[8]],[,,"9[0246]\\d{6}",,,,"90123456",,,[8]],[,,"8[12]\\d{6}",,,,"82123456",,,[8]],
+[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BA",387,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3})","$1-$2",["[2-9]"]],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["6[1-3]|[7-9]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2-$3",["[3-5]|6[56]"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3 $4",["6"],"0$1"]],[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["6[1-3]|[7-9]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2-$3",["[3-5]|6[56]"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3 $4",["6"],"0$1"]],[,,,,,,,,,[-1]],
+,,[,,,,,,,,,[-1]],[,,"703[235]0\\d{3}|70(?:2[0-5]|3[0146]|[56]0)\\d{4}",,,,"70341234",,,[8]],,,[,,,,,,,,,[-1]]],BB:[,[,,"(?:246|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"246521[0369]\\d{3}|246(?:2(?:2[78]|7[0-4])|4(?:1[024-6]|2\\d|3[2-9])|5(?:20|[34]\\d|54|7[1-3])|6(?:2\\d|38)|7[35]7|9(?:1[89]|63))\\d{4}",,,,"2464123456",,,,[7]],[,,"246(?:(?:2(?:[3568]\\d|4[0-57-9])|3(?:5[2-9]|6[0-6])|4(?:46|5\\d)|69[5-7]|8(?:[2-5]\\d|83))\\d|52(?:1[147]|20))\\d{3}",,,,"2462501234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",
+,,,"8002123456"],[,,"(?:246976|900[2-9]\\d\\d)\\d{4}",,,,"9002123456",,,,[7]],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,"24631\\d{5}",,,,"2463101234",,,,[7]],"BB",1,"011","1",,,"([2-9]\\d{6})$|1","246$1",,,,,[,,,,,,,,,[-1]],,"246",[,,,,,,,,,[-1]],[,,"246(?:292|367|4(?:1[7-9]|3[01]|4[47-9]|67)|7(?:1[2-9]|2\\d|3[016]|53))\\d{4}",
+,,,"2464301234",,,,[7]],,,[,,,,,,,,,[-1]]],BD:[,[,,"[1-469]\\d{9}|8[0-79]\\d{7,8}|[2-79]\\d{8}|[2-9]\\d{7}|[3-9]\\d{6}|[57-9]\\d{5}",,,,,,,[6,7,8,9,10]],[,,"(?:4(?:31\\d\\d|423)|5222)\\d{3}(?:\\d{2})?|8332[6-9]\\d\\d|(?:3(?:03[56]|224)|4(?:22[25]|653))\\d{3,4}|(?:3(?:42[47]|529|823)|4(?:027|525|65(?:28|8))|562|6257|7(?:1(?:5[3-5]|6[12]|7[156]|89)|22[589]56|32|42675|52(?:[25689](?:56|8)|[347]8)|71(?:6[1267]|75|89)|92374)|82(?:2[59]|32)56|9(?:03[23]56|23(?:256|373)|31|5(?:1|2[4589]56)))\\d{3}|(?:3(?:02[348]|22[35]|324|422)|4(?:22[67]|32[236-9]|6(?:2[46]|5[57])|953)|5526|6(?:024|6655)|81)\\d{4,5}|(?:2(?:7(?:1[0-267]|2[0-289]|3[0-29]|4[01]|5[1-3]|6[013]|7[0178]|91)|8(?:0[125]|1[1-6]|2[0157-9]|3[1-69]|41|6[1-35]|7[1-5]|8[1-8]|9[0-6])|9(?:0[0-2]|1[0-4]|2[568]|3[3-6]|5[5-7]|6[0136-9]|7[0-7]|8[014-9]))|3(?:0(?:2[025-79]|3[2-4])|181|22[12]|32[2356]|824)|4(?:02[09]|22[348]|32[045]|523|6(?:27|54))|666(?:22|53)|7(?:22[57-9]|42[56]|82[35])8|8(?:0[124-9]|2(?:181|2[02-4679]8)|4[12]|[5-7]2)|9(?:[04]2|2(?:2|328)|81))\\d{4}|(?:2(?:222|[45]\\d)\\d|3(?:1(?:2[5-7]|[5-7])|425|822)|4(?:033|1\\d|[257]1|332|4(?:2[246]|5[25])|6(?:2[35]|56|62)|8(?:23|54)|92[2-5])|5(?:02[03489]|22[457]|32[35-79]|42[46]|6(?:[18]|53)|724|826)|6(?:023|2(?:2[2-5]|5[3-5]|8)|32[3478]|42[34]|52[47]|6(?:[18]|6(?:2[34]|5[24]))|[78]2[2-5]|92[2-6])|7(?:02|21\\d|[3-589]1|6[12]|72[24])|8(?:217|3[12]|[5-7]1)|9[24]1)\\d{5}|(?:(?:3[2-8]|5[2-57-9]|6[03-589])1|4[4689][18])\\d{5}|[59]1\\d{5}",
+,,,"27111234"],[,,"(?:1[13-9]\\d|644)\\d{7}|(?:3[78]|44|66)[02-9]\\d{7}",,,,"1812345678",,,[10]],[,,"80[03]\\d{7}",,,,"8001234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"96(?:0[469]|1[0-47]|3[389]|6[69]|7[78])\\d{6}",,,,"9604123456",,,[10]],"BD",880,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{4,6})","$1-$2",["31[5-8]|[459]1"],"0$1"],[,"(\\d{3})(\\d{3,7})","$1-$2",["3(?:[67]|8[013-9])|4(?:6[168]|7|[89][18])|5(?:6[128]|9)|6(?:[15]|28|4[14])|7[2-589]|8(?:0[014-9]|[12])|9[358]|(?:3[2-5]|4[235]|5[2-578]|6[0389]|76|8[3-7]|9[24])1|(?:44|66)[01346-9]"],
+"0$1"],[,"(\\d{4})(\\d{3,6})","$1-$2",["[13-9]|22"],"0$1"],[,"(\\d)(\\d{7,8})","$1-$2",["2"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BE:[,[,,"4\\d{8}|[1-9]\\d{7}",,,,,,,[8,9]],[,,"80[2-8]\\d{5}|(?:1[0-69]|[23][2-8]|4[23]|5\\d|6[013-57-9]|71|8[1-79]|9[2-4])\\d{6}",,,,"12345678",,,[8]],[,,"4[5-9]\\d{7}",,,,"470123456",,,[9]],[,,"800[1-9]\\d{4}",,,,"80012345",,,[8]],[,,"(?:70(?:2[0-57]|3[04-7]|44|6[4-69]|7[0579])|90\\d\\d)\\d{4}",,,,"90012345",,,[8]],[,,"7879\\d{4}",
+,,,"78791234",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BE",32,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["(?:80|9)0"],"0$1"],[,"(\\d)(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[239]|4[23]"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[15-8]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["4"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"78(?:0[57]|1[014-8]|2[25]|3[15-8]|48|[56]0|7[06-8]|9\\d)\\d{4}",,,,"78102345",,,[8]],,,[,,,,,,,,,[-1]]],BF:[,[,,"[025-7]\\d{7}",
+,,,,,,[8]],[,,"2(?:0(?:49|5[23]|6[5-7]|9[016-9])|4(?:4[569]|5[4-6]|6[5-7]|7[0179])|5(?:[34]\\d|50|6[5-7]))\\d{4}",,,,"20491234"],[,,"(?:0[1-35-7]|5[0-8]|[67]\\d)\\d{6}",,,,"70123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BF",226,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[025-7]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BG:[,[,,"00800\\d{7}|[2-7]\\d{6,7}|[89]\\d{6,8}|2\\d{5}",,,,,,,[6,7,8,9,12],[4,5]],
+[,,"2\\d{5,7}|(?:43[1-6]|70[1-9])\\d{4,5}|(?:[36]\\d|4[124-7]|[57][1-9]|8[1-6]|9[1-7])\\d{5,6}",,,,"2123456",,,[6,7,8],[4,5]],[,,"(?:43[07-9]|99[69]\\d)\\d{5}|(?:8[7-9]|98)\\d{7}",,,,"43012345",,,[8,9]],[,,"(?:00800\\d\\d|800)\\d{5}",,,,"80012345",,,[8,12]],[,,"90\\d{6}",,,,"90123456",,,[8]],[,,"700\\d{5}",,,,"70012345",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BG",359,"00","0",,,"0",,,,[[,"(\\d{6})","$1",["1"]],[,"(\\d)(\\d)(\\d{2})(\\d{2})","$1 $2 $3 $4",["2"],"0$1"],[,"(\\d{3})(\\d{4})","$1 $2",
+["43[1-6]|70[1-9]"],"0$1"],[,"(\\d)(\\d{3})(\\d{3,4})","$1 $2 $3",["2"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2,3})","$1 $2 $3",["[356]|4[124-7]|7[1-9]|8[1-6]|9[1-7]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["(?:70|8)0"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{2})","$1 $2 $3",["43[1-7]|7"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[48]|9[08]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["9"],"0$1"]],[[,"(\\d)(\\d)(\\d{2})(\\d{2})","$1 $2 $3 $4",["2"],"0$1"],[,"(\\d{3})(\\d{4})","$1 $2",["43[1-6]|70[1-9]"],
+"0$1"],[,"(\\d)(\\d{3})(\\d{3,4})","$1 $2 $3",["2"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2,3})","$1 $2 $3",["[356]|4[124-7]|7[1-9]|8[1-6]|9[1-7]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["(?:70|8)0"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{2})","$1 $2 $3",["43[1-7]|7"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[48]|9[08]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["9"],"0$1"]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BH:[,[,,"[136-9]\\d{7}",,,,,,,[8]],[,,"(?:1(?:3[1356]|6[0156]|7\\d)\\d|6(?:1[16]\\d|500|6(?:0\\d|3[12]|44|7[7-9]|88)|9[69][69])|7(?:1(?:11|78)|7\\d\\d))\\d{4}",
+,,,"17001234"],[,,"(?:3(?:[1-79]\\d|8[0-47-9])\\d|6(?:3(?:00|33|6[16])|6(?:3[03-9]|[69]\\d|7[0-6])))\\d{4}",,,,"36001234"],[,,"80\\d{6}",,,,"80123456"],[,,"(?:87|9[014578])\\d{6}",,,,"90123456"],[,,"84\\d{6}",,,,"84123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BH",973,"00",,,,,,,,[[,"(\\d{4})(\\d{4})","$1 $2",["[13679]|8[047]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BI:[,[,,"(?:[267]\\d|31)\\d{6}",,,,,,,[8]],[,,"(?:22|31)\\d{6}",,,,"22201234"],[,,"(?:29|[67][125-9])\\d{6}",
+,,,"79561234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BI",257,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[2367]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BJ:[,[,,"[24-689]\\d{7}",,,,,,,[8]],[,,"2(?:02|1[037]|2[45]|3[68]|4\\d)\\d{5}",,,,"20211234"],[,,"(?:4[0-356]|[56]\\d|9[013-9])\\d{6}",,,,"90011234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"857[58]\\d{4}",,,,"85751234"],"BJ",
+229,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[24-689]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"81\\d{6}",,,,"81123456"],,,[,,,,,,,,,[-1]]],BL:[,[,,"590\\d{6}|(?:69|80|9\\d)\\d{7}",,,,,,,[9]],[,,"590(?:2[7-9]|5[12]|87)\\d{4}",,,,"590271234"],[,,"69(?:0\\d\\d|1(?:2[2-9]|3[0-5]))\\d{4}",,,,"690001234"],[,,"80[0-5]\\d{6}",,,,"800012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"9(?:(?:395|76[018])\\d|475[0-2])\\d{4}",,,,"976012345"],"BL",590,"00","0",,,"0",,,,,,[,
+,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BM:[,[,,"(?:441|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"441(?:[46]\\d\\d|5(?:4\\d|60|89))\\d{4}",,,,"4414123456",,,,[7]],[,,"441(?:[2378]\\d|5[0-39]|92)\\d{5}",,,,"4413701234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"BM",1,"011","1",,,"([2-9]\\d{6})$|1","441$1",,,,,[,,,,,,,,,[-1]],,"441",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BN:[,[,,"[2-578]\\d{6}",,,,,,,[7]],[,,"22[0-7]\\d{4}|(?:2[013-9]|[34]\\d|5[0-25-9])\\d{5}",,,,"2345678"],[,,"(?:22[89]|[78]\\d\\d)\\d{4}",,,,"7123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"5[34]\\d{5}",,,,"5345678"],"BN",673,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[2-578]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],
+[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BO:[,[,,"(?:[2-467]\\d\\d|8001)\\d{5}",,,,,,,[8,9],[7]],[,,"(?:2(?:2\\d\\d|5(?:11|[258]\\d|9[67])|6(?:12|2\\d|9[34])|8(?:2[34]|39|62))|3(?:3\\d\\d|4(?:6\\d|8[24])|8(?:25|42|5[257]|86|9[25])|9(?:[27]\\d|3[2-4]|4[248]|5[24]|6[2-6]))|4(?:4\\d\\d|6(?:11|[24689]\\d|72)))\\d{4}",,,,"22123456",,,[8],[7]],[,,"[67]\\d{7}",,,,"71234567",,,[8]],[,,"8001[07]\\d{4}",,,,"800171234",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BO",591,"00(?:1\\d)?","0",
+,,"0(1\\d)?",,,,[[,"(\\d)(\\d{7})","$1 $2",["[23]|4[46]"],,"0$CC $1"],[,"(\\d{8})","$1",["[67]"],,"0$CC $1"],[,"(\\d{3})(\\d{2})(\\d{4})","$1 $2 $3",["8"],,"0$CC $1"]],,[,,,,,,,,,[-1]],,,[,,"8001[07]\\d{4}",,,,,,,[9]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BQ:[,[,,"(?:[34]1|7\\d)\\d{5}",,,,,,,[7]],[,,"(?:318[023]|41(?:6[023]|70)|7(?:1[578]|2[05]|50)\\d)\\d{3}",,,,"7151234"],[,,"(?:31(?:8[14-8]|9[14578])|416[14-9]|7(?:0[01]|7[07]|8\\d|9[056])\\d)\\d{3}",,,,"3181234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,
+,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BQ",599,"00",,,,,,,,,,[,,,,,,,,,[-1]],,"[347]",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BR:[,[,,"(?:[1-46-9]\\d\\d|5(?:[0-46-9]\\d|5[0-46-9]))\\d{8}|[1-9]\\d{9}|[3589]\\d{8}|[34]\\d{7}",,,,,,,[8,9,10,11]],[,,"(?:[14689][1-9]|2[12478]|3[1-578]|5[13-5]|7[13-579])[2-5]\\d{7}",,,,"1123456789",,,[10],[8]],[,,"(?:[14689][1-9]|2[12478]|3[1-578]|5[13-5]|7[13-579])(?:7|9\\d)\\d{7}",,,,"11961234567",,,[10,11],[8,9]],[,,"800\\d{6,7}",,,,"800123456",,,
+[9,10]],[,,"300\\d{6}|[59]00\\d{6,7}",,,,"300123456",,,[9,10]],[,,"(?:30[03]\\d{3}|4(?:0(?:0\\d|20)|370))\\d{4}|300\\d{5}",,,,"40041234",,,[8,10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BR",55,"00(?:1[245]|2[1-35]|31|4[13]|[56]5|99)","0",,,"(?:0|90)(?:(1[245]|2[1-35]|31|4[13]|[56]5|99)(\\d{10,11}))?","$2",,,[[,"(\\d{3,6})","$1",["1(?:1[25-8]|2[357-9]|3[02-68]|4[12568]|5|6[0-8]|8[015]|9[0-47-9])|321|610"]],[,"(\\d{4})(\\d{4})","$1-$2",["300|4(?:0[02]|37)","4(?:02|37)0|[34]00"]],[,"(\\d{4})(\\d{4})","$1-$2",
+["[2-57]","[2357]|4(?:[0-24-9]|3(?:[0-689]|7[1-9]))"]],[,"(\\d{3})(\\d{2,3})(\\d{4})","$1 $2 $3",["(?:[358]|90)0"],"0$1"],[,"(\\d{5})(\\d{4})","$1-$2",["9"]],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2-$3",["(?:[14689][1-9]|2[12478]|3[1-578]|5[13-5]|7[13-579])[2-57]"],"($1)","0 $CC ($1)"],[,"(\\d{2})(\\d{5})(\\d{4})","$1 $2-$3",["[16][1-9]|[2-57-9]"],"($1)","0 $CC ($1)"]],[[,"(\\d{4})(\\d{4})","$1-$2",["300|4(?:0[02]|37)","4(?:02|37)0|[34]00"]],[,"(\\d{3})(\\d{2,3})(\\d{4})","$1 $2 $3",["(?:[358]|90)0"],
+"0$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2-$3",["(?:[14689][1-9]|2[12478]|3[1-578]|5[13-5]|7[13-579])[2-57]"],"($1)","0 $CC ($1)"],[,"(\\d{2})(\\d{5})(\\d{4})","$1 $2-$3",["[16][1-9]|[2-57-9]"],"($1)","0 $CC ($1)"]],[,,,,,,,,,[-1]],,,[,,"30(?:0\\d{5,7}|3\\d{7})|40(?:0\\d|20)\\d{4}|800\\d{6,7}",,,,,,,[8,9,10]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BS:[,[,,"(?:242|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"242(?:3(?:02|[236][1-9]|4[0-24-9]|5[0-68]|7[347]|8[0-4]|9[2-467])|461|502|6(?:0[1-5]|12|2[013]|[45]0|7[67]|8[78]|9[89])|7(?:02|88))\\d{4}",
+,,,"2423456789",,,,[7]],[,,"242(?:3(?:5[79]|7[56]|95)|4(?:[23][1-9]|4[1-35-9]|5[1-8]|6[2-8]|7\\d|81)|5(?:2[45]|3[35]|44|5[1-46-9]|65|77)|6[34]6|7(?:27|38)|8(?:0[1-9]|1[02-9]|2\\d|[89]9))\\d{4}",,,,"2423591234",,,,[7]],[,,"242300\\d{4}|8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456",,,,[7]],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"BS",1,"011","1",,,"([3-8]\\d{6})$|1","242$1",,,,,[,,,,,,,,,[-1]],,"242",[,,,,,,,,,[-1]],[,,"242225\\d{4}",,,,"2422250123"],,,[,,,,,,,,,[-1]]],BT:[,[,,"[17]\\d{7}|[2-8]\\d{6}",,,,,,,[7,8],[6]],[,,"(?:2[3-6]|[34][5-7]|5[236]|6[2-46]|7[246]|8[2-4])\\d{5}",,,,"2345678",,,[7],[6]],[,,"(?:1[67]|77)\\d{6}",,,,"17123456",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BT",975,"00",,,,,,,,[[,"(\\d{3})(\\d{3})","$1 $2",["[2-7]"]],[,"(\\d)(\\d{3})(\\d{3})",
+"$1 $2 $3",["[2-68]|7[246]"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["1[67]|7"]]],[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["[2-68]|7[246]"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["1[67]|7"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BW:[,[,,"(?:0800|(?:[37]|800)\\d)\\d{6}|(?:[2-6]\\d|90)\\d{5}",,,,,,,[7,8,10]],[,,"(?:2(?:4[0-48]|6[0-24]|9[0578])|3(?:1[0-35-9]|55|[69]\\d|7[013])|4(?:6[03]|7[1267]|9[0-5])|5(?:3[03489]|4[0489]|7[1-47]|88|9[0-49])|6(?:2[1-35]|5[149]|8[067]))\\d{4}",
+,,,"2401234",,,[7]],[,,"(?:321|7(?:[1-7]\\d|8[0-4]))\\d{5}",,,,"71123456",,,[8]],[,,"(?:0800|800\\d)\\d{6}",,,,"0800012345",,,[10]],[,,"90\\d{5}",,,,"9012345",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"79(?:1(?:[01]\\d|2[0-7])|2[0-7]\\d)\\d{3}",,,,"79101234",,,[8]],"BW",267,"00",,,,,,,,[[,"(\\d{2})(\\d{5})","$1 $2",["90"]],[,"(\\d{3})(\\d{4})","$1 $2",["[24-6]|3[15-79]"]],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[37]"]],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["0"]],[,"(\\d{3})(\\d{4})(\\d{3})",
+"$1 $2 $3",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BY:[,[,,"(?:[12]\\d|33|44|902)\\d{7}|8(?:0[0-79]\\d{5,7}|[1-7]\\d{9})|8(?:1[0-489]|[5-79]\\d)\\d{7}|8[1-79]\\d{6,7}|8[0-79]\\d{5}|8\\d{5}",,,,,,,[6,7,8,9,10,11],[5]],[,,"(?:1(?:5(?:1[1-5]|[24]\\d|6[2-4]|9[1-7])|6(?:[235]\\d|4[1-7])|7\\d\\d)|2(?:1(?:[246]\\d|3[0-35-9]|5[1-9])|2(?:[235]\\d|4[0-8])|3(?:[26]\\d|3[02-79]|4[024-7]|5[03-7])))\\d{5}",,,,"152450911",,,[9],[5,6,7]],[,,"(?:2(?:5[5-79]|9[1-9])|(?:33|44)\\d)\\d{6}",
+,,,"294911911",,,[9]],[,,"800\\d{3,7}|8(?:0[13]|20\\d)\\d{7}",,,,"8011234567"],[,,"(?:810|902)\\d{7}",,,,"9021234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"249\\d{6}",,,,"249123456",,,[9]],"BY",375,"810","8",,,"0|80?",,"8~10",,[[,"(\\d{3})(\\d{3})","$1 $2",["800"],"8 $1"],[,"(\\d{3})(\\d{2})(\\d{2,4})","$1 $2 $3",["800"],"8 $1"],[,"(\\d{4})(\\d{2})(\\d{3})","$1 $2-$3",["1(?:5[169]|6[3-5]|7[179])|2(?:1[35]|2[34]|3[3-5])","1(?:5[169]|6(?:3[1-3]|4|5[125])|7(?:1[3-9]|7[0-24-6]|9[2-7]))|2(?:1[35]|2[34]|3[3-5])"],
+"8 0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2-$3-$4",["1(?:[56]|7[467])|2[1-3]"],"8 0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2-$3-$4",["[1-4]"],"8 0$1"],[,"(\\d{3})(\\d{3,4})(\\d{4})","$1 $2 $3",["[89]"],"8 $1"]],,[,,,,,,,,,[-1]],,,[,,"800\\d{3,7}|(?:8(?:0[13]|10|20\\d)|902)\\d{7}"],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],BZ:[,[,,"(?:0800\\d|[2-8])\\d{6}",,,,,,,[7,11]],[,,"(?:2(?:[02]\\d|36|[68]0)|[3-58](?:[02]\\d|[68]0)|7(?:[02]\\d|32|[68]0))\\d{4}",,,,"2221234",,,[7]],[,,"6[0-35-7]\\d{5}",
+,,,"6221234",,,[7]],[,,"0800\\d{7}",,,,"08001234123",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"BZ",501,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1-$2",["[2-8]"]],[,"(\\d)(\\d{3})(\\d{4})(\\d{3})","$1-$2-$3-$4",["0"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CA:[,[,,"(?:[2-8]\\d|90)\\d{8}|3\\d{6}",,,,,,,[7,10]],[,,"(?:2(?:04|[23]6|[48]9|50|63)|3(?:06|43|54|6[578]|82)|4(?:03|1[68]|[26]8|3[178]|50|74)|5(?:06|1[49]|48|79|8[147])|6(?:04|[18]3|39|47|72)|7(?:0[59]|42|53|78|8[02])|8(?:[06]7|19|25|73)|90[25])[2-9]\\d{6}",
+,,,"5062345678",,,[10],[7]],[,,"(?:2(?:04|[23]6|[48]9|50|63)|3(?:06|43|54|6[578]|82)|4(?:03|1[68]|[26]8|3[178]|50|74)|5(?:06|1[49]|48|79|8[147])|6(?:04|[18]3|39|47|72)|7(?:0[59]|42|53|78|8[02])|8(?:[06]7|19|25|73)|90[25])[2-9]\\d{6}",,,,"5062345678",,,[10],[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456",,,[10]],[,,"900[2-9]\\d{6}",,,,"9002123456",,,[10]],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|(?:5(?:00|2[125-9]|33|44|66|77|88)|622)[2-9]\\d{6}",
+,,,"5002345678",,,[10]],[,,"600[2-9]\\d{6}",,,,"6002012345",,,[10]],"CA",1,"011","1",,,"1",,,1,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"310\\d{4}",,,,"3101234",,,[7]],,,[,,,,,,,,,[-1]]],CC:[,[,,"1(?:[0-79]\\d{8}(?:\\d{2})?|8[0-24-9]\\d{7})|[148]\\d{8}|1\\d{5,7}",,,,,,,[6,7,8,9,10,12]],[,,"8(?:51(?:0(?:02|31|60|89)|1(?:18|76)|223)|91(?:0(?:1[0-2]|29)|1(?:[28]2|50|79)|2(?:10|64)|3(?:[06]8|22)|4[29]8|62\\d|70[23]|959))\\d{3}",,,,"891621234",,,[9],[8]],[,,"4(?:(?:79|94)[01]|83[0-389])\\d{5}|4(?:[0-3]\\d|4[047-9]|5[0-25-9]|6[016-9]|7[02-8]|8[0-24-9]|9[0-37-9])\\d{6}",
+,,,"412345678",,,[9]],[,,"180(?:0\\d{3}|2)\\d{3}",,,,"1800123456",,,[7,10]],[,,"190[0-26]\\d{6}",,,,"1900123456",,,[10]],[,,"13(?:00\\d{6}(?:\\d{2})?|45[0-4]\\d{3})|13\\d{4}",,,,"1300123456",,,[6,8,10,12]],[,,,,,,,,,[-1]],[,,"14(?:5(?:1[0458]|[23][458])|71\\d)\\d{4}",,,,"147101234",,,[9]],"CC",61,"001[14-689]|14(?:1[14]|34|4[17]|[56]6|7[47]|88)0011","0",,,"([59]\\d{7})$|0","8$1","0011",,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CD:[,[,,"[189]\\d{8}|[1-68]\\d{6}",,,,,,
+,[7,9]],[,,"12\\d{7}|[1-6]\\d{6}",,,,"1234567"],[,,"88\\d{5}|(?:8[0-59]|9[017-9])\\d{7}",,,,"991234567"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CD",243,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3",["88"],"0$1"],[,"(\\d{2})(\\d{5})","$1 $2",["[1-6]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["1"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[89]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CF:[,[,,
+"(?:[27]\\d{3}|8776)\\d{4}",,,,,,,[8]],[,,"2[12]\\d{6}",,,,"21612345"],[,,"7[024-7]\\d{6}",,,,"70012345"],[,,,,,,,,,[-1]],[,,"8776\\d{4}",,,,"87761234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CF",236,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[278]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CG:[,[,,"222\\d{6}|(?:0\\d|80)\\d{7}",,,,,,,[9]],[,,"222[1-589]\\d{5}",,,,"222123456"],[,,"026(?:1[0-5]|6[6-9])\\d{4}|0(?:[14-6]\\d\\d|2(?:40|5[5-8]|6[07-9]))\\d{5}",
+,,,"061234567"],[,,,,,,,,,[-1]],[,,"80[0-2]\\d{6}",,,,"800123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CG",242,"00",,,,,,,,[[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["8"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[02]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CH:[,[,,"8\\d{11}|[2-9]\\d{8}",,,,,,,[9,12]],[,,"(?:2[12467]|3[1-4]|4[134]|5[256]|6[12]|[7-9]1)\\d{7}",,,,"212345678",,,[9]],[,,"7[35-9]\\d{7}",,,,"781234567",,,[9]],[,,"800\\d{6}",,,,"800123456",,,[9]],
+[,,"90[016]\\d{6}",,,,"900123456",,,[9]],[,,"84[0248]\\d{6}",,,,"840123456",,,[9]],[,,"878\\d{6}",,,,"878123456",,,[9]],[,,,,,,,,,[-1]],"CH",41,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["8[047]|90"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[2-79]|81"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4 $5",["8"],"0$1"]],,[,,"74[0248]\\d{6}",,,,"740123456",,,[9]],,,[,,,,,,,,,[-1]],[,,"5[18]\\d{7}",,,,"581234567",,,[9]],,,[,,"860\\d{9}",,,,"860123456789",
+,,[12]]],CI:[,[,,"[02]\\d{9}",,,,,,,[10]],[,,"2(?:[15]\\d{3}|7(?:2(?:0[23]|1[2357]|2[245]|3[45]|4[3-5])|3(?:06|1[69]|[2-6]7)))\\d{5}",,,,"2123456789"],[,,"0[157]\\d{8}",,,,"0123456789"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CI",225,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d)(\\d{5})","$1 $2 $3 $4",["2"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{4})","$1 $2 $3 $4",["0"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CK:[,[,,"[2-578]\\d{4}",,,,,,
+,[5]],[,,"(?:2\\d|3[13-7]|4[1-5])\\d{3}",,,,"21234"],[,,"[578]\\d{4}",,,,"71234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CK",682,"00",,,,,,,,[[,"(\\d{2})(\\d{3})","$1 $2",["[2-578]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CL:[,[,,"12300\\d{6}|6\\d{9,10}|[2-9]\\d{8}",,,,,,,[9,10,11]],[,,"2(?:1982[0-6]|3314[05-9])\\d{3}|(?:2(?:1(?:160|962)|3(?:2\\d\\d|3(?:[03467]\\d|1[0-35-9]|2[1-9]|5[0-24-9]|8[0-3])|600)|646[59])|80[1-9]\\d\\d|9(?:3(?:[0-57-9]\\d\\d|6(?:0[02-9]|[1-9]\\d))|6(?:[0-8]\\d\\d|9(?:[02-79]\\d|1[05-9]))|7[1-9]\\d\\d|9(?:[03-9]\\d\\d|1(?:[0235-9]\\d|4[0-24-9])|2(?:[0-79]\\d|8[0-46-9]))))\\d{4}|(?:22|3[2-5]|[47][1-35]|5[1-3578]|6[13-57]|8[1-9]|9[2458])\\d{7}",
+,,,"221234567",,,[9]],[,,"2(?:1982[0-6]|3314[05-9])\\d{3}|(?:2(?:1(?:160|962)|3(?:2\\d\\d|3(?:[03467]\\d|1[0-35-9]|2[1-9]|5[0-24-9]|8[0-3])|600)|646[59])|80[1-9]\\d\\d|9(?:3(?:[0-57-9]\\d\\d|6(?:0[02-9]|[1-9]\\d))|6(?:[0-8]\\d\\d|9(?:[02-79]\\d|1[05-9]))|7[1-9]\\d\\d|9(?:[03-9]\\d\\d|1(?:[0235-9]\\d|4[0-24-9])|2(?:[0-79]\\d|8[0-46-9]))))\\d{4}|(?:22|3[2-5]|[47][1-35]|5[1-3578]|6[13-57]|8[1-9]|9[2458])\\d{7}",,,,"221234567",,,[9]],[,,"(?:123|8)00\\d{6}",,,,"800123456",,,[9,11]],[,,,,,,,,,[-1]],[,,
+"600\\d{7,8}",,,,"6001234567",,,[10,11]],[,,,,,,,,,[-1]],[,,"44\\d{7}",,,,"441234567",,,[9]],"CL",56,"(?:0|1(?:1[0-69]|2[02-5]|5[13-58]|69|7[0167]|8[018]))0",,,,,,,1,[[,"(\\d{4})","$1",["1(?:[03-589]|21)|[29]0|78"]],[,"(\\d{5})(\\d{4})","$1 $2",["219","2196"],"($1)"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["44"]],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["2[1-36]"],"($1)"],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["9[2-9]"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["3[2-5]|[47]|5[1-3578]|6[13-57]|8(?:0[1-9]|[1-9])"],
+"($1)"],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["60|8"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["1"]],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3 $4",["60"]]],[[,"(\\d{5})(\\d{4})","$1 $2",["219","2196"],"($1)"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["44"]],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["2[1-36]"],"($1)"],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["9[2-9]"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["3[2-5]|[47]|5[1-3578]|6[13-57]|8(?:0[1-9]|[1-9])"],"($1)"],[,"(\\d{3})(\\d{3})(\\d{3,4})",
+"$1 $2 $3",["60|8"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["1"]],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3 $4",["60"]]],[,,,,,,,,,[-1]],,,[,,"600\\d{7,8}",,,,,,,[10,11]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CM:[,[,,"[26]\\d{8}|88\\d{6,7}",,,,,,,[8,9]],[,,"2(?:22|33)\\d{6}",,,,"222123456",,,[9]],[,,"(?:24[23]|6[25-9]\\d)\\d{6}",,,,"671234567",,,[9]],[,,"88\\d{6,7}",,,,"88012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CM",237,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["88"]],[,"(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4 $5",["[26]|88"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CN:[,[,,"1[127]\\d{8,9}|2\\d{9}(?:\\d{2})?|[12]\\d{6,7}|86\\d{6}|(?:1[03-689]\\d|6)\\d{7,9}|(?:[3-579]\\d|8[0-57-9])\\d{6,9}",,,,,,,[7,8,9,10,11,12],[5,6]],[,,"(?:10(?:[02-79]\\d\\d|[18](?:0[1-9]|[1-9]\\d))|21(?:[18](?:0[1-9]|[1-9]\\d)|[2-79]\\d\\d))\\d{5}|(?:43[35]|754)\\d{7,8}|8(?:078\\d{7}|51\\d{7,8})|(?:10|(?:2|85)1|43[35]|754)(?:100\\d\\d|95\\d{3,4})|(?:2[02-57-9]|3(?:11|7[179])|4(?:[15]1|3[12])|5(?:1\\d|2[37]|3[12]|51|7[13-79]|9[15])|7(?:[39]1|5[57]|6[09])|8(?:71|98))(?:[02-8]\\d{7}|1(?:0(?:0\\d\\d(?:\\d{3})?|[1-9]\\d{5})|[1-9]\\d{6})|9(?:[0-46-9]\\d{6}|5\\d{3}(?:\\d(?:\\d{2})?)?))|(?:3(?:1[02-9]|35|49|5\\d|7[02-68]|9[1-68])|4(?:1[02-9]|2[179]|3[46-9]|5[2-9]|6[47-9]|7\\d|8[23])|5(?:3[03-9]|4[36]|5[02-9]|6[1-46]|7[028]|80|9[2-46-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[17]\\d|2[248]|3[04-9]|4[3-6]|5[0-3689]|6[2368]|9[02-9])|8(?:1[236-8]|2[5-7]|3\\d|5[2-9]|7[02-9]|8[36-8]|9[1-7])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))(?:[02-8]\\d{6}|1(?:0(?:0\\d\\d(?:\\d{2})?|[1-9]\\d{4})|[1-9]\\d{5})|9(?:[0-46-9]\\d{5}|5\\d{3,5}))",
+,,,"1012345678",,,[7,8,9,10,11],[5,6]],[,,"1740[0-5]\\d{6}|1(?:[38]\\d|4[57]|[59][0-35-9]|6[25-7]|7[0-35-8])\\d{8}",,,,"13123456789",,,[11]],[,,"(?:(?:10|21)8|8)00\\d{7}",,,,"8001234567",,,[10,12]],[,,"16[08]\\d{5}",,,,"16812345",,,[8]],[,,"10(?:10\\d{4}|96\\d{3,4})|400\\d{7}|950\\d{7,8}|(?:2[0-57-9]|3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[14-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))96\\d{3,4}",
+,,,"4001234567",,,[7,8,9,10,11],[5,6]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CN",86,"00|1(?:[12]\\d|79)\\d\\d00","0",,,"(1(?:[12]\\d|79)\\d\\d)|0",,"00",,[[,"(\\d{5,6})","$1",["10|96"]],[,"(\\d{2})(\\d{5,6})","$1 $2",["(?:10|2[0-57-9])[19]","(?:10|2[0-57-9])(?:10|9[56])","10(?:10|9[56])|2[0-57-9](?:100|9[56])"],"0$1","$CC $1"],[,"(\\d{3})(\\d{4})","$1 $2",["[1-9]","1[1-9]|26|[3-9]|(?:10|2[0-57-9])(?:[0-8]|9[0-47-9])","1(?:0(?:[0-8]|9[0-47-9])|[1-9])|2(?:[0-57-9](?:[02-8]|1(?:0[1-9]|[1-9])|9[0-47-9])|6)|[3-9]"]],
+[,"(\\d{4})(\\d{4})","$1 $2",["16[08]"]],[,"(\\d{3})(\\d{5,6})","$1 $2",["3(?:[157]|35|49|9[1-68])|4(?:[17]|2[179]|6[47-9]|8[23])|5(?:[1357]|2[37]|4[36]|6[1-46]|80)|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]|4[13]|5[1-5])|(?:4[35]|59|85)[1-9]","(?:3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[1-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))[19]",
+"85[23](?:10|95)|(?:3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[14-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))(?:10|9[56])","85[23](?:100|95)|(?:3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[14-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))(?:100|9[56])"],
+"0$1","$CC $1"],[,"(\\d{4})(\\d{4})","$1 $2",["[1-9]","1(?:0(?:[02-8]|1[1-9]|9[0-47-9])|[1-9])|2(?:[0-57-9](?:[0-8]|9[0-47-9])|6)|[3-9]","1(?:0(?:[02-8]|1[1-9]|9[0-47-9])|[1-9])|26|3(?:[0268]|4[0-8]|9[079])|4(?:[049]|2[02-68]|[35]0|6[0-356]|8[014-9])|5(?:0|2[0-24-689]|4[0-2457-9]|6[057-9]|8[1-9]|90)|6(?:[0-24578]|3[06-9]|6[14-79]|9[03-9])|7(?:0[02-9]|2[0135-79]|3[23]|4[0-27-9]|6[1457]|8)|8(?:[046]|1[01459]|2[0-489]|5(?:0|[23][0-8])|8[0-2459]|9[09])|9(?:0[0457]|1[08]|[268]|4[024-9]|5[06-9])|(?:33|85[23]9)[0-46-9]|(?:2[0-57-9]|3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[14-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))(?:[0-8]|9[0-47-9])",
+"1(?:0[02-8]|[1-9])|2(?:[0-57-9][0-8]|6)|3(?:[0268]|3[0-46-9]|4[0-8]|9[079])|4(?:[049]|2[02-68]|[35]0|6[0-356]|8[014-9])|5(?:0|2[0-24-689]|4[0-2457-9]|6[057-9]|90)|6(?:[0-24578]|3[06-9]|6[14-79]|9[03-9])|7(?:0[02-9]|2[0135-79]|3[23]|4[0-27-9]|6[1457]|8)|8(?:[046]|1[01459]|2[0-489]|5(?:0|[23](?:[02-8]|1[1-9]|9[0-46-9]))|8[0-2459]|9[09])|9(?:0[0457]|1[08]|[268]|4[024-9]|5[06-9])|(?:10|2[0-57-9])9[0-47-9]|(?:101|58|85[23]10)[1-9]|(?:3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[14-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))(?:[02-8]|1(?:0[1-9]|[1-9])|9[0-47-9])"]],
+[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["(?:4|80)0"]],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["10|2(?:[02-57-9]|1[1-9])","10|2(?:[02-57-9]|1[1-9])","10[0-79]|2(?:[02-57-9]|1[1-79])|(?:10|21)8(?:0[1-9]|[1-9])"],"0$1","$CC $1",1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["3(?:[3-59]|7[02-68])|4(?:[26-8]|3[3-9]|5[2-9])|5(?:3[03-9]|[468]|7[028]|9[2-46-9])|6|7(?:[0-247]|3[04-9]|5[0-4689]|6[2368])|8(?:[1-358]|9[1-7])|9(?:[013479]|5[1-5])|(?:[34]1|55|79|87)[02-9]"],"0$1","$CC $1",1],[,"(\\d{3})(\\d{7,8})",
+"$1 $2",["9"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["80"],"0$1","$CC $1",1],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["[3-578]"],"0$1","$CC $1",1],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["1[3-9]"],,"$CC $1"],[,"(\\d{2})(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3 $4",["[12]"],"0$1",,1]],[[,"(\\d{2})(\\d{5,6})","$1 $2",["(?:10|2[0-57-9])[19]","(?:10|2[0-57-9])(?:10|9[56])","10(?:10|9[56])|2[0-57-9](?:100|9[56])"],"0$1","$CC $1"],[,"(\\d{3})(\\d{5,6})","$1 $2",["3(?:[157]|35|49|9[1-68])|4(?:[17]|2[179]|6[47-9]|8[23])|5(?:[1357]|2[37]|4[36]|6[1-46]|80)|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]|4[13]|5[1-5])|(?:4[35]|59|85)[1-9]",
+"(?:3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[1-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))[19]","85[23](?:10|95)|(?:3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[14-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))(?:10|9[56])",
+"85[23](?:100|95)|(?:3(?:[157]\\d|35|49|9[1-68])|4(?:[17]\\d|2[179]|[35][1-9]|6[47-9]|8[23])|5(?:[1357]\\d|2[37]|4[36]|6[1-46]|80|9[1-9])|6(?:3[1-5]|6[0238]|9[12])|7(?:01|[1579]\\d|2[248]|3[014-9]|4[3-6]|6[023689])|8(?:1[236-8]|2[5-7]|[37]\\d|5[14-9]|8[36-8]|9[1-8])|9(?:0[1-3689]|1[1-79]|[379]\\d|4[13]|5[1-5]))(?:100|9[56])"],"0$1","$CC $1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["(?:4|80)0"]],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["10|2(?:[02-57-9]|1[1-9])","10|2(?:[02-57-9]|1[1-9])","10[0-79]|2(?:[02-57-9]|1[1-79])|(?:10|21)8(?:0[1-9]|[1-9])"],
+"0$1","$CC $1",1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["3(?:[3-59]|7[02-68])|4(?:[26-8]|3[3-9]|5[2-9])|5(?:3[03-9]|[468]|7[028]|9[2-46-9])|6|7(?:[0-247]|3[04-9]|5[0-4689]|6[2368])|8(?:[1-358]|9[1-7])|9(?:[013479]|5[1-5])|(?:[34]1|55|79|87)[02-9]"],"0$1","$CC $1",1],[,"(\\d{3})(\\d{7,8})","$1 $2",["9"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["80"],"0$1","$CC $1",1],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["[3-578]"],"0$1","$CC $1",1],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["1[3-9]"],,"$CC $1"],
+[,"(\\d{2})(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3 $4",["[12]"],"0$1",,1]],[,,,,,,,,,[-1]],,,[,,"(?:(?:10|21)8|[48])00\\d{7}|950\\d{7,8}",,,,,,,[10,11,12]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CO:[,[,,"(?:60\\d\\d|9101)\\d{6}|(?:1\\d|3)\\d{9}",,,,,,,[10,11],[7]],[,,"601055(?:[0-4]\\d|50)\\d\\d|6010(?:[0-4]\\d|5[0-4])\\d{4}|60[124-8][2-9]\\d{6}",,,,"6012345678",,,[10],[7]],[,,"3333(?:0(?:0\\d|1[0-5])|[4-9]\\d\\d)\\d{3}|(?:3(?:24[1-9]|3(?:00|3[0-24-9]))|9101)\\d{6}|3(?:0[0-5]|1\\d|2[0-3]|5[01]|70)\\d{7}",
+,,,"3211234567",,,[10]],[,,"1800\\d{7}",,,,"18001234567",,,[11]],[,,"19(?:0[01]|4[78])\\d{7}",,,,"19001234567",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CO",57,"00(?:4(?:[14]4|56)|[579])","0",,,"0(4(?:[14]4|56)|[579])?",,,,[[,"(\\d{3})(\\d{7})","$1 $2",["6"],"($1)","0$CC $1"],[,"(\\d{3})(\\d{7})","$1 $2",["3[0-357]|91"],,"0$CC $1"],[,"(\\d)(\\d{3})(\\d{7})","$1-$2-$3",["1"],"0$1"]],[[,"(\\d{3})(\\d{7})","$1 $2",["6"],"($1)","0$CC $1"],[,"(\\d{3})(\\d{7})","$1 $2",["3[0-357]|91"],,"0$CC $1"],
+[,"(\\d)(\\d{3})(\\d{7})","$1 $2 $3",["1"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CR:[,[,,"(?:8\\d|90)\\d{8}|(?:[24-8]\\d{3}|3005)\\d{4}",,,,,,,[8,10]],[,,"210[7-9]\\d{4}|2(?:[024-7]\\d|1[1-9])\\d{5}",,,,"22123456",,,[8]],[,,"(?:3005\\d|6500[01])\\d{3}|(?:5[07]|6[0-4]|7[0-3]|8[3-9])\\d{6}",,,,"83123456",,,[8]],[,,"800\\d{7}",,,,"8001234567",,,[10]],[,,"90[059]\\d{7}",,,,"9001234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:210[0-6]|4\\d{3}|5100)\\d{4}",,,,"40001234",
+,,[8]],"CR",506,"00",,,,"(19(?:0[0-2468]|1[09]|20|66|77|99))",,,,[[,"(\\d{4})(\\d{4})","$1 $2",["[2-7]|8[3-9]"],,"$CC $1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1-$2-$3",["[89]"],,"$CC $1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CU:[,[,,"[27]\\d{6,7}|[34]\\d{5,7}|(?:5|8\\d\\d)\\d{7}",,,,,,,[6,7,8,10],[4,5]],[,,"(?:3[23]|48)\\d{4,6}|(?:31|4[36]|8(?:0[25]|78)\\d)\\d{6}|(?:2[1-4]|4[1257]|7\\d)\\d{5,6}",,,,"71234567",,,,[4,5]],[,,"5\\d{7}",,,,"51234567",,,[8]],[,,"800\\d{7}",
+,,,"8001234567",,,[10]],[,,,,,,,,,[-1]],[,,"807\\d{7}",,,,"8071234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CU",53,"119","0",,,"0",,,,[[,"(\\d{2})(\\d{4,6})","$1 $2",["2[1-4]|[34]"],"(0$1)"],[,"(\\d)(\\d{6,7})","$1 $2",["7"],"(0$1)"],[,"(\\d)(\\d{7})","$1 $2",["5"],"0$1"],[,"(\\d{3})(\\d{7})","$1 $2",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CV:[,[,,"(?:[2-59]\\d\\d|800)\\d{4}",,,,,,,[7]],[,,"2(?:2[1-7]|3[0-8]|4[12]|5[1256]|6\\d|7[1-3]|8[1-5])\\d{4}",
+,,,"2211234"],[,,"(?:36|5[1-389]|9\\d)\\d{5}",,,,"9911234"],[,,"800\\d{4}",,,,"8001234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:3[3-5]|4[356])\\d{5}",,,,"3401234"],"CV",238,"0",,,,,,,,[[,"(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3",["[2-589]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CW:[,[,,"(?:[34]1|60|(?:7|9\\d)\\d)\\d{5}",,,,,,,[7,8]],[,,"9(?:4(?:3[0-5]|4[14]|6\\d)|50\\d|7(?:2[014]|3[02-9]|4[4-9]|6[357]|77|8[7-9])|8(?:3[39]|[46]\\d|7[01]|8[57-9]))\\d{4}",
+,,,"94351234"],[,,"953[01]\\d{4}|9(?:5[12467]|6[5-9])\\d{5}",,,,"95181234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"60[0-2]\\d{4}",,,,"6001234",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"CW",599,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[3467]"]],[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["9[4-8]"]]],,[,,"955\\d{5}",,,,"95581234",,,[8]],1,"[69]",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CX:[,[,,"1(?:[0-79]\\d{8}(?:\\d{2})?|8[0-24-9]\\d{7})|[148]\\d{8}|1\\d{5,7}",,,,,,,[6,7,8,9,10,12]],[,,"8(?:51(?:0(?:01|30|59|88)|1(?:17|46|75)|2(?:22|35))|91(?:00[6-9]|1(?:[28]1|49|78)|2(?:09|63)|3(?:12|26|75)|4(?:56|97)|64\\d|7(?:0[01]|1[0-2])|958))\\d{3}",
+,,,"891641234",,,[9],[8]],[,,"4(?:(?:79|94)[01]|83[0-389])\\d{5}|4(?:[0-3]\\d|4[047-9]|5[0-25-9]|6[016-9]|7[02-8]|8[0-24-9]|9[0-37-9])\\d{6}",,,,"412345678",,,[9]],[,,"180(?:0\\d{3}|2)\\d{3}",,,,"1800123456",,,[7,10]],[,,"190[0-26]\\d{6}",,,,"1900123456",,,[10]],[,,"13(?:00\\d{6}(?:\\d{2})?|45[0-4]\\d{3})|13\\d{4}",,,,"1300123456",,,[6,8,10,12]],[,,,,,,,,,[-1]],[,,"14(?:5(?:1[0458]|[23][458])|71\\d)\\d{4}",,,,"147101234",,,[9]],"CX",61,"001[14-689]|14(?:1[14]|34|4[17]|[56]6|7[47]|88)0011","0",,,"([59]\\d{7})$|0",
+"8$1","0011",,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],CY:[,[,,"(?:[279]\\d|[58]0)\\d{6}",,,,,,,[8]],[,,"2[2-6]\\d{6}",,,,"22345678"],[,,"9(?:10|[4-79]\\d)\\d{5}",,,,"96123456"],[,,"800\\d{5}",,,,"80001234"],[,,"90[09]\\d{5}",,,,"90012345"],[,,"80[1-9]\\d{5}",,,,"80112345"],[,,"700\\d{5}",,,,"70012345"],[,,,,,,,,,[-1]],"CY",357,"00",,,,,,,,[[,"(\\d{2})(\\d{6})","$1 $2",["[257-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"(?:50|77)\\d{6}",,,,"77123456"],,,[,,,,,,,,,[-1]]],
+CZ:[,[,,"(?:[2-578]\\d|60)\\d{7}|9\\d{8,11}",,,,,,,[9,10,11,12]],[,,"(?:2\\d|3[1257-9]|4[16-9]|5[13-9])\\d{7}",,,,"212345678",,,[9]],[,,"(?:60[1-8]|7(?:0[2-5]|[2379]\\d))\\d{6}",,,,"601123456",,,[9]],[,,"800\\d{6}",,,,"800123456",,,[9]],[,,"9(?:0[05689]|76)\\d{6}",,,,"900123456",,,[9]],[,,"8[134]\\d{7}",,,,"811234567",,,[9]],[,,"70[01]\\d{6}",,,,"700123456",,,[9]],[,,"9[17]0\\d{6}",,,,"910123456",,,[9]],"CZ",420,"00",,,,,,,,[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[2-8]|9[015-7]"]],[,"(\\d{2})(\\d{3})(\\d{3})(\\d{2})",
+"$1 $2 $3 $4",["96"]],[,"(\\d{2})(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["9"]],[,"(\\d{3})(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["9"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"9(?:5\\d|7[2-4])\\d{6}",,,,"972123456",,,[9]],,,[,,"9(?:3\\d{9}|6\\d{7,10})",,,,"93123456789"]],DE:[,[,,"[2579]\\d{5,14}|49(?:[34]0|69|8\\d)\\d\\d?|49(?:37|49|60|7[089]|9\\d)\\d{1,3}|49(?:2[024-9]|3[2-689]|7[1-7])\\d{1,8}|(?:1|[368]\\d|4[0-8])\\d{3,13}|49(?:[015]\\d|2[13]|31|[46][1-8])\\d{1,9}",,,,,,,[4,5,6,7,8,9,10,11,12,
+13,14,15],[2,3]],[,,"32\\d{9,11}|49[1-6]\\d{10}|322\\d{6}|49[0-7]\\d{3,9}|(?:[34]0|[68]9)\\d{3,13}|(?:2(?:0[1-689]|[1-3569]\\d|4[0-8]|7[1-7]|8[0-7])|3(?:[3569]\\d|4[0-79]|7[1-7]|8[1-8])|4(?:1[02-9]|[2-48]\\d|5[0-6]|6[0-8]|7[0-79])|5(?:0[2-8]|[124-6]\\d|[38][0-8]|[79][0-7])|6(?:0[02-9]|[1-358]\\d|[47][0-8]|6[1-9])|7(?:0[2-8]|1[1-9]|[27][0-7]|3\\d|[4-6][0-8]|8[0-5]|9[013-7])|8(?:0[2-9]|1[0-79]|2\\d|3[0-46-9]|4[0-6]|5[013-9]|6[1-8]|7[0-8]|8[0-24-6])|9(?:0[6-9]|[1-4]\\d|[589][0-7]|6[0-8]|7[0-467]))\\d{3,12}",
+,,,"30123456",,,[5,6,7,8,9,10,11,12,13,14,15],[2,3,4]],[,,"15[0-25-9]\\d{8}|1(?:6[023]|7\\d)\\d{7,8}",,,,"15123456789",,,[10,11]],[,,"800\\d{7,12}",,,,"8001234567890",,,[10,11,12,13,14,15]],[,,"(?:137[7-9]|900(?:[135]|9\\d))\\d{6}",,,,"9001234567",,,[10,11]],[,,"180\\d{5,11}|13(?:7[1-6]\\d\\d|8)\\d{4}",,,,"18012345",,,[7,8,9,10,11,12,13,14]],[,,"700\\d{8}",,,,"70012345678",,,[11]],[,,,,,,,,,[-1]],"DE",49,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3,13})","$1 $2",["3[02]|40|[68]9"],"0$1"],[,"(\\d{3})(\\d{3,12})",
+"$1 $2",["2(?:0[1-389]|1[124]|2[18]|3[14])|3(?:[35-9][15]|4[015])|906|(?:2[4-9]|4[2-9]|[579][1-9]|[68][1-8])1","2(?:0[1-389]|12[0-8])|3(?:[35-9][15]|4[015])|906|2(?:[13][14]|2[18])|(?:2[4-9]|4[2-9]|[579][1-9]|[68][1-8])1"],"0$1"],[,"(\\d{4})(\\d{2,11})","$1 $2",["[24-6]|3(?:[3569][02-46-9]|4[2-4679]|7[2-467]|8[2-46-8])|70[2-8]|8(?:0[2-9]|[1-8])|90[7-9]|[79][1-9]","[24-6]|3(?:3(?:0[1-467]|2[127-9]|3[124578]|7[1257-9]|8[1256]|9[145])|4(?:2[135]|4[13578]|9[1346])|5(?:0[14]|2[1-3589]|6[1-4]|7[13468]|8[13568])|6(?:2[1-489]|3[124-6]|6[13]|7[12579]|8[1-356]|9[135])|7(?:2[1-7]|4[145]|6[1-5]|7[1-4])|8(?:21|3[1468]|6|7[1467]|8[136])|9(?:0[12479]|2[1358]|4[134679]|6[1-9]|7[136]|8[147]|9[1468]))|70[2-8]|8(?:0[2-9]|[1-8])|90[7-9]|[79][1-9]|3[68]4[1347]|3(?:47|60)[1356]|3(?:3[46]|46|5[49])[1246]|3[4579]3[1357]"],
+"0$1"],[,"(\\d{3})(\\d{4})","$1 $2",["138"],"0$1"],[,"(\\d{5})(\\d{2,10})","$1 $2",["3"],"0$1"],[,"(\\d{3})(\\d{5,11})","$1 $2",["181"],"0$1"],[,"(\\d{3})(\\d)(\\d{4,10})","$1 $2 $3",["1(?:3|80)|9"],"0$1"],[,"(\\d{3})(\\d{7,8})","$1 $2",["1[67]"],"0$1"],[,"(\\d{3})(\\d{7,12})","$1 $2",["8"],"0$1"],[,"(\\d{5})(\\d{6})","$1 $2",["185","1850","18500"],"0$1"],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["7"],"0$1"],[,"(\\d{4})(\\d{7})","$1 $2",["18[68]"],"0$1"],[,"(\\d{5})(\\d{6})","$1 $2",["15[0568]"],"0$1"],
+[,"(\\d{4})(\\d{7})","$1 $2",["15[1279]"],"0$1"],[,"(\\d{3})(\\d{8})","$1 $2",["18"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{7,8})","$1 $2 $3",["1(?:6[023]|7)"],"0$1"],[,"(\\d{4})(\\d{2})(\\d{7})","$1 $2 $3",["15[279]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{8})","$1 $2 $3",["15"],"0$1"]],,[,,"16(?:4\\d{1,10}|[89]\\d{1,11})",,,,"16412345",,,[4,5,6,7,8,9,10,11,12,13,14]],,,[,,,,,,,,,[-1]],[,,"18(?:1\\d{5,11}|[2-9]\\d{8})",,,,"18500123456",,,[8,9,10,11,12,13,14]],,,[,,"1(?:6(?:013|255|399)|7(?:(?:[015]1|[69]3)3|[2-4]55|[78]99))\\d{7,8}|15(?:(?:[03-68]00|113)\\d|2\\d55|7\\d99|9\\d33)\\d{7}",
+,,,"177991234567",,,[12,13]]],DJ:[,[,,"(?:2\\d|77)\\d{6}",,,,,,,[8]],[,,"2(?:1[2-5]|7[45])\\d{5}",,,,"21360003"],[,,"77\\d{6}",,,,"77831001"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"DJ",253,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[27]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],DK:[,[,,"[2-9]\\d{7}",,,,,,,[8]],[,,"(?:[2-7]\\d|8[126-9]|9[1-46-9])\\d{6}",,,,"32123456"],[,,"(?:[2-7]\\d|8[126-9]|9[1-46-9])\\d{6}",
+,,,"32123456"],[,,"80\\d{6}",,,,"80123456"],[,,"90\\d{6}",,,,"90123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"DK",45,"00",,,,,,,1,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[2-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],DM:[,[,,"(?:[58]\\d\\d|767|900)\\d{7}",,,,,,,[10],[7]],[,,"767(?:2(?:55|66)|4(?:2[01]|4[0-25-9])|50[0-4])\\d{4}",,,,"7674201234",,,,[7]],[,,"767(?:2(?:[2-4689]5|7[5-7])|31[5-7]|61[1-8]|70[1-6])\\d{4}",,,,"7672251234",,,,[7]],
+[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"DM",1,"011","1",,,"([2-7]\\d{6})$|1","767$1",,,,,[,,,,,,,,,[-1]],,"767",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],
+DO:[,[,,"(?:[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"8(?:[04]9[2-9]\\d\\d|29(?:2(?:[0-59]\\d|6[04-9]|7[0-27]|8[0237-9])|3(?:[0-35-9]\\d|4[7-9])|[45]\\d\\d|6(?:[0-27-9]\\d|[3-5][1-9]|6[0135-8])|7(?:0[013-9]|[1-37]\\d|4[1-35689]|5[1-4689]|6[1-57-9]|8[1-79]|9[1-8])|8(?:0[146-9]|1[0-48]|[248]\\d|3[1-79]|5[01589]|6[013-68]|7[124-8]|9[0-8])|9(?:[0-24]\\d|3[02-46-9]|5[0-79]|60|7[0169]|8[57-9]|9[02-9])))\\d{4}",,,,"8092345678",,,,[7]],[,,"8[024]9[2-9]\\d{6}",,,,"8092345678",,,,[7]],[,,"8(?:00(?:14|[2-9]\\d)|(?:33|44|55|66|77|88)[2-9]\\d)\\d{5}",
+,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"DO",1,"011","1",,,"1",,,,,,[,,,,,,,,,[-1]],,"8001|8[024]9",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],DZ:[,[,,"(?:[1-4]|[5-79]\\d|80)\\d{7}",,,,,,,[8,9]],
+[,,"9619\\d{5}|(?:1\\d|2[013-79]|3[0-8]|4[013-689])\\d{6}",,,,"12345678"],[,,"(?:5(?:4[0-29]|5\\d|6[0-2])|6(?:[569]\\d|7[0-6])|7[7-9]\\d)\\d{6}",,,,"551234567",,,[9]],[,,"800\\d{6}",,,,"800123456",,,[9]],[,,"80[3-689]1\\d{5}",,,,"808123456",,,[9]],[,,"80[12]1\\d{5}",,,,"801123456",,,[9]],[,,,,,,,,,[-1]],[,,"98[23]\\d{6}",,,,"983123456",,,[9]],"DZ",213,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[1-4]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["9"],"0$1"],
+[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[5-8]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],EC:[,[,,"1\\d{9,10}|(?:[2-7]|9\\d)\\d{7}",,,,,,,[8,9,10,11],[7]],[,,"[2-7][2-7]\\d{6}",,,,"22123456",,,[8],[7]],[,,"964[0-2]\\d{5}|9(?:39|[57][89]|6[0-36-9]|[89]\\d)\\d{6}",,,,"991234567",,,[9]],[,,"1800\\d{7}|1[78]00\\d{6}",,,,"18001234567",,,[10,11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"[2-7]890\\d{4}",,,,"28901234",,,[8]],"EC",593,"00","0",,,
+"0",,,,[[,"(\\d{3})(\\d{4})","$1-$2",["[2-7]"]],[,"(\\d)(\\d{3})(\\d{4})","$1 $2-$3",["[2-7]"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["9"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3,4})","$1 $2 $3",["1"]]],[[,"(\\d)(\\d{3})(\\d{4})","$1-$2-$3",["[2-7]"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["9"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3,4})","$1 $2 $3",["1"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],EE:[,[,,"8\\d{9}|[4578]\\d{7}|(?:[3-8]\\d|90)\\d{5}",,,,,,,[7,8,10]],[,,"(?:3[23589]|4[3-8]|6\\d|7[1-9]|88)\\d{5}",
+,,,"3212345",,,[7]],[,,"(?:5\\d{5}|8(?:1(?:0(?:000|[3-9]\\d\\d)|(?:1(?:0[236]|1\\d)|(?:2[0-59]|[3-79]\\d)\\d)\\d)|2(?:0(?:000|(?:19|[2-7]\\d)\\d)|(?:(?:[124-6]\\d|3[5-9])\\d|7(?:[0-3679]\\d|8[13-9])|8(?:[2-6]\\d|7[01]))\\d)|[349]\\d{4}))\\d\\d|5(?:(?:[02]\\d|5[0-478])\\d|1(?:[0-8]\\d|95)|6(?:4[0-4]|5[1-589]))\\d{3}",,,,"51234567",,,[7,8]],[,,"800(?:(?:0\\d\\d|1)\\d|[2-9])\\d{3}",,,,"80012345"],[,,"(?:40\\d\\d|900)\\d{4}",,,,"9001234",,,[7,8]],[,,,,,,,,,[-1]],[,,"70[0-2]\\d{5}",,,,"70012345",,,[8]],
+[,,,,,,,,,[-1]],"EE",372,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[369]|4[3-8]|5(?:[0-2]|5[0-478]|6[45])|7[1-9]|88","[369]|4[3-8]|5(?:[02]|1(?:[0-8]|95)|5[0-478]|6(?:4[0-4]|5[1-589]))|7[1-9]|88"]],[,"(\\d{4})(\\d{3,4})","$1 $2",["[45]|8(?:00|[1-49])","[45]|8(?:00[1-9]|[1-49])"]],[,"(\\d{2})(\\d{2})(\\d{4})","$1 $2 $3",["7"]],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["8"]]],,[,,,,,,,,,[-1]],,,[,,"800[2-9]\\d{3}",,,,,,,[7]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],EG:[,[,,"[189]\\d{8,9}|[24-6]\\d{8}|[135]\\d{7}",
+,,,,,,[8,9,10],[6,7]],[,,"13[23]\\d{6}|(?:15|57)\\d{6,7}|(?:2[2-4]|3|4[05-8]|5[05]|6[24-689]|8[2468]|9[235-7])\\d{7}",,,,"234567890",,,[8,9],[6,7]],[,,"1[0-25]\\d{8}",,,,"1001234567",,,[10]],[,,"800\\d{7}",,,,"8001234567",,,[10]],[,,"900\\d{7}",,,,"9001234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"EG",20,"00","0",,,"0",,,,[[,"(\\d)(\\d{7,8})","$1 $2",["[23]"],"0$1"],[,"(\\d{2})(\\d{6,7})","$1 $2",["1[35]|[4-6]|8[2468]|9[235-7]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["[189]"],
+"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],EH:[,[,,"[5-8]\\d{8}",,,,,,,[9]],[,,"528[89]\\d{5}",,,,"528812345"],[,,"(?:6(?:[0-79]\\d|8[0-247-9])|7(?:[017]\\d|2[0-2]|6[0-8]|8[0-3]))\\d{6}",,,,"650123456"],[,,"80\\d{7}",,,,"801234567"],[,,"89\\d{7}",,,,"891234567"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"592(?:4[0-2]|93)\\d{4}",,,,"592401234"],"EH",212,"00","0",,,"0",,,,,,[,,,,,,,,,[-1]],,"528[89]",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],ER:[,[,,"[178]\\d{6}",
+,,,,,,[7],[6]],[,,"(?:1(?:1[12568]|[24]0|55|6[146])|8\\d\\d)\\d{4}",,,,"8370362",,,,[6]],[,,"(?:17[1-3]|7\\d\\d)\\d{4}",,,,"7123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"ER",291,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["[178]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],ES:[,[,,"[5-9]\\d{8}",,,,,,,[9]],[,,"96906(?:0[0-8]|1[1-9]|[2-9]\\d)\\d\\d|9(?:69(?:0[0-57-9]|[1-9]\\d)|73(?:[0-8]\\d|9[1-9]))\\d{4}|(?:8(?:[1356]\\d|[28][0-8]|[47][1-9])|9(?:[135]\\d|[268][0-8]|4[1-9]|7[124-9]))\\d{6}",
+,,,"810123456"],[,,"(?:590[16]00\\d|9(?:6906(?:09|10)|7390\\d\\d))\\d\\d|(?:6\\d|7[1-48])\\d{7}",,,,"612345678"],[,,"[89]00\\d{6}",,,,"800123456"],[,,"80[367]\\d{6}",,,,"803123456"],[,,"90[12]\\d{6}",,,,"901123456"],[,,"70\\d{7}",,,,"701234567"],[,,,,,,,,,[-1]],"ES",34,"00",,,,,,,,[[,"(\\d{4})","$1",["905"]],[,"(\\d{6})","$1",["[79]9"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[89]00"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[5-9]"]]],[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[89]00"]],
+[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[5-9]"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"51\\d{7}",,,,"511234567"],,,[,,,,,,,,,[-1]]],ET:[,[,,"(?:11|[2-579]\\d)\\d{7}",,,,,,,[9],[7]],[,,"11667[01]\\d{3}|(?:11(?:1(?:1[124]|2[2-7]|3[1-5]|5[5-8]|8[6-8])|2(?:13|3[6-8]|5[89]|7[05-9]|8[2-6])|3(?:2[01]|3[0-289]|4[1289]|7[1-4]|87)|4(?:1[69]|3[2-49]|4[0-3]|6[5-8])|5(?:1[578]|44|5[0-4])|6(?:1[578]|2[69]|39|4[5-7]|5[0-5]|6[0-59]|8[015-8]))|2(?:2(?:11[1-9]|22[0-7]|33\\d|44[1467]|66[1-68])|5(?:11[124-6]|33[2-8]|44[1467]|55[14]|66[1-3679]|77[124-79]|880))|3(?:3(?:11[0-46-8]|(?:22|55)[0-6]|33[0134689]|44[04]|66[01467])|4(?:44[0-8]|55[0-69]|66[0-3]|77[1-5]))|4(?:6(?:119|22[0-24-7]|33[1-5]|44[13-69]|55[14-689]|660|88[1-4])|7(?:(?:11|22)[1-9]|33[13-7]|44[13-6]|55[1-689]))|5(?:7(?:227|55[05]|(?:66|77)[14-8])|8(?:11[149]|22[013-79]|33[0-68]|44[013-8]|550|66[1-5]|77\\d)))\\d{4}",
+,,,"111112345",,,,[7]],[,,"700[1-9]\\d{5}|(?:7(?:0[1-9]|1[0-8]|22|77|86|99)|9\\d\\d)\\d{6}",,,,"911234567"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"ET",251,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[1-579]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],FI:[,[,,"[1-35689]\\d{4}|7\\d{10,11}|(?:[124-7]\\d|3[0-46-9])\\d{8}|[1-9]\\d{5,8}",,,,,,,[5,6,7,8,9,10,11,12]],[,,"(?:1[3-79][1-8]|[235689][1-8]\\d)\\d{2,6}",
+,,,"131234567",,,[5,6,7,8,9]],[,,"4946\\d{2,6}|(?:4[0-8]|50)\\d{4,8}",,,,"412345678",,,[6,7,8,9,10]],[,,"800\\d{4,6}",,,,"800123456",,,[7,8,9]],[,,"[67]00\\d{5,6}",,,,"600123456",,,[8,9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"FI",358,"00|99(?:[01469]|5(?:[14]1|3[23]|5[59]|77|88|9[09]))","0",,,"0",,"00",,[[,"(\\d{5})","$1",["75[12]"],"0$1"],[,"(\\d)(\\d{4,9})","$1 $2",["[2568][1-8]|3(?:0[1-9]|[1-9])|9"],"0$1"],[,"(\\d{6})","$1",["11"]],[,"(\\d{3})(\\d{3,7})","$1 $2",["[12]00|[368]|70[07-9]"],
+"0$1"],[,"(\\d{2})(\\d{4,8})","$1 $2",["[1245]|7[135]"],"0$1"],[,"(\\d{2})(\\d{6,10})","$1 $2",["7"],"0$1"]],[[,"(\\d)(\\d{4,9})","$1 $2",["[2568][1-8]|3(?:0[1-9]|[1-9])|9"],"0$1"],[,"(\\d{3})(\\d{3,7})","$1 $2",["[12]00|[368]|70[07-9]"],"0$1"],[,"(\\d{2})(\\d{4,8})","$1 $2",["[1245]|7[135]"],"0$1"],[,"(\\d{2})(\\d{6,10})","$1 $2",["7"],"0$1"]],[,,,,,,,,,[-1]],1,"1[03-79]|[2-9]",[,,"20(?:2[023]|9[89])\\d{1,6}|(?:60[12]\\d|7099)\\d{4,5}|(?:606|7(?:0[78]|1|3\\d))\\d{7}|(?:[1-3]00|7(?:0[1-5]\\d\\d|5[03-9]))\\d{3,7}"],
+[,,"20\\d{4,8}|60[12]\\d{5,6}|7(?:099\\d{4,5}|5[03-9]\\d{3,7})|20[2-59]\\d\\d|(?:606|7(?:0[78]|1|3\\d))\\d{7}|(?:10|29|3[09]|70[1-5]\\d)\\d{4,8}",,,,"10112345"],,,[,,,,,,,,,[-1]]],FJ:[,[,,"45\\d{5}|(?:0800\\d|[235-9])\\d{6}",,,,,,,[7,11]],[,,"603\\d{4}|(?:3[0-5]|6[25-7]|8[58])\\d{5}",,,,"3212345",,,[7]],[,,"(?:[279]\\d|45|5[01568]|8[034679])\\d{5}",,,,"7012345",,,[7]],[,,"0800\\d{7}",,,,"08001234567",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"FJ",679,"0(?:0|52)",,,,,
+,"00",,[[,"(\\d{3})(\\d{4})","$1 $2",["[235-9]|45"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["0"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],FK:[,[,,"[2-7]\\d{4}",,,,,,,[5]],[,,"[2-47]\\d{4}",,,,"31234"],[,,"[56]\\d{4}",,,,"51234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"FK",500,"00",,,,,,,,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],FM:[,[,,"(?:[39]\\d\\d|820)\\d{4}",,,,,,,[7]],[,,"31(?:00[67]|208|309)\\d\\d|(?:3(?:[2357]0[1-9]|602|804|905)|(?:820|9[2-6]\\d)\\d)\\d{3}",
+,,,"3201234"],[,,"31(?:00[67]|208|309)\\d\\d|(?:3(?:[2357]0[1-9]|602|804|905)|(?:820|9[2-7]\\d)\\d)\\d{3}",,,,"3501234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"FM",691,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[389]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],FO:[,[,,"[2-9]\\d{5}",,,,,,,[6]],[,,"(?:20|[34]\\d|8[19])\\d{4}",,,,"201234"],[,,"(?:[27][1-9]|5\\d|9[16])\\d{4}",,,,"211234"],[,,"80[257-9]\\d{3}",,,,"802123"],[,,"90(?:[13-5][15-7]|2[125-7]|9\\d)\\d\\d",
+,,,"901123"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:6[0-36]|88)\\d{4}",,,,"601234"],"FO",298,"00",,,,"(10(?:01|[12]0|88))",,,,[[,"(\\d{6})","$1",["[2-9]"],,"$CC $1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],FR:[,[,,"[1-9]\\d{8}",,,,,,,[9]],[,,"(?:[1-35]\\d|4[1-9])\\d{7}",,,,"123456789"],[,,"(?:6(?:[0-24-8]\\d|3[0-8]|9[589])|7[3-9]\\d)\\d{6}",,,,"612345678"],[,,"80[0-5]\\d{6}",,,,"801234567"],[,,"836(?:0[0-36-9]|[1-9]\\d)\\d{4}|8(?:1[2-9]|2[2-47-9]|3[0-57-9]|[569]\\d|8[0-35-9])\\d{6}",
+,,,"891123456"],[,,"8(?:1[01]|2[0156]|4[02]|84)\\d{6}",,,,"884012345"],[,,,,,,,,,[-1]],[,,"9\\d{8}",,,,"912345678"],"FR",33,"00","0",,,"0",,,,[[,"(\\d{4})","$1",["10"]],[,"(\\d{3})(\\d{3})","$1 $2",["1"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"],"0 $1"],[,"(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4 $5",["[1-79]"],"0$1"]],[[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"],"0 $1"],[,"(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4 $5",["[1-79]"],"0$1"]],[,,,,,,,,
+,[-1]],,,[,,,,,,,,,[-1]],[,,"80[6-9]\\d{6}",,,,"806123456"],,,[,,,,,,,,,[-1]]],GA:[,[,,"(?:[067]\\d|11)\\d{6}|[2-7]\\d{6}",,,,,,,[7,8]],[,,"[01]1\\d{6}",,,,"01441234",,,[8]],[,,"(?:(?:0[2-7]|7[467])\\d|6(?:0[0-4]|10|[256]\\d))\\d{5}|[2-7]\\d{6}",,,,"06031234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"GA",241,"00",,,,"0(11\\d{6}|60\\d{6}|61\\d{6}|6[256]\\d{6}|7[467]\\d{6})","$1",,,[[,"(\\d)(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[2-7]"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["0"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["11|[67]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GB:[,[,,"[1-357-9]\\d{9}|[18]\\d{8}|8\\d{6}",,,,,,,[7,9,10],[4,5,6,8]],[,,"(?:1(?:1(?:3(?:[0-58]\\d\\d|73[0235])|4(?:[0-5]\\d\\d|69[7-9]|70[0-579])|(?:(?:5[0-26-9]|[78][0-49])\\d|6(?:[0-4]\\d|50))\\d)|(?:2(?:(?:0[024-9]|2[3-9]|3[3-79]|4[1-689]|[58][02-9]|6[0-47-9]|7[013-9]|9\\d)\\d|1(?:[0-7]\\d|8[0-2]))|(?:3(?:0\\d|1[0-8]|[25][02-9]|3[02-579]|[468][0-46-9]|7[1-35-79]|9[2-578])|4(?:0[03-9]|[137]\\d|[28][02-57-9]|4[02-69]|5[0-8]|[69][0-79])|5(?:0[1-35-9]|[16]\\d|2[024-9]|3[015689]|4[02-9]|5[03-9]|7[0-35-9]|8[0-468]|9[0-57-9])|6(?:0[034689]|1\\d|2[0-35689]|[38][013-9]|4[1-467]|5[0-69]|6[13-9]|7[0-8]|9[0-24578])|7(?:0[0246-9]|2\\d|3[0236-8]|4[03-9]|5[0-46-9]|6[013-9]|7[0-35-9]|8[024-9]|9[02-9])|8(?:0[35-9]|2[1-57-9]|3[02-578]|4[0-578]|5[124-9]|6[2-69]|7\\d|8[02-9]|9[02569])|9(?:0[02-589]|[18]\\d|2[02-689]|3[1-57-9]|4[2-9]|5[0-579]|6[2-47-9]|7[0-24578]|9[2-57]))\\d)\\d)|2(?:0[013478]|3[0189]|4[017]|8[0-46-9]|9[0-2])\\d{3})\\d{4}|1(?:2(?:0(?:46[1-4]|87[2-9])|545[1-79]|76(?:2\\d|3[1-8]|6[1-6])|9(?:7(?:2[0-4]|3[2-5])|8(?:2[2-8]|7[0-47-9]|8[3-5])))|3(?:6(?:38[2-5]|47[23])|8(?:47[04-9]|64[0157-9]))|4(?:044[1-7]|20(?:2[23]|8\\d)|6(?:0(?:30|5[2-57]|6[1-8]|7[2-8])|140)|8(?:052|87[1-3]))|5(?:2(?:4(?:3[2-79]|6\\d)|76\\d)|6(?:26[06-9]|686))|6(?:06(?:4\\d|7[4-79])|295[5-7]|35[34]\\d|47(?:24|61)|59(?:5[08]|6[67]|74)|9(?:55[0-4]|77[23]))|7(?:26(?:6[13-9]|7[0-7])|(?:442|688)\\d|50(?:2[0-3]|[3-68]2|76))|8(?:27[56]\\d|37(?:5[2-5]|8[239])|843[2-58])|9(?:0(?:0(?:6[1-8]|85)|52\\d)|3583|4(?:66[1-8]|9(?:2[01]|81))|63(?:23|3[1-4])|9561))\\d{3}",
+,,,"1212345678",,,[9,10],[4,5,6,7,8]],[,,"7(?:457[0-57-9]|700[01]|911[028])\\d{5}|7(?:[1-3]\\d\\d|4(?:[0-46-9]\\d|5[0-689])|5(?:0[0-8]|[13-9]\\d|2[0-35-9])|7(?:0[1-9]|[1-7]\\d|8[02-9]|9[0-689])|8(?:[014-9]\\d|[23][0-8])|9(?:[024-9]\\d|1[02-9]|3[0-689]))\\d{6}",,,,"7400123456",,,[10]],[,,"80[08]\\d{7}|800\\d{6}|8001111",,,,"8001234567"],[,,"(?:8(?:4[2-5]|7[0-3])|9(?:[01]\\d|8[2-49]))\\d{7}|845464\\d",,,,"9012345678",,,[7,10]],[,,,,,,,,,[-1]],[,,"70\\d{8}",,,,"7012345678",,,[10]],[,,"56\\d{8}",,,,"5612345678",
+,,[10]],"GB",44,"00","0"," x",,"0",,,,[[,"(\\d{3})(\\d{4})","$1 $2",["800","8001","80011","800111","8001111"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3",["845","8454","84546","845464"],"0$1"],[,"(\\d{3})(\\d{6})","$1 $2",["800"],"0$1"],[,"(\\d{5})(\\d{4,5})","$1 $2",["1(?:38|5[23]|69|76|94)","1(?:(?:38|69)7|5(?:24|39)|768|946)","1(?:3873|5(?:242|39[4-6])|(?:697|768)[347]|9467)"],"0$1"],[,"(\\d{4})(\\d{5,6})","$1 $2",["1(?:[2-69][02-9]|[78])"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["[25]|7(?:0|6[02-9])",
+"[25]|7(?:0|6(?:[03-9]|2[356]))"],"0$1"],[,"(\\d{4})(\\d{6})","$1 $2",["7"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["[1389]"],"0$1"]],,[,,"76(?:464|652)\\d{5}|76(?:0[0-28]|2[356]|34|4[01347]|5[49]|6[0-369]|77|8[14]|9[139])\\d{6}",,,,"7640123456",,,[10]],1,,[,,,,,,,,,[-1]],[,,"(?:3[0347]|55)\\d{8}",,,,"5512345678",,,[10]],,,[,,,,,,,,,[-1]]],GD:[,[,,"(?:473|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"473(?:2(?:3[0-2]|69)|3(?:2[89]|86)|4(?:[06]8|3[5-9]|4[0-49]|5[5-79]|73|90)|63[68]|7(?:58|84)|800|938)\\d{4}",
+,,,"4732691234",,,,[7]],[,,"473(?:4(?:0[2-79]|1[04-9]|2[0-5]|58)|5(?:2[01]|3[3-8])|901)\\d{4}",,,,"4734031234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],
+"GD",1,"011","1",,,"([2-9]\\d{6})$|1","473$1",,,,,[,,,,,,,,,[-1]],,"473",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GE:[,[,,"(?:[3-57]\\d\\d|800)\\d{6}",,,,,,,[9],[6,7]],[,,"(?:3(?:[256]\\d|4[124-9]|7[0-4])|4(?:1\\d|2[2-7]|3[1-79]|4[2-8]|7[239]|9[1-7]))\\d{6}",,,,"322123456",,,,[6,7]],[,,"5(?:(?:(?:0555|1(?:[17]77|555))[5-9]|757(?:7[7-9]|8[01]))\\d|22252[0-4])\\d\\d|(?:5(?:00(?:0\\d|44|5[05]|77|88|99)|1(?:1(?:00|[124]\\d|3[01])|4\\d\\d)|(?:44|68)\\d\\d|5(?:[0157-9]\\d\\d|200)|7(?:[0147-9]\\d\\d|5(?:00|[57]5))|8(?:0(?:[01]\\d|2[0-4])|58[89]|8(?:55|88))|9(?:090|[1-35-9]\\d\\d))|790\\d\\d)\\d{4}|5(?:0(?:070|505)|1(?:0[01]0|1(?:07|33|51))|2(?:0[02]0|2[25]2)|3(?:0[03]0|3[35]3)|(?:40[04]|900)0|5222)[0-4]\\d{3}",
+,,,"555123456"],[,,"800\\d{6}",,,,"800123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"70[67]\\d{6}",,,,"706123456"],"GE",995,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["70"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["32"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[57]"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[348]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,"70[67]\\d{6}"],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GF:[,[,,"[56]94\\d{6}|(?:80|9\\d)\\d{7}",
+,,,,,,[9]],[,,"594(?:[0239]\\d|[16][0-3]|4[03-9]|5[6-9]|80)\\d{4}",,,,"594101234"],[,,"694(?:[0-249]\\d|3[0-8])\\d{4}",,,,"694201234"],[,,"80[0-5]\\d{6}",,,,"800012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"9(?:(?:396|76\\d)\\d|476[0-2])\\d{4}",,,,"976012345"],"GF",594,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[56]|9[47]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[89]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,
+,,,,,,,[-1]]],GG:[,[,,"(?:1481|[357-9]\\d{3})\\d{6}|8\\d{6}(?:\\d{2})?",,,,,,,[7,9,10],[6]],[,,"1481[25-9]\\d{5}",,,,"1481256789",,,[10],[6]],[,,"7(?:(?:781|839)\\d|911[17])\\d{5}",,,,"7781123456",,,[10]],[,,"80[08]\\d{7}|800\\d{6}|8001111",,,,"8001234567"],[,,"(?:8(?:4[2-5]|7[0-3])|9(?:[01]\\d|8[0-3]))\\d{7}|845464\\d",,,,"9012345678",,,[7,10]],[,,,,,,,,,[-1]],[,,"70\\d{8}",,,,"7012345678",,,[10]],[,,"56\\d{8}",,,,"5612345678",,,[10]],"GG",44,"00","0",,,"([25-9]\\d{5})$|0","1481$1",,,,,[,,"76(?:464|652)\\d{5}|76(?:0[0-28]|2[356]|34|4[01347]|5[49]|6[0-369]|77|8[14]|9[139])\\d{6}",
+,,,"7640123456",,,[10]],,,[,,,,,,,,,[-1]],[,,"(?:3[0347]|55)\\d{8}",,,,"5512345678",,,[10]],,,[,,,,,,,,,[-1]]],GH:[,[,,"(?:[235]\\d{3}|800)\\d{5}",,,,,,,[8,9],[7]],[,,"3082[0-5]\\d{4}|3(?:0(?:[237]\\d|8[01])|[167](?:2[0-6]|7\\d|80)|2(?:2[0-5]|7\\d|80)|3(?:2[0-3]|7\\d|80)|4(?:2[013-9]|3[01]|7\\d|80)|5(?:2[0-7]|7\\d|80)|8(?:2[0-2]|7\\d|80)|9(?:[28]0|7\\d))\\d{5}",,,,"302345678",,,[9],[7]],[,,"(?:2(?:[0346-9]\\d|5[67])|5(?:[03-7]\\d|9[1-9]))\\d{6}",,,,"231234567",,,[9]],[,,"800\\d{5}",,,,"80012345",
+,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"GH",233,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[237]|8[0-2]"]],[,"(\\d{3})(\\d{5})","$1 $2",["8"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[235]"],"0$1"]],[[,"(\\d{3})(\\d{5})","$1 $2",["8"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[235]"],"0$1"]],[,,,,,,,,,[-1]],,,[,,"800\\d{5}",,,,,,,[8]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GI:[,[,,"(?:[25]\\d|60)\\d{6}",,,,,,,[8]],[,,"2190[0-2]\\d{3}|2(?:0(?:[02]\\d|3[01])|16[24-9]|2[2-5]\\d)\\d{4}",
+,,,"20012345"],[,,"5251[0-4]\\d{3}|(?:5(?:[146-8]\\d\\d|250)|60(?:1[01]|6\\d))\\d{4}",,,,"57123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"GI",350,"00",,,,,,,,[[,"(\\d{3})(\\d{5})","$1 $2",["2"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GL:[,[,,"(?:19|[2-689]\\d|70)\\d{4}",,,,,,,[6]],[,,"(?:19|3[1-7]|6[14689]|70|8[14-79]|9\\d)\\d{4}",,,,"321000"],[,,"[245]\\d{5}",,,,"221234"],[,,"80\\d{4}",,,,"801234"],[,,,,,,,,,[-1]],[,,,,,
+,,,,[-1]],[,,,,,,,,,[-1]],[,,"3[89]\\d{4}",,,,"381234"],"GL",299,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3",["19|[2-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GM:[,[,,"[2-9]\\d{6}",,,,,,,[7]],[,,"(?:4(?:[23]\\d\\d|4(?:1[024679]|[6-9]\\d))|5(?:5(?:3\\d|4[0-7])|6[67]\\d|7(?:1[04]|2[035]|3[58]|48))|8\\d{3})\\d{3}",,,,"5661234"],[,,"(?:[23679]\\d|5[0-489])\\d{5}",,,,"3012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"GM",
+220,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[2-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GN:[,[,,"722\\d{6}|(?:3|6\\d)\\d{7}",,,,,,,[8,9]],[,,"3(?:0(?:24|3[12]|4[1-35-7]|5[13]|6[189]|[78]1|9[1478])|1\\d\\d)\\d{4}",,,,"30241234",,,[8]],[,,"6[0-356]\\d{7}",,,,"601123456",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"722\\d{6}",,,,"722123456",,,[9]],"GN",224,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["3"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["[67]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GP:[,[,,"590\\d{6}|(?:69|80|9\\d)\\d{7}",,,,,,,[9]],[,,"590(?:0[1-68]|[14][0-24-9]|2[0-68]|3[1289]|5[3-579]|[68][0-689]|7[08]|9\\d)\\d{4}",,,,"590201234"],[,,"69(?:0\\d\\d|1(?:2[2-9]|3[0-5]))\\d{4}",,,,"690001234"],[,,"80[0-5]\\d{6}",,,,"800012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"9(?:(?:395|76[018])\\d|475[0-2])\\d{4}",,,,"976012345"],"GP",590,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["[569]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"],"0$1"]],,[,,,,,,,,,[-1]],1,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GQ:[,[,,"222\\d{6}|(?:3\\d|55|[89]0)\\d{7}",,,,,,,[9]],[,,"33[0-24-9]\\d[46]\\d{4}|3(?:33|5\\d)\\d[7-9]\\d{4}",,,,"333091234"],[,,"(?:222|55\\d)\\d{6}",,,,"222123456"],[,,"80\\d[1-9]\\d{5}",,,,"800123456"],[,,"90\\d[1-9]\\d{5}",,,,"900123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"GQ",240,"00",,,,,,,,[[,"(\\d{3})(\\d{3})(\\d{3})",
+"$1 $2 $3",["[235]"]],[,"(\\d{3})(\\d{6})","$1 $2",["[89]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GR:[,[,,"5005000\\d{3}|8\\d{9,11}|(?:[269]\\d|70)\\d{8}",,,,,,,[10,11,12]],[,,"2(?:1\\d\\d|2(?:2[1-46-9]|[36][1-8]|4[1-7]|5[1-4]|7[1-5]|[89][1-9])|3(?:1\\d|2[1-57]|[35][1-3]|4[13]|7[1-7]|8[124-6]|9[1-79])|4(?:1\\d|2[1-8]|3[1-4]|4[13-5]|6[1-578]|9[1-5])|5(?:1\\d|[29][1-4]|3[1-5]|4[124]|5[1-6])|6(?:1\\d|[269][1-6]|3[1245]|4[1-7]|5[13-9]|7[14]|8[1-5])|7(?:1\\d|2[1-5]|3[1-6]|4[1-7]|5[1-57]|6[135]|9[125-7])|8(?:1\\d|2[1-5]|[34][1-4]|9[1-57]))\\d{6}",
+,,,"2123456789",,,[10]],[,,"68[57-9]\\d{7}|(?:69|94)\\d{8}",,,,"6912345678",,,[10]],[,,"800\\d{7,9}",,,,"8001234567"],[,,"90[19]\\d{7}",,,,"9091234567",,,[10]],[,,"8(?:0[16]|12|[27]5|50)\\d{7}",,,,"8011234567",,,[10]],[,,"70\\d{8}",,,,"7012345678",,,[10]],[,,,,,,,,,[-1]],"GR",30,"00",,,,,,,,[[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["21|7"]],[,"(\\d{4})(\\d{6})","$1 $2",["2(?:2|3[2-57-9]|4[2-469]|5[2-59]|6[2-9]|7[2-69]|8[2-49])|5"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["[2689]"]],[,"(\\d{3})(\\d{3,4})(\\d{5})",
+"$1 $2 $3",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"5005000\\d{3}",,,,"5005000123",,,[10]],,,[,,,,,,,,,[-1]]],GT:[,[,,"(?:1\\d{3}|[2-7])\\d{7}",,,,,,,[8,11]],[,,"[267][2-9]\\d{6}",,,,"22456789",,,[8]],[,,"[3-5]\\d{7}",,,,"51234567",,,[8]],[,,"18[01]\\d{8}",,,,"18001112222",,,[11]],[,,"19\\d{9}",,,,"19001112222",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"GT",502,"00",,,,,,,,[[,"(\\d{4})(\\d{4})","$1 $2",["[2-7]"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["1"]]],,[,,,,,,,,,[-1]],
+,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GU:[,[,,"(?:[58]\\d\\d|671|900)\\d{7}",,,,,,,[10],[7]],[,,"671(?:3(?:00|3[39]|4[349]|55|6[26])|4(?:00|56|7[1-9]|8[02-46-9])|5(?:55|6[2-5]|88)|6(?:3[2-578]|4[24-9]|5[34]|78|8[235-9])|7(?:[0479]7|2[0167]|3[45]|8[7-9])|8(?:[2-57-9]8|6[48])|9(?:2[29]|6[79]|7[1279]|8[7-9]|9[78]))\\d{4}",,,,"6713001234",,,,[7]],[,,"671(?:3(?:00|3[39]|4[349]|55|6[26])|4(?:00|56|7[1-9]|8[02-46-9])|5(?:55|6[2-5]|88)|6(?:3[2-578]|4[24-9]|5[34]|78|8[235-9])|7(?:[0479]7|2[0167]|3[45]|8[7-9])|8(?:[2-57-9]8|6[48])|9(?:2[29]|6[79]|7[1279]|8[7-9]|9[78]))\\d{4}",
+,,,"6713001234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"GU",1,"011","1",,,"([3-9]\\d{6})$|1","671$1",,1,,,[,,,,,,,,,[-1]],,"671",[,,,,,,,,,[-1]],[,,,,
+,,,,,[-1]],,,[,,,,,,,,,[-1]]],GW:[,[,,"[49]\\d{8}|4\\d{6}",,,,,,,[7,9]],[,,"443\\d{6}",,,,"443201234",,,[9]],[,,"9(?:5\\d|6[569]|77)\\d{6}",,,,"955012345",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"40\\d{5}",,,,"4012345",,,[7]],"GW",245,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["40"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[49]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],GY:[,[,,"9008\\d{3}|(?:[2-467]\\d\\d|862)\\d{4}",,,,,,,[7]],[,
+,"(?:2(?:1[6-9]|2[0-35-9]|3[1-4]|5[3-9]|6\\d|7[0-24-79])|3(?:2[25-9]|3\\d)|4(?:4[0-24]|5[56])|77[1-57])\\d{4}",,,,"2201234"],[,,"(?:6\\d\\d|70[0-35-7])\\d{4}",,,,"6091234"],[,,"(?:289|862)\\d{4}",,,,"2891234"],[,,"9008\\d{3}",,,,"9008123"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"GY",592,"001",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[2-46-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],HK:[,[,,"8[0-46-9]\\d{6,7}|9\\d{4,7}|(?:[2-7]|9\\d{3})\\d{7}",,,,,,,[5,6,7,8,
+9,11]],[,,"(?:2(?:[13-9]\\d|2[013-9])\\d|3(?:(?:[1569][0-24-9]|4[0-246-9]|7[0-24-69])\\d|8(?:[45][0-8]|6[01]|9\\d))|58(?:0[1-8]|1[2-9]))\\d{4}",,,,"21234567",,,[8]],[,,"(?:4(?:44[5-9]|6(?:0[0-7]|1[0-6]|4[0-57-9]|6[0-4]|7[0-8]))|573[0-6]|6(?:26[013-8]|66[0-3])|70(?:7[1-5]|8[0-4])|848[015-9]|9(?:29[013-9]|59[0-4]))\\d{4}|(?:4(?:4[01]|6[2358])|5(?:[1-59][0-46-9]|6[0-4689]|7[0-246-9])|6(?:0[1-9]|[13-59]\\d|[268][0-57-9]|7[0-79])|84[09]|9(?:0[1-9]|1[02-9]|[2358][0-8]|[467]\\d))\\d{5}",,,,"51234567",,,
+[8]],[,,"800\\d{6}",,,,"800123456",,,[9]],[,,"900(?:[0-24-9]\\d{7}|3\\d{1,4})",,,,"90012345678",,,[5,6,7,8,11]],[,,,,,,,,,[-1]],[,,"8(?:1[0-4679]\\d|2(?:[0-36]\\d|7[0-4])|3(?:[034]\\d|2[09]|70))\\d{4}",,,,"81123456",,,[8]],[,,,,,,,,,[-1]],"HK",852,"00(?:30|5[09]|[126-9]?)",,,,,,"00",,[[,"(\\d{3})(\\d{2,5})","$1 $2",["900","9003"]],[,"(\\d{4})(\\d{4})","$1 $2",["[2-7]|8[1-4]|9(?:0[1-9]|[1-8])"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["8"]],[,"(\\d{3})(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3 $4",["9"]]],
+,[,,"7(?:1(?:0[0-38]|1[0-3679]|3[013]|69|9[0136])|2(?:[02389]\\d|1[18]|7[27-9])|3(?:[0-38]\\d|7[0-369]|9[2357-9])|47\\d|5(?:[178]\\d|5[0-5])|6(?:0[0-7]|2[236-9]|[35]\\d)|7(?:[27]\\d|8[7-9])|8(?:[23689]\\d|7[1-9])|9(?:[025]\\d|6[0-246-8]|7[0-36-9]|8[238]))\\d{4}",,,,"71123456",,,[8]],,,[,,,,,,,,,[-1]],[,,"30(?:0[1-9]|[15-7]\\d|2[047]|89)\\d{4}",,,,"30161234",,,[8]],,,[,,,,,,,,,[-1]]],HN:[,[,,"8\\d{10}|[237-9]\\d{7}",,,,,,,[8,11]],[,,"2(?:2(?:0[0-59]|1[1-9]|[23]\\d|4[02-6]|5[57]|6[245]|7[0135689]|8[01346-9]|9[0-2])|4(?:0[578]|2[3-59]|3[13-9]|4[0-68]|5[1-3589])|5(?:0[2357-9]|1[1-356]|4[03-5]|5\\d|6[014-69]|7[04]|80)|6(?:[056]\\d|17|2[067]|3[047]|4[0-378]|[78][0-8]|9[01])|7(?:0[5-79]|6[46-9]|7[02-9]|8[034]|91)|8(?:79|8[0-357-9]|9[1-57-9]))\\d{4}",
+,,,"22123456",,,[8]],[,,"[37-9]\\d{7}",,,,"91234567",,,[8]],[,,"8002\\d{7}",,,,"80021234567",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"HN",504,"00",,,,,,,,[[,"(\\d{4})(\\d{4})","$1-$2",["[237-9]"]],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["8"]]],[[,"(\\d{4})(\\d{4})","$1-$2",["[237-9]"]]],[,,,,,,,,,[-1]],,,[,,"8002\\d{7}",,,,,,,[11]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],HR:[,[,,"(?:[24-69]\\d|3[0-79])\\d{7}|80\\d{5,7}|[1-79]\\d{7}|6\\d{5,6}",,,,,,,[6,7,8,9]],[,,"1\\d{7}|(?:2[0-3]|3[1-5]|4[02-47-9]|5[1-3])\\d{6,7}",
+,,,"12345678",,,[8,9],[6,7]],[,,"9(?:(?:0[1-9]|[12589]\\d)\\d\\d|7(?:[0679]\\d\\d|5(?:[01]\\d|44|77|9[67])))\\d{4}|98\\d{6}",,,,"921234567",,,[8,9]],[,,"80[01]\\d{4,6}",,,,"800123456",,,[7,8,9]],[,,"6[01459]\\d{6}|6[01]\\d{4,5}",,,,"611234",,,[6,7,8]],[,,,,,,,,,[-1]],[,,"7[45]\\d{6}",,,,"74123456",,,[8]],[,,,,,,,,,[-1]],"HR",385,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{2})(\\d{2,3})","$1 $2 $3",["6[01]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2,3})","$1 $2 $3",["8"],"0$1"],[,"(\\d)(\\d{4})(\\d{3})","$1 $2 $3",
+["1"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[67]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["9"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[2-5]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"62\\d{6,7}|72\\d{6}",,,,"62123456",,,[8,9]],,,[,,,,,,,,,[-1]]],HT:[,[,,"(?:[2-489]\\d|55)\\d{6}",,,,,,,[8]],[,,"2(?:2\\d|5[1-5]|81|9[149])\\d{5}",,,,"22453300"],[,,"(?:[34]\\d|55)\\d{6}",,,,"34101234"],[,,"8\\d{7}",,,,"80012345"],
+[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"9(?:[67][0-4]|8[0-3589]|9\\d)\\d{5}",,,,"98901234"],"HT",509,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{4})","$1 $2 $3",["[2-589]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],HU:[,[,,"[235-7]\\d{8}|[1-9]\\d{7}",,,,,,,[8,9],[6,7]],[,,"(?:1\\d|[27][2-9]|3[2-7]|4[24-9]|5[2-79]|6[23689]|8[2-57-9]|9[2-69])\\d{6}",,,,"12345678",,,[8],[6,7]],[,,"(?:[257]0|3[01])\\d{7}",,,,"201234567",,,[9]],[,,"(?:[48]0\\d|680[29])\\d{5}",,,,"80123456"],
+[,,"9[01]\\d{6}",,,,"90123456",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"21\\d{7}",,,,"211234567",,,[9]],"HU",36,"00","06",,,"06",,,,[[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["1"],"(06 $1)"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[27][2-9]|3[2-7]|4[24-9]|5[2-79]|6|8[2-57-9]|9[2-69]"],"(06 $1)"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[2-9]"],"06 $1"]],,[,,,,,,,,,[-1]],,,[,,"(?:[48]0\\d|680[29])\\d{5}"],[,,"38\\d{7}",,,,"381234567",,,[9]],,,[,,,,,,,,,[-1]]],ID:[,[,,"(?:(?:00[1-9]|8\\d)\\d{4}|[1-36])\\d{6}|00\\d{10}|[1-9]\\d{8,10}|[2-9]\\d{7}",
+,,,,,,[7,8,9,10,11,12,13],[5,6]],[,,"2[124]\\d{7,8}|619\\d{8}|2(?:1(?:14|500)|2\\d{3})\\d{3}|61\\d{5,8}|(?:2(?:[35][1-4]|6[0-8]|7[1-6]|8\\d|9[1-8])|3(?:1|[25][1-8]|3[1-68]|4[1-3]|6[1-3568]|7[0-469]|8\\d)|4(?:0[1-589]|1[01347-9]|2[0-36-8]|3[0-24-68]|43|5[1-378]|6[1-5]|7[134]|8[1245])|5(?:1[1-35-9]|2[25-8]|3[124-9]|4[1-3589]|5[1-46]|6[1-8])|6(?:[25]\\d|3[1-69]|4[1-6])|7(?:02|[125][1-9]|[36]\\d|4[1-8]|7[0-36-9])|9(?:0[12]|1[013-8]|2[0-479]|5[125-8]|6[23679]|7[159]|8[01346]))\\d{5,8}",,,,"218350123",
+,,[7,8,9,10,11],[5,6]],[,,"8[1-35-9]\\d{7,10}",,,,"812345678",,,[9,10,11,12]],[,,"00[17]803\\d{7}|(?:177\\d|800)\\d{5,7}|001803\\d{6}",,,,"8001234567",,,[8,9,10,11,12,13]],[,,"809\\d{7}",,,,"8091234567",,,[10]],[,,"804\\d{7}",,,,"8041234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"ID",62,"00[89]","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["15"]],[,"(\\d{2})(\\d{5,9})","$1 $2",["2[124]|[36]1"],"(0$1)"],[,"(\\d{3})(\\d{5,7})","$1 $2",["800"],"0$1"],[,"(\\d{3})(\\d{5,8})","$1 $2",["[2-79]"],
+"(0$1)"],[,"(\\d{3})(\\d{3,4})(\\d{3})","$1-$2-$3",["8[1-35-9]"],"0$1"],[,"(\\d{3})(\\d{6,8})","$1 $2",["1"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["804"],"0$1"],[,"(\\d{3})(\\d)(\\d{3})(\\d{3})","$1 $2 $3 $4",["80"],"0$1"],[,"(\\d{3})(\\d{4})(\\d{4,5})","$1-$2-$3",["8"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["001"]],[,"(\\d{2})(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3 $4",["0"]]],[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["15"]],[,"(\\d{2})(\\d{5,9})","$1 $2",["2[124]|[36]1"],
+"(0$1)"],[,"(\\d{3})(\\d{5,7})","$1 $2",["800"],"0$1"],[,"(\\d{3})(\\d{5,8})","$1 $2",["[2-79]"],"(0$1)"],[,"(\\d{3})(\\d{3,4})(\\d{3})","$1-$2-$3",["8[1-35-9]"],"0$1"],[,"(\\d{3})(\\d{6,8})","$1 $2",["1"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["804"],"0$1"],[,"(\\d{3})(\\d)(\\d{3})(\\d{3})","$1 $2 $3 $4",["80"],"0$1"],[,"(\\d{3})(\\d{4})(\\d{4,5})","$1-$2-$3",["8"],"0$1"]],[,,,,,,,,,[-1]],,,[,,"001803\\d{6,7}|(?:007803\\d|8071)\\d{6}",,,,,,,[10,12,13]],[,,"(?:1500|8071\\d{3})\\d{3}",,,,
+"8071123456",,,[7,10]],,,[,,,,,,,,,[-1]]],IE:[,[,,"(?:1\\d|[2569])\\d{6,8}|4\\d{6,9}|7\\d{8}|8\\d{8,9}",,,,,,,[7,8,9,10],[5,6]],[,,"(?:1\\d|21)\\d{6,7}|(?:2[24-9]|4(?:0[24]|5\\d|7)|5(?:0[45]|1\\d|8)|6(?:1\\d|[237-9])|9(?:1\\d|[35-9]))\\d{5}|(?:23|4(?:[1-469]|8\\d)|5[23679]|6[4-6]|7[14]|9[04])\\d{7}",,,,"2212345",,,,[5,6]],[,,"8(?:22|[35-9]\\d)\\d{6}",,,,"850123456",,,[9]],[,,"1800\\d{6}",,,,"1800123456",,,[10]],[,,"15(?:1[2-8]|[2-8]0|9[089])\\d{6}",,,,"1520123456",,,[10]],[,,"18[59]0\\d{6}",,,,"1850123456",
+,,[10]],[,,"700\\d{6}",,,,"700123456",,,[9]],[,,"76\\d{7}",,,,"761234567",,,[9]],"IE",353,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{5})","$1 $2",["2[24-9]|47|58|6[237-9]|9[35-9]"],"(0$1)"],[,"(\\d{3})(\\d{5})","$1 $2",["[45]0"],"(0$1)"],[,"(\\d)(\\d{3,4})(\\d{4})","$1 $2 $3",["1"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[2569]|4[1-69]|7[14]"],"(0$1)"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["70"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["81"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",
+["[78]"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1"]],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["4"],"(0$1)"],[,"(\\d{2})(\\d)(\\d{3})(\\d{4})","$1 $2 $3 $4",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,"18[59]0\\d{6}",,,,,,,[10]],[,,"818\\d{6}",,,,"818123456",,,[9]],,,[,,"88210[1-9]\\d{4}|8(?:[35-79]5\\d\\d|8(?:[013-9]\\d\\d|2(?:[01][1-9]|[2-9]\\d)))\\d{5}",,,,"8551234567",,,[10]]],IL:[,[,,"1\\d{6}(?:\\d{3,5})?|[57]\\d{8}|[1-489]\\d{7}",,,,,,,[7,8,9,10,11,12]],[,,"153\\d{8,9}|29[1-9]\\d{5}|(?:2[0-8]|[3489]\\d)\\d{6}",
+,,,"21234567",,,[8,11,12],[7]],[,,"55410\\d{4}|5(?:(?:[02368]\\d|[19][2-9]|4[1-9])\\d|5(?:01|1[79]|2[2-9]|3[0-3]|4[34]|5[015689]|6[6-8]|7[0-267]|8[7-9]|9[1-9]))\\d{5}",,,,"502345678",,,[9]],[,,"1(?:255|80[019]\\d{3})\\d{3}",,,,"1800123456",,,[7,10]],[,,"1212\\d{4}|1(?:200|9(?:0[0-2]|19))\\d{6}",,,,"1919123456",,,[8,10]],[,,"1700\\d{6}",,,,"1700123456",,,[10]],[,,,,,,,,,[-1]],[,,"7(?:38(?:0\\d|5[09]|88)|8(?:33|55|77|81)\\d)\\d{4}|7(?:18|2[23]|3[237]|47|6[258]|7\\d|82|9[2-9])\\d{6}",,,,"771234567",
+,,[9]],"IL",972,"0(?:0|1[2-9])","0",,,"0",,,,[[,"(\\d{4})(\\d{3})","$1-$2",["125"]],[,"(\\d{4})(\\d{2})(\\d{2})","$1-$2-$3",["121"]],[,"(\\d)(\\d{3})(\\d{4})","$1-$2-$3",["[2-489]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3",["[57]"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3})","$1-$2-$3",["12"]],[,"(\\d{4})(\\d{6})","$1-$2",["159"]],[,"(\\d)(\\d{3})(\\d{3})(\\d{3})","$1-$2-$3-$4",["1[7-9]"]],[,"(\\d{3})(\\d{1,2})(\\d{3})(\\d{4})","$1-$2 $3-$4",["15"]]],,[,,,,,,,,,[-1]],,,[,,"1700\\d{6}",,,,,,,[10]],[,
+,"1599\\d{6}",,,,"1599123456",,,[10]],,,[,,"151\\d{8,9}",,,,"15112340000",,,[11,12]]],IM:[,[,,"1624\\d{6}|(?:[3578]\\d|90)\\d{8}",,,,,,,[10],[6]],[,,"1624(?:230|[5-8]\\d\\d)\\d{3}",,,,"1624756789",,,,[6]],[,,"76245[06]\\d{4}|7(?:4576|[59]24\\d|624[0-4689])\\d{5}",,,,"7924123456"],[,,"808162\\d{4}",,,,"8081624567"],[,,"8(?:440[49]06|72299\\d)\\d{3}|(?:8(?:45|70)|90[0167])624\\d{4}",,,,"9016247890"],[,,,,,,,,,[-1]],[,,"70\\d{8}",,,,"7012345678"],[,,"56\\d{8}",,,,"5612345678"],"IM",44,"00","0",,,"([25-8]\\d{5})$|0",
+"1624$1",,,,,[,,,,,,,,,[-1]],,"74576|(?:16|7[56])24",[,,,,,,,,,[-1]],[,,"3440[49]06\\d{3}|(?:3(?:08162|3\\d{4}|45624|7(?:0624|2299))|55\\d{4})\\d{4}",,,,"5512345678"],,,[,,,,,,,,,[-1]]],IN:[,[,,"(?:000800|[2-9]\\d\\d)\\d{7}|1\\d{7,12}",,,,,,,[8,9,10,11,12,13],[6,7]],[,,"2717(?:[2-7]\\d|95)\\d{4}|(?:271[0-689]|782[0-6])[2-7]\\d{5}|(?:170[24]|2(?:(?:[02][2-79]|90)\\d|80[13468])|(?:3(?:23|80)|683|79[1-7])\\d|4(?:20[24]|72[2-8])|552[1-7])\\d{6}|(?:11|33|4[04]|80)[2-7]\\d{7}|(?:342|674|788)(?:[0189][2-7]|[2-7]\\d)\\d{5}|(?:1(?:2[0-249]|3[0-25]|4[145]|[59][14]|6[014]|7[1257]|8[01346])|2(?:1[257]|3[013]|4[01]|5[0137]|6[0158]|78|8[1568]|9[14])|3(?:26|4[13]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|3[15]|5[12]|6[0-26-9]|7[014-9]|8[013-57]|9[014-7])|5(?:1[025]|22|[36][25]|4[28]|[578]1|9[15])|6(?:12|[2-47]1|5[17]|6[13]|80)|7(?:12|2[14]|3[134]|4[47]|5[15]|[67]1)|8(?:16|2[014]|3[126]|6[136]|7[078]|8[34]|91))[2-7]\\d{6}|(?:1(?:2[35-8]|3[346-9]|4[236-9]|[59][0235-9]|6[235-9]|7[34689]|8[257-9])|2(?:1[134689]|3[24-8]|4[2-8]|5[25689]|6[2-4679]|7[3-79]|8[2-479]|9[235-9])|3(?:01|1[79]|2[1245]|4[5-8]|5[125689]|6[235-7]|7[157-9]|8[2-46-8])|4(?:1[14578]|2[5689]|3[2-467]|5[4-7]|6[35]|73|8[2689]|9[2389])|5(?:[16][146-9]|2[14-8]|3[1346]|4[14-69]|5[46]|7[2-4]|8[2-8]|9[246])|6(?:1[1358]|2[2457]|3[2-4]|4[235-7]|5[2-689]|6[24578]|7[235689]|8[124-6])|7(?:1[013-9]|2[0235-9]|3[2679]|4[1-35689]|5[2-46-9]|[67][02-9]|8[013-7]|9[089])|8(?:1[1357-9]|2[235-8]|3[03-57-9]|4[0-24-9]|5\\d|6[2457-9]|7[1-6]|8[1256]|9[2-4]))\\d[2-7]\\d{5}",
+,,,"7410410123",,,[10],[6,7,8]],[,,"(?:61279|7(?:887[02-9]|9(?:313|79[07-9]))|8(?:079[04-9]|(?:84|91)7[02-8]))\\d{5}|(?:6(?:12|[2-47]1|5[17]|6[13]|80)[0189]|7(?:1(?:2[0189]|9[0-5])|2(?:[14][017-9]|8[0-59])|3(?:2[5-8]|[34][017-9]|9[016-9])|4(?:1[015-9]|[29][89]|39|8[389])|5(?:[15][017-9]|2[04-9]|9[7-9])|6(?:0[0-47]|1[0-257-9]|2[0-4]|3[19]|5[4589])|70[0289]|88[089]|97[02-8])|8(?:0(?:6[67]|7[02-8])|70[017-9]|84[01489]|91[0-289]))\\d{6}|(?:7(?:31|4[47])|8(?:16|2[014]|3[126]|6[136]|7[78]|83))(?:[0189]\\d|7[02-8])\\d{5}|(?:6(?:[09]\\d|1[04679]|2[03689]|3[05-9]|4[0489]|50|6[069]|7[07]|8[7-9])|7(?:0\\d|2[0235-79]|3[05-8]|40|5[0346-8]|6[6-9]|7[1-9]|8[0-79]|9[089])|8(?:0[01589]|1[0-57-9]|2[235-9]|3[03-57-9]|[45]\\d|6[02457-9]|7[1-69]|8[0-25-9]|9[02-9])|9\\d\\d)\\d{7}|(?:6(?:(?:1[1358]|2[2457]|3[2-4]|4[235-7]|5[2-689]|6[24578]|8[124-6])\\d|7(?:[235689]\\d|4[0189]))|7(?:1(?:[013-8]\\d|9[6-9])|28[6-8]|3(?:2[0-49]|9[2-5])|4(?:1[2-4]|[29][0-7]|3[0-8]|[56]\\d|8[0-24-7])|5(?:2[1-3]|9[0-6])|6(?:0[5689]|2[5-9]|3[02-8]|4\\d|5[0-367])|70[13-7]|881))[0189]\\d{5}",
+,,,"8123456789",,,[10]],[,,"000800\\d{7}|1(?:600\\d{6}|80(?:0\\d{4,9}|3\\d{9}))",,,,"1800123456"],[,,"186[12]\\d{9}",,,,"1861123456789",,,[13]],[,,"1860\\d{7}",,,,"18603451234",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"IN",91,"00","0",,,"0",,,,[[,"(\\d{7})","$1",["575"]],[,"(\\d{8})","$1",["5(?:0|2[23]|3[03]|[67]1|88)","5(?:0|2(?:21|3)|3(?:0|3[23])|616|717|888)","5(?:0|2(?:21|3)|3(?:0|3[23])|616|717|8888)"],,,1],[,"(\\d{4})(\\d{4,5})","$1 $2",["180","1800"],,,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",
+["140"],,,1],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["11|2[02]|33|4[04]|79[1-7]|80[2-46]","11|2[02]|33|4[04]|79(?:[1-6]|7[19])|80(?:[2-4]|6[0-589])","11|2[02]|33|4[04]|79(?:[124-6]|3(?:[02-9]|1[0-24-9])|7(?:1|9[1-6]))|80(?:[2-4]|6[0-589])"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["1(?:2[0-249]|3[0-25]|4[145]|[68]|7[1257])|2(?:1[257]|3[013]|4[01]|5[0137]|6[0158]|78|8[1568])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|22|[36][25]|4[28]|5[12]|[78]1)|6(?:12|[2-4]1|5[17]|6[13]|80)|7(?:12|3[134]|4[47]|61|88)|8(?:16|2[014]|3[126]|6[136]|7[078]|8[34]|91)|(?:43|59|75)[15]|(?:1[59]|29|67|72)[14]",
+"1(?:2[0-24]|3[0-25]|4[145]|[59][14]|6[1-9]|7[1257]|8[1-57-9])|2(?:1[257]|3[013]|4[01]|5[0137]|6[058]|78|8[1568]|9[14])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|3[15]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|22|[36][25]|4[28]|[578]1|9[15])|674|7(?:(?:2[14]|3[34]|5[15])[2-6]|61[346]|88[0-8])|8(?:70[2-6]|84[235-7]|91[3-7])|(?:1(?:29|60|8[06])|261|552|6(?:12|[2-47]1|5[17]|6[13]|80)|7(?:12|31|4[47])|8(?:16|2[014]|3[126]|6[136]|7[78]|83))[2-7]","1(?:2[0-24]|3[0-25]|4[145]|[59][14]|6[1-9]|7[1257]|8[1-57-9])|2(?:1[257]|3[013]|4[01]|5[0137]|6[058]|78|8[1568]|9[14])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|3[15]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|22|[36][25]|4[28]|[578]1|9[15])|6(?:12(?:[2-6]|7[0-8])|74[2-7])|7(?:(?:2[14]|5[15])[2-6]|3171|61[346]|88(?:[2-7]|82))|8(?:70[2-6]|84(?:[2356]|7[19])|91(?:[3-6]|7[19]))|73[134][2-6]|(?:74[47]|8(?:16|2[014]|3[126]|6[136]|7[78]|83))(?:[2-6]|7[19])|(?:1(?:29|60|8[06])|261|552|6(?:[2-4]1|5[17]|6[13]|7(?:1|4[0189])|80)|7(?:12|88[01]))[2-7]"],
+"0$1",,1],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1(?:[2-479]|5[0235-9])|[2-5]|6(?:1[1358]|2[2457-9]|3[2-5]|4[235-7]|5[2-689]|6[24578]|7[235689]|8[1-6])|7(?:1[013-9]|28|3[129]|4[1-35689]|5[29]|6[02-5]|70)|807","1(?:[2-479]|5[0235-9])|[2-5]|6(?:1[1358]|2(?:[2457]|84|95)|3(?:[2-4]|55)|4[235-7]|5[2-689]|6[24578]|7[235689]|8[1-6])|7(?:1(?:[013-8]|9[6-9])|28[6-8]|3(?:17|2[0-49]|9[2-57])|4(?:1[2-4]|[29][0-7]|3[0-8]|[56]|8[0-24-7])|5(?:2[1-3]|9[0-6])|6(?:0[5689]|2[5-9]|3[02-8]|4|5[0-367])|70[13-7])|807[19]",
+"1(?:[2-479]|5(?:[0236-9]|5[013-9]))|[2-5]|6(?:2(?:84|95)|355|83)|73179|807(?:1|9[1-3])|(?:1552|6(?:1[1358]|2[2457]|3[2-4]|4[235-7]|5[2-689]|6[24578]|7[235689]|8[124-6])\\d|7(?:1(?:[013-8]\\d|9[6-9])|28[6-8]|3(?:2[0-49]|9[2-57])|4(?:1[2-4]|[29][0-7]|3[0-8]|[56]\\d|8[0-24-7])|5(?:2[1-3]|9[0-6])|6(?:0[5689]|2[5-9]|3[02-8]|4\\d|5[0-367])|70[13-7]))[2-7]"],"0$1",,1],[,"(\\d{5})(\\d{5})","$1 $2",["[6-9]"],"0$1",,1],[,"(\\d{4})(\\d{2,4})(\\d{4})","$1 $2 $3",["1(?:6|8[06])","1(?:6|8[06]0)"],,,1],[,"(\\d{3})(\\d{3})(\\d{3})(\\d{4})",
+"$1 $2 $3 $4",["0"]],[,"(\\d{4})(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["18"],,,1]],[[,"(\\d{8})","$1",["5(?:0|2[23]|3[03]|[67]1|88)","5(?:0|2(?:21|3)|3(?:0|3[23])|616|717|888)","5(?:0|2(?:21|3)|3(?:0|3[23])|616|717|8888)"],,,1],[,"(\\d{4})(\\d{4,5})","$1 $2",["180","1800"],,,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["140"],,,1],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["11|2[02]|33|4[04]|79[1-7]|80[2-46]","11|2[02]|33|4[04]|79(?:[1-6]|7[19])|80(?:[2-4]|6[0-589])","11|2[02]|33|4[04]|79(?:[124-6]|3(?:[02-9]|1[0-24-9])|7(?:1|9[1-6]))|80(?:[2-4]|6[0-589])"],
+"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["1(?:2[0-249]|3[0-25]|4[145]|[68]|7[1257])|2(?:1[257]|3[013]|4[01]|5[0137]|6[0158]|78|8[1568])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|22|[36][25]|4[28]|5[12]|[78]1)|6(?:12|[2-4]1|5[17]|6[13]|80)|7(?:12|3[134]|4[47]|61|88)|8(?:16|2[014]|3[126]|6[136]|7[078]|8[34]|91)|(?:43|59|75)[15]|(?:1[59]|29|67|72)[14]","1(?:2[0-24]|3[0-25]|4[145]|[59][14]|6[1-9]|7[1257]|8[1-57-9])|2(?:1[257]|3[013]|4[01]|5[0137]|6[058]|78|8[1568]|9[14])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|3[15]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|22|[36][25]|4[28]|[578]1|9[15])|674|7(?:(?:2[14]|3[34]|5[15])[2-6]|61[346]|88[0-8])|8(?:70[2-6]|84[235-7]|91[3-7])|(?:1(?:29|60|8[06])|261|552|6(?:12|[2-47]1|5[17]|6[13]|80)|7(?:12|31|4[47])|8(?:16|2[014]|3[126]|6[136]|7[78]|83))[2-7]",
+"1(?:2[0-24]|3[0-25]|4[145]|[59][14]|6[1-9]|7[1257]|8[1-57-9])|2(?:1[257]|3[013]|4[01]|5[0137]|6[058]|78|8[1568]|9[14])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|3[15]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|22|[36][25]|4[28]|[578]1|9[15])|6(?:12(?:[2-6]|7[0-8])|74[2-7])|7(?:(?:2[14]|5[15])[2-6]|3171|61[346]|88(?:[2-7]|82))|8(?:70[2-6]|84(?:[2356]|7[19])|91(?:[3-6]|7[19]))|73[134][2-6]|(?:74[47]|8(?:16|2[014]|3[126]|6[136]|7[78]|83))(?:[2-6]|7[19])|(?:1(?:29|60|8[06])|261|552|6(?:[2-4]1|5[17]|6[13]|7(?:1|4[0189])|80)|7(?:12|88[01]))[2-7]"],
+"0$1",,1],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1(?:[2-479]|5[0235-9])|[2-5]|6(?:1[1358]|2[2457-9]|3[2-5]|4[235-7]|5[2-689]|6[24578]|7[235689]|8[1-6])|7(?:1[013-9]|28|3[129]|4[1-35689]|5[29]|6[02-5]|70)|807","1(?:[2-479]|5[0235-9])|[2-5]|6(?:1[1358]|2(?:[2457]|84|95)|3(?:[2-4]|55)|4[235-7]|5[2-689]|6[24578]|7[235689]|8[1-6])|7(?:1(?:[013-8]|9[6-9])|28[6-8]|3(?:17|2[0-49]|9[2-57])|4(?:1[2-4]|[29][0-7]|3[0-8]|[56]|8[0-24-7])|5(?:2[1-3]|9[0-6])|6(?:0[5689]|2[5-9]|3[02-8]|4|5[0-367])|70[13-7])|807[19]",
+"1(?:[2-479]|5(?:[0236-9]|5[013-9]))|[2-5]|6(?:2(?:84|95)|355|83)|73179|807(?:1|9[1-3])|(?:1552|6(?:1[1358]|2[2457]|3[2-4]|4[235-7]|5[2-689]|6[24578]|7[235689]|8[124-6])\\d|7(?:1(?:[013-8]\\d|9[6-9])|28[6-8]|3(?:2[0-49]|9[2-57])|4(?:1[2-4]|[29][0-7]|3[0-8]|[56]\\d|8[0-24-7])|5(?:2[1-3]|9[0-6])|6(?:0[5689]|2[5-9]|3[02-8]|4\\d|5[0-367])|70[13-7]))[2-7]"],"0$1",,1],[,"(\\d{5})(\\d{5})","$1 $2",["[6-9]"],"0$1",,1],[,"(\\d{4})(\\d{2,4})(\\d{4})","$1 $2 $3",["1(?:6|8[06])","1(?:6|8[06]0)"],,,1],[,"(\\d{4})(\\d{3})(\\d{3})(\\d{3})",
+"$1 $2 $3 $4",["18"],,,1]],[,,,,,,,,,[-1]],,,[,,"1(?:600\\d{6}|800\\d{4,9})|(?:000800|18(?:03\\d\\d|6(?:0|[12]\\d\\d)))\\d{7}"],[,,"140\\d{7}",,,,"1409305260",,,[10]],,,[,,,,,,,,,[-1]]],IO:[,[,,"3\\d{6}",,,,,,,[7]],[,,"37\\d{5}",,,,"3709100"],[,,"38\\d{5}",,,,"3801234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"IO",246,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["3"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],IQ:[,[,,"(?:1|7\\d\\d)\\d{7}|[2-6]\\d{7,8}",
+,,,,,,[8,9,10],[6,7]],[,,"1\\d{7}|(?:2[13-5]|3[02367]|4[023]|5[03]|6[026])\\d{6,7}",,,,"12345678",,,[8,9],[6,7]],[,,"7[3-9]\\d{8}",,,,"7912345678",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"IQ",964,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["1"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[2-6]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["7"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],IR:[,
+[,,"[1-9]\\d{9}|(?:[1-8]\\d\\d|9)\\d{3,4}",,,,,,,[4,5,6,7,10],[8]],[,,"(?:1[137]|2[13-68]|3[1458]|4[145]|5[1468]|6[16]|7[1467]|8[13467])(?:[03-57]\\d{7}|[16]\\d{3}(?:\\d{4})?|[289]\\d{3}(?:\\d(?:\\d{3})?)?)|94(?:000[09]|2(?:121|[2689]0\\d)|30[0-2]\\d|4(?:111|40\\d))\\d{4}",,,,"2123456789",,,[6,7,10],[4,5,8]],[,,"9(?:(?:0(?:[0-35]\\d|4[4-6])|(?:[13]\\d|2[0-3])\\d)\\d|9(?:[0-46]\\d\\d|5[15]0|8(?:[12]\\d|88)|9(?:0[0-3]|[19]\\d|21|69|77|8[7-9])))\\d{5}",,,,"9123456789",,,[10]],[,,,,,,,,,[-1]],[,,,,,,
+,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"IR",98,"00","0",,,"0",,,,[[,"(\\d{4,5})","$1",["96"],"0$1"],[,"(\\d{2})(\\d{4,5})","$1 $2",["(?:1[137]|2[13-68]|3[1458]|4[145]|5[1468]|6[16]|7[1467]|8[13467])[12689]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["9"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["[1-8]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,"9(?:4440\\d{5}|6(?:0[12]|2[16-8]|3(?:08|[14]5|[23]|66)|4(?:0|80)|5[01]|6[89]|86|9[19]))",,,,,,,[4,5,10]],[,,"96(?:0[12]|2[16-8]|3(?:08|[14]5|[23]|66)|4(?:0|80)|5[01]|6[89]|86|9[19])",
+,,,"9601",,,[4,5]],,,[,,,,,,,,,[-1]]],IS:[,[,,"(?:38\\d|[4-9])\\d{6}",,,,,,,[7,9]],[,,"(?:4(?:1[0-24-69]|2[0-7]|[37][0-8]|4[0-24589]|5[0-68]|6\\d|8[0-36-8])|5(?:05|[156]\\d|2[02578]|3[0-579]|4[03-7]|7[0-2578]|8[0-35-9]|9[013-689])|872)\\d{4}",,,,"4101234",,,[7]],[,,"(?:38[589]\\d\\d|6(?:1[1-8]|2[0-6]|3[026-9]|4[014679]|5[0159]|6[0-69]|70|8[06-8]|9\\d)|7(?:5[057]|[6-9]\\d)|8(?:2[0-59]|[3-69]\\d|8[238]))\\d{4}",,,,"6111234"],[,,"80[0-8]\\d{4}",,,,"8001234",,,[7]],[,,"90(?:0\\d|1[5-79]|2[015-79]|3[135-79]|4[125-7]|5[25-79]|7[1-37]|8[0-35-7])\\d{3}",
+,,,"9001234",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"49[0-24-79]\\d{4}",,,,"4921234",,,[7]],"IS",354,"00|1(?:0(?:01|[12]0)|100)",,,,,,"00",,[[,"(\\d{3})(\\d{4})","$1 $2",["[4-9]"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["3"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"809\\d{4}",,,,"8091234",,,[7]],,,[,,"(?:689|8(?:7[18]|80)|95[48])\\d{4}",,,,"6891234",,,[7]]],IT:[,[,,"0\\d{5,10}|1\\d{8,10}|3(?:[0-8]\\d{7,10}|9\\d{7,8})|(?:55|70)\\d{8}|8\\d{5}(?:\\d{2,4})?",,,,,,,[6,7,8,9,10,11,12]],[,,"0669[0-79]\\d{1,6}|0(?:1(?:[0159]\\d|[27][1-5]|31|4[1-4]|6[1356]|8[2-57])|2\\d\\d|3(?:[0159]\\d|2[1-4]|3[12]|[48][1-6]|6[2-59]|7[1-7])|4(?:[0159]\\d|[23][1-9]|4[245]|6[1-5]|7[1-4]|81)|5(?:[0159]\\d|2[1-5]|3[2-6]|4[1-79]|6[4-6]|7[1-578]|8[3-8])|6(?:[0-57-9]\\d|6[0-8])|7(?:[0159]\\d|2[12]|3[1-7]|4[2-46]|6[13569]|7[13-6]|8[1-59])|8(?:[0159]\\d|2[3-578]|3[1-356]|[6-8][1-5])|9(?:[0159]\\d|[238][1-5]|4[12]|6[1-8]|7[1-6]))\\d{2,7}",
+,,,"0212345678",,,[6,7,8,9,10,11]],[,,"3[1-9]\\d{8}|3[2-9]\\d{7}",,,,"3123456789",,,[9,10]],[,,"80(?:0\\d{3}|3)\\d{3}",,,,"800123456",,,[6,9]],[,,"(?:0878\\d{3}|89(?:2\\d|3[04]|4(?:[0-4]|[5-9]\\d\\d)|5[0-4]))\\d\\d|(?:1(?:44|6[346])|89(?:38|5[5-9]|9))\\d{6}",,,,"899123456",,,[6,8,9,10]],[,,"84(?:[08]\\d{3}|[17])\\d{3}",,,,"848123456",,,[6,9]],[,,"1(?:78\\d|99)\\d{6}",,,,"1781234567",,,[9,10]],[,,"55\\d{8}",,,,"5512345678",,,[10]],"IT",39,"00",,,,,,,,[[,"(\\d{4,5})","$1",["1(?:0|9[246])","1(?:0|9(?:2[2-9]|[46]))"]],
+[,"(\\d{6})","$1",["1(?:1|92)"]],[,"(\\d{2})(\\d{4,6})","$1 $2",["0[26]"]],[,"(\\d{3})(\\d{3,6})","$1 $2",["0[13-57-9][0159]|8(?:03|4[17]|9[2-5])","0[13-57-9][0159]|8(?:03|4[17]|9(?:2|3[04]|[45][0-4]))"]],[,"(\\d{4})(\\d{2,6})","$1 $2",["0(?:[13-579][2-46-8]|8[236-8])"]],[,"(\\d{4})(\\d{4})","$1 $2",["894"]],[,"(\\d{2})(\\d{3,4})(\\d{4})","$1 $2 $3",["0[26]|5"]],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["1(?:44|[679])|[378]"]],[,"(\\d{3})(\\d{3,4})(\\d{4})","$1 $2 $3",["0[13-57-9][0159]|14"]],[,
+"(\\d{2})(\\d{4})(\\d{5})","$1 $2 $3",["0[26]"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["0"]],[,"(\\d{3})(\\d{4})(\\d{4,5})","$1 $2 $3",["3"]]],[[,"(\\d{2})(\\d{4,6})","$1 $2",["0[26]"]],[,"(\\d{3})(\\d{3,6})","$1 $2",["0[13-57-9][0159]|8(?:03|4[17]|9[2-5])","0[13-57-9][0159]|8(?:03|4[17]|9(?:2|3[04]|[45][0-4]))"]],[,"(\\d{4})(\\d{2,6})","$1 $2",["0(?:[13-579][2-46-8]|8[236-8])"]],[,"(\\d{4})(\\d{4})","$1 $2",["894"]],[,"(\\d{2})(\\d{3,4})(\\d{4})","$1 $2 $3",["0[26]|5"]],[,"(\\d{3})(\\d{3})(\\d{3,4})",
+"$1 $2 $3",["1(?:44|[679])|[378]"]],[,"(\\d{3})(\\d{3,4})(\\d{4})","$1 $2 $3",["0[13-57-9][0159]|14"]],[,"(\\d{2})(\\d{4})(\\d{5})","$1 $2 $3",["0[26]"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["0"]],[,"(\\d{3})(\\d{4})(\\d{4,5})","$1 $2 $3",["3"]]],[,,,,,,,,,[-1]],1,,[,,"848\\d{6}",,,,,,,[9]],[,,,,,,,,,[-1]],,,[,,"3[2-8]\\d{9,10}",,,,"33101234501",,,[11,12]]],JE:[,[,,"1534\\d{6}|(?:[3578]\\d|90)\\d{8}",,,,,,,[10],[6]],[,,"1534[0-24-8]\\d{5}",,,,"1534456789",,,,[6]],[,,"7(?:(?:(?:50|82)9|937)\\d|7(?:00[378]|97[7-9]))\\d{5}",
+,,,"7797712345"],[,,"80(?:07(?:35|81)|8901)\\d{4}",,,,"8007354567"],[,,"(?:8(?:4(?:4(?:4(?:05|42|69)|703)|5(?:041|800))|7(?:0002|1206))|90(?:066[59]|1810|71(?:07|55)))\\d{4}",,,,"9018105678"],[,,,,,,,,,[-1]],[,,"701511\\d{4}",,,,"7015115678"],[,,"56\\d{8}",,,,"5612345678"],"JE",44,"00","0",,,"([0-24-8]\\d{5})$|0","1534$1",,,,,[,,"76(?:464|652)\\d{5}|76(?:0[0-28]|2[356]|34|4[01347]|5[49]|6[0-369]|77|8[14]|9[139])\\d{6}",,,,"7640123456"],,,[,,,,,,,,,[-1]],[,,"(?:3(?:0(?:07(?:35|81)|8901)|3\\d{4}|4(?:4(?:4(?:05|42|69)|703)|5(?:041|800))|7(?:0002|1206))|55\\d{4})\\d{4}",
+,,,"5512345678"],,,[,,,,,,,,,[-1]]],JM:[,[,,"(?:[58]\\d\\d|658|900)\\d{7}",,,,,,,[10],[7]],[,,"8766060\\d{3}|(?:658(?:2(?:[0-8]\\d|9[0-46-9])|[3-9]\\d\\d)|876(?:52[35]|6(?:0[1-3579]|1[0235-9]|[23]\\d|40|5[06]|6[2-589]|7[025-9]|8[04]|9[4-9])|7(?:0[2-689]|[1-6]\\d|8[056]|9[45])|9(?:0[1-8]|1[02378]|[2-8]\\d|9[2-468])))\\d{4}",,,,"8765230123",,,,[7]],[,,"(?:658295|876(?:2(?:0[1-9]|[13-9]\\d|2[013-9])|[348]\\d\\d|5(?:0[1-9]|[1-9]\\d)|6(?:4[89]|6[67])|7(?:0[07]|7\\d|8[1-47-9]|9[0-36-9])|9(?:[01]9|9[0579])))\\d{4}",
+,,,"8762101234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"JM",1,"011","1",,,"1",,,,,,[,,,,,,,,,[-1]],,"658|876",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,
+,,,,[-1]]],JO:[,[,,"(?:(?:[2689]|7\\d)\\d|32|53)\\d{6}",,,,,,,[8,9]],[,,"87(?:000|90[01])\\d{3}|(?:2(?:6(?:2[0-35-9]|3[0-578]|4[24-7]|5[0-24-8]|[6-8][023]|9[0-3])|7(?:0[1-79]|10|2[014-7]|3[0-689]|4[019]|5[0-3578]))|32(?:0[1-69]|1[1-35-7]|2[024-7]|3\\d|4[0-3]|[5-7][023])|53(?:0[0-3]|[13][023]|2[0-59]|49|5[0-35-9]|6[15]|7[45]|8[1-6]|9[0-36-9])|6(?:2(?:[05]0|22)|3(?:00|33)|4(?:0[0-25]|1[2-7]|2[0569]|[38][07-9]|4[025689]|6[0-589]|7\\d|9[0-2])|5(?:[01][056]|2[034]|3[0-57-9]|4[178]|5[0-69]|6[0-35-9]|7[1-379]|8[0-68]|9[0239]))|87(?:20|7[078]|99))\\d{4}",
+,,,"62001234",,,[8]],[,,"7(?:[78][0-25-9]|9\\d)\\d{6}",,,,"790123456",,,[9]],[,,"80\\d{6}",,,,"80012345",,,[8]],[,,"9\\d{7}",,,,"90012345",,,[8]],[,,"85\\d{6}",,,,"85012345",,,[8]],[,,"70\\d{7}",,,,"700123456",,,[9]],[,,,,,,,,,[-1]],"JO",962,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["[2356]|87"],"(0$1)"],[,"(\\d{3})(\\d{5,6})","$1 $2",["[89]"],"0$1"],[,"(\\d{2})(\\d{7})","$1 $2",["70"],"0$1"],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["7"],"0$1"]],,[,,"74(?:66|77)\\d{5}",,,,"746612345",
+,,[9]],,,[,,,,,,,,,[-1]],[,,"8(?:10|8\\d)\\d{5}",,,,"88101234",,,[8]],,,[,,,,,,,,,[-1]]],JP:[,[,,"00[1-9]\\d{6,14}|[257-9]\\d{9}|(?:00|[1-9]\\d\\d)\\d{6}",,,,,,,[8,9,10,11,12,13,14,15,16,17]],[,,"(?:1(?:1[235-8]|2[3-6]|3[3-9]|4[2-6]|[58][2-8]|6[2-7]|7[2-9]|9[1-9])|(?:2[2-9]|[36][1-9])\\d|4(?:[2-578]\\d|6[02-8]|9[2-59])|5(?:[2-589]\\d|6[1-9]|7[2-8])|7(?:[25-9]\\d|3[4-9]|4[02-9])|8(?:[2679]\\d|3[2-9]|4[5-9]|5[1-9]|8[03-9])|9(?:[2-58]\\d|[679][1-9]))\\d{6}",,,,"312345678",,,[9]],[,,"[7-9]0[1-9]\\d{7}",
+,,,"9012345678",,,[10]],[,,"00777(?:[01]|5\\d)\\d\\d|(?:00(?:7778|882[1245])|(?:120|800\\d)\\d\\d)\\d{4}|00(?:37|66|78)\\d{6,13}",,,,"120123456"],[,,"990\\d{6}",,,,"990123456",,,[9]],[,,,,,,,,,[-1]],[,,"60\\d{7}",,,,"601234567",,,[9]],[,,"50[1-9]\\d{7}",,,,"5012345678",,,[10]],"JP",81,"010","0",,,"0",,,,[[,"(\\d{4})(\\d{4})","$1-$2",["007","0077","00777","00777[01]"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1-$2-$3",["(?:12|57|99)0"],"0$1"],[,"(\\d{4})(\\d)(\\d{4})","$1-$2-$3",["1(?:26|3[79]|4[56]|5[4-68]|6[3-5])|499|5(?:76|97)|746|8(?:3[89]|47|51|63)|9(?:80|9[16])",
+"1(?:267|3(?:7[247]|9[278])|466|5(?:47|58|64)|6(?:3[245]|48|5[4-68]))|499[2468]|5(?:76|97)9|7468|8(?:3(?:8[7-9]|96)|477|51[2-9]|636)|9(?:802|9(?:1[23]|69))|1(?:45|58)[67]","1(?:267|3(?:7[247]|9[278])|466|5(?:47|58|64)|6(?:3[245]|48|5[4-68]))|499[2468]|5(?:769|979[2-69])|7468|8(?:3(?:8[7-9]|96[2457-9])|477|51[2-9]|636[457-9])|9(?:802|9(?:1[23]|69))|1(?:45|58)[67]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3",["60"],"0$1"],[,"(\\d)(\\d{4})(\\d{4})","$1-$2-$3",["[36]|4(?:2[09]|7[01])","[36]|4(?:2(?:0|9[02-69])|7(?:0[019]|1))"],
+"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3",["1(?:1|5[45]|77|88|9[69])|2(?:2[1-37]|3[0-269]|4[59]|5|6[24]|7[1-358]|8[1369]|9[0-38])|4(?:[28][1-9]|3[0-57]|[45]|6[248]|7[2-579]|9[29])|5(?:2|3[045]|4[0-369]|5[29]|8[02389]|9[0-389])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9[2-6])|8(?:2[124589]|3[27-9]|49|51|6|7[0-468]|8[68]|9[019])|9(?:[23][1-9]|4[15]|5[138]|6[1-3]|7[156]|8[189]|9[1-489])","1(?:1|5(?:4[018]|5[017])|77|88|9[69])|2(?:2(?:[127]|3[014-9])|3[0-269]|4[59]|5(?:[1-3]|5[0-69]|9[19])|62|7(?:[1-35]|8[0189])|8(?:[16]|3[0134]|9[0-5])|9(?:[028]|17))|4(?:2(?:[13-79]|8[014-6])|3[0-57]|[45]|6[248]|7[2-47]|8[1-9])|5(?:2|3[045]|4[0-369]|8[02389]|9[0-3])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9(?:[23]|4[0-59]|5[01569]|6[0167]))|8(?:2(?:[1258]|4[0-39]|9[0-2469])|49|51|6(?:[0-24]|36|5[0-3589]|72|9[01459])|7[0-468]|8[68])|9(?:[23][1-9]|4[15]|5[138]|6[1-3]|7[156]|8[189]|9(?:[1289]|3[34]|4[0178]))|(?:49|55|83)[29]|(?:264|837)[016-9]|2(?:57|93)[015-9]|(?:25[0468]|422|838)[01]|(?:47[59]|59[89]|8(?:6[68]|9))[019]",
+"1(?:1|5(?:4[018]|5[017])|77|88|9[69])|2(?:2[127]|3[0-269]|4[59]|5(?:[1-3]|5[0-69]|9(?:17|99))|6(?:2|4[016-9])|7(?:[1-35]|8[0189])|8(?:[16]|3[0134]|9[0-5])|9(?:[028]|17))|4(?:2(?:[13-79]|8[014-6])|3[0-57]|[45]|6[248]|7[2-47]|9[29])|5(?:2|3[045]|4[0-369]|5[29]|8[02389]|9[0-3])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9(?:[23]|4[0-59]|5[01569]|6[0167]))|8(?:2(?:[1258]|4[0-39]|9[0169])|3(?:[29]|7(?:[017-9]|6[6-8]))|49|51|6(?:[0-24]|36[23]|5(?:[0-389]|5[23])|6(?:[01]|9[178])|72|9[0145])|7[0-468]|8[68])|9(?:4[15]|5[138]|7[156]|8[189]|9(?:[1289]|3(?:31|4[357])|4[0178]))|(?:8294|96)[1-3]|2(?:57|93)[015-9]|(?:223|8699)[014-9]|(?:25[0468]|422|838)[01]|(?:48|8292|9[23])[1-9]|(?:47[59]|59[89]|8(?:68|9))[019]",
+"1(?:1|5(?:4[018]|5[017])|77|88|9[69])|2(?:2[127]|3[0-269]|4[59]|5(?:[1-3]|5[0-69]|7[015-9]|9(?:17|99))|6(?:2|4[016-9])|7(?:[1-35]|8[0189])|8(?:[16]|3[0134]|9[0-5])|9(?:[028]|17|3[015-9]))|4(?:2(?:[13-79]|8[014-6])|3[0-57]|[45]|6[248]|7[2-47]|9[29])|5(?:2|3[045]|4[0-369]|5[29]|8[02389]|9[0-3])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9(?:[23]|4[0-59]|5[01569]|6[0167]))|8(?:2(?:[1258]|4[0-39]|9(?:[019]|4[1-3]|6(?:[0-47-9]|5[01346-9])))|3(?:[29]|7(?:[017-9]|6[6-8]))|49|51|6(?:[0-24]|36[23]|5(?:[0-389]|5[23])|6(?:[01]|9[178])|72|9[0145])|7[0-468]|8[68])|9(?:4[15]|5[138]|6[1-3]|7[156]|8[189]|9(?:[1289]|3(?:31|4[357])|4[0178]))|(?:223|8699)[014-9]|(?:25[0468]|422|838)[01]|(?:48|829(?:2|66)|9[23])[1-9]|(?:47[59]|59[89]|8(?:68|9))[019]"],
+"0$1"],[,"(\\d{3})(\\d{2})(\\d{4})","$1-$2-$3",["[14]|[289][2-9]|5[3-9]|7[2-4679]"],"0$1"],[,"(\\d{4})(\\d{2})(\\d{3,4})","$1-$2-$3",["007","0077"]],[,"(\\d{4})(\\d{2})(\\d{4})","$1-$2-$3",["008"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1-$2-$3",["800"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1-$2-$3",["[257-9]"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3,4})","$1-$2-$3",["0"]],[,"(\\d{4})(\\d{4})(\\d{4,5})","$1-$2-$3",["0"]],[,"(\\d{4})(\\d{5})(\\d{5,6})","$1-$2-$3",["0"]],[,"(\\d{4})(\\d{6})(\\d{6,7})","$1-$2-$3",
+["0"]]],[[,"(\\d{3})(\\d{3})(\\d{3})","$1-$2-$3",["(?:12|57|99)0"],"0$1"],[,"(\\d{4})(\\d)(\\d{4})","$1-$2-$3",["1(?:26|3[79]|4[56]|5[4-68]|6[3-5])|499|5(?:76|97)|746|8(?:3[89]|47|51|63)|9(?:80|9[16])","1(?:267|3(?:7[247]|9[278])|466|5(?:47|58|64)|6(?:3[245]|48|5[4-68]))|499[2468]|5(?:76|97)9|7468|8(?:3(?:8[7-9]|96)|477|51[2-9]|636)|9(?:802|9(?:1[23]|69))|1(?:45|58)[67]","1(?:267|3(?:7[247]|9[278])|466|5(?:47|58|64)|6(?:3[245]|48|5[4-68]))|499[2468]|5(?:769|979[2-69])|7468|8(?:3(?:8[7-9]|96[2457-9])|477|51[2-9]|636[457-9])|9(?:802|9(?:1[23]|69))|1(?:45|58)[67]"],
+"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3",["60"],"0$1"],[,"(\\d)(\\d{4})(\\d{4})","$1-$2-$3",["[36]|4(?:2[09]|7[01])","[36]|4(?:2(?:0|9[02-69])|7(?:0[019]|1))"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3",["1(?:1|5[45]|77|88|9[69])|2(?:2[1-37]|3[0-269]|4[59]|5|6[24]|7[1-358]|8[1369]|9[0-38])|4(?:[28][1-9]|3[0-57]|[45]|6[248]|7[2-579]|9[29])|5(?:2|3[045]|4[0-369]|5[29]|8[02389]|9[0-389])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9[2-6])|8(?:2[124589]|3[27-9]|49|51|6|7[0-468]|8[68]|9[019])|9(?:[23][1-9]|4[15]|5[138]|6[1-3]|7[156]|8[189]|9[1-489])",
+"1(?:1|5(?:4[018]|5[017])|77|88|9[69])|2(?:2(?:[127]|3[014-9])|3[0-269]|4[59]|5(?:[1-3]|5[0-69]|9[19])|62|7(?:[1-35]|8[0189])|8(?:[16]|3[0134]|9[0-5])|9(?:[028]|17))|4(?:2(?:[13-79]|8[014-6])|3[0-57]|[45]|6[248]|7[2-47]|8[1-9])|5(?:2|3[045]|4[0-369]|8[02389]|9[0-3])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9(?:[23]|4[0-59]|5[01569]|6[0167]))|8(?:2(?:[1258]|4[0-39]|9[0-2469])|49|51|6(?:[0-24]|36|5[0-3589]|72|9[01459])|7[0-468]|8[68])|9(?:[23][1-9]|4[15]|5[138]|6[1-3]|7[156]|8[189]|9(?:[1289]|3[34]|4[0178]))|(?:49|55|83)[29]|(?:264|837)[016-9]|2(?:57|93)[015-9]|(?:25[0468]|422|838)[01]|(?:47[59]|59[89]|8(?:6[68]|9))[019]",
+"1(?:1|5(?:4[018]|5[017])|77|88|9[69])|2(?:2[127]|3[0-269]|4[59]|5(?:[1-3]|5[0-69]|9(?:17|99))|6(?:2|4[016-9])|7(?:[1-35]|8[0189])|8(?:[16]|3[0134]|9[0-5])|9(?:[028]|17))|4(?:2(?:[13-79]|8[014-6])|3[0-57]|[45]|6[248]|7[2-47]|9[29])|5(?:2|3[045]|4[0-369]|5[29]|8[02389]|9[0-3])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9(?:[23]|4[0-59]|5[01569]|6[0167]))|8(?:2(?:[1258]|4[0-39]|9[0169])|3(?:[29]|7(?:[017-9]|6[6-8]))|49|51|6(?:[0-24]|36[23]|5(?:[0-389]|5[23])|6(?:[01]|9[178])|72|9[0145])|7[0-468]|8[68])|9(?:4[15]|5[138]|7[156]|8[189]|9(?:[1289]|3(?:31|4[357])|4[0178]))|(?:8294|96)[1-3]|2(?:57|93)[015-9]|(?:223|8699)[014-9]|(?:25[0468]|422|838)[01]|(?:48|8292|9[23])[1-9]|(?:47[59]|59[89]|8(?:68|9))[019]",
+"1(?:1|5(?:4[018]|5[017])|77|88|9[69])|2(?:2[127]|3[0-269]|4[59]|5(?:[1-3]|5[0-69]|7[015-9]|9(?:17|99))|6(?:2|4[016-9])|7(?:[1-35]|8[0189])|8(?:[16]|3[0134]|9[0-5])|9(?:[028]|17|3[015-9]))|4(?:2(?:[13-79]|8[014-6])|3[0-57]|[45]|6[248]|7[2-47]|9[29])|5(?:2|3[045]|4[0-369]|5[29]|8[02389]|9[0-3])|7(?:2[02-46-9]|34|[58]|6[0249]|7[57]|9(?:[23]|4[0-59]|5[01569]|6[0167]))|8(?:2(?:[1258]|4[0-39]|9(?:[019]|4[1-3]|6(?:[0-47-9]|5[01346-9])))|3(?:[29]|7(?:[017-9]|6[6-8]))|49|51|6(?:[0-24]|36[23]|5(?:[0-389]|5[23])|6(?:[01]|9[178])|72|9[0145])|7[0-468]|8[68])|9(?:4[15]|5[138]|6[1-3]|7[156]|8[189]|9(?:[1289]|3(?:31|4[357])|4[0178]))|(?:223|8699)[014-9]|(?:25[0468]|422|838)[01]|(?:48|829(?:2|66)|9[23])[1-9]|(?:47[59]|59[89]|8(?:68|9))[019]"],
+"0$1"],[,"(\\d{3})(\\d{2})(\\d{4})","$1-$2-$3",["[14]|[289][2-9]|5[3-9]|7[2-4679]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1-$2-$3",["800"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1-$2-$3",["[257-9]"],"0$1"]],[,,"20\\d{8}",,,,"2012345678",,,[10]],,,[,,"00(?:777(?:[01]|(?:5|8\\d)\\d)|882[1245]\\d\\d)\\d\\d|00(?:37|66|78)\\d{6,13}"],[,,"570\\d{6}",,,,"570123456",,,[9]],,,[,,,,,,,,,[-1]]],KE:[,[,,"(?:[17]\\d\\d|900)\\d{6}|(?:2|80)0\\d{6,7}|[4-6]\\d{6,8}",,,,,,,[7,8,9,10]],[,,"(?:4[245]|5[1-79]|6[01457-9])\\d{5,7}|(?:4[136]|5[08]|62)\\d{7}|(?:[24]0|66)\\d{6,7}",
+,,,"202012345",,,[7,8,9]],[,,"(?:1(?:0[0-6]|1[0-5]|2[014]|30)|7\\d\\d)\\d{6}",,,,"712123456",,,[9]],[,,"800[2-8]\\d{5,6}",,,,"800223456",,,[9,10]],[,,"900[02-9]\\d{5}",,,,"900223456",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"KE",254,"000","0",,,"0",,,,[[,"(\\d{2})(\\d{5,7})","$1 $2",["[24-6]"],"0$1"],[,"(\\d{3})(\\d{6})","$1 $2",["[17]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["[89]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KG:[,[,,"8\\d{9}|(?:[235-8]\\d|99)\\d{7}",
+,,,,,,[9,10],[5,6]],[,,"312(?:5[0-79]\\d|9(?:[0-689]\\d|7[0-24-9]))\\d{3}|(?:3(?:1(?:2[0-46-8]|3[1-9]|47|[56]\\d)|2(?:22|3[0-479]|6[0-7])|4(?:22|5[6-9]|6\\d)|5(?:22|3[4-7]|59|6\\d)|6(?:22|5[35-7]|6\\d)|7(?:22|3[468]|4[1-9]|59|[67]\\d)|9(?:22|4[1-8]|6\\d))|6(?:09|12|2[2-4])\\d)\\d{5}",,,,"312123456",,,[9],[5,6]],[,,"312(?:58\\d|973)\\d{3}|(?:2(?:0[0-35]|2\\d)|5[0-24-7]\\d|600|7(?:[07]\\d|55)|88[08]|99[05-9])\\d{6}",,,,"700123456",,,[9]],[,,"800\\d{6,7}",,,,"800123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],
+[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"KG",996,"00","0",,,"0",,,,[[,"(\\d{4})(\\d{5})","$1 $2",["3(?:1[346]|[24-79])"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[235-79]|88"],"0$1"],[,"(\\d{3})(\\d{3})(\\d)(\\d{2,3})","$1 $2 $3 $4",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KH:[,[,,"1\\d{9}|[1-9]\\d{7,8}",,,,,,,[8,9,10],[6,7]],[,,"23(?:4(?:[2-4]|[56]\\d)|[568]\\d\\d)\\d{4}|23[236-9]\\d{5}|(?:2[4-6]|3[2-6]|4[2-4]|[5-7][2-5])(?:(?:[237-9]|4[56]|5\\d)\\d{5}|6\\d{5,6})",
+,,,"23756789",,,[8,9],[6,7]],[,,"(?:(?:1[28]|3[18]|9[67])\\d|6[016-9]|7(?:[07-9]|[16]\\d)|8(?:[013-79]|8\\d))\\d{6}|(?:1\\d|9[0-57-9])\\d{6}|(?:2[3-6]|3[2-6]|4[2-4]|[5-7][2-5])48\\d{5}",,,,"91234567",,,[8,9]],[,,"1800(?:1\\d|2[019])\\d{4}",,,,"1800123456",,,[10]],[,,"1900(?:1\\d|2[09])\\d{4}",,,,"1900123456",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"KH",855,"00[14-9]","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[1-9]"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1"]]],
+,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KI:[,[,,"(?:[37]\\d|6[0-79])\\d{6}|(?:[2-48]\\d|50)\\d{3}",,,,,,,[5,8]],[,,"(?:[24]\\d|3[1-9]|50|65(?:02[12]|12[56]|22[89]|[3-5]00)|7(?:27\\d\\d|3100|5(?:02[12]|12[56]|22[89]|[34](?:00|81)|500))|8[0-5])\\d{3}",,,,"31234"],[,,"(?:6200[01]|7(?:310[1-9]|5(?:02[03-9]|12[0-47-9]|22[0-7]|[34](?:0[1-9]|8[02-9])|50[1-9])))\\d{3}|(?:63\\d\\d|7(?:(?:[0146-9]\\d|2[0-689])\\d|3(?:[02-9]\\d|1[1-9])|5(?:[0-2][013-9]|[34][1-79]|5[1-9]|[6-9]\\d)))\\d{4}",
+,,,"72001234",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"30(?:0[01]\\d\\d|12(?:11|20))\\d\\d",,,,"30010000",,,[8]],"KI",686,"00","0",,,"0",,,,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KM:[,[,,"[3478]\\d{6}",,,,,,,[7],[4]],[,,"7[4-7]\\d{5}",,,,"7712345",,,,[4]],[,,"[34]\\d{6}",,,,"3212345"],[,,,,,,,,,[-1]],[,,"8\\d{6}",,,,"8001234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"KM",269,"00",,,,,,,,[[,"(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3",
+["[3478]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KN:[,[,,"(?:[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"869(?:2(?:29|36)|302|4(?:6[015-9]|70)|56[5-7])\\d{4}",,,,"8692361234",,,,[7]],[,,"869(?:48[89]|55[6-8]|66\\d|76[02-7])\\d{4}",,,,"8697652917",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"KN",1,"011","1",,,"([2-7]\\d{6})$|1","869$1",,,,,[,,,,,,,,,[-1]],,"869",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KP:[,[,,"85\\d{6}|(?:19\\d|[2-7])\\d{7}",,,,,,,[8,10],[6,7]],[,,"(?:(?:195|2)\\d|3[19]|4[159]|5[37]|6[17]|7[39]|85)\\d{6}",,,,"21234567",,,,[6,7]],[,,"19[1-3]\\d{7}",,,,"1921234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"KP",850,"00|99","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["8"],
+"0$1"],[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["[2-7]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["1"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,"238[02-9]\\d{4}|2(?:[0-24-9]\\d|3[0-79])\\d{5}",,,,,,,[8]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KR:[,[,,"00[1-9]\\d{8,11}|(?:[12]|5\\d{3})\\d{7}|[13-6]\\d{9}|(?:[1-6]\\d|80)\\d{7}|[3-6]\\d{4,5}|(?:00|7)0\\d{8}",,,,,,,[5,6,8,9,10,11,12,13,14],[3,4,7]],[,,"(?:2|3[1-3]|[46][1-4]|5[1-5])[1-9]\\d{6,7}|(?:3[1-3]|[46][1-4]|5[1-5])1\\d{2,3}",,,,"22123456",,,[5,6,8,9,10],
+[3,4,7]],[,,"1(?:05(?:[0-8]\\d|9[0-6])|22[13]\\d)\\d{4,5}|1(?:0[1-46-9]|[16-9]\\d|2[013-9])\\d{6,7}",,,,"1020000000",,,[9,10]],[,,"00(?:308\\d{6,7}|798\\d{7,9})|(?:00368|80)\\d{7}",,,,"801234567",,,[9,11,12,13,14]],[,,"60[2-9]\\d{6}",,,,"602345678",,,[9]],[,,,,,,,,,[-1]],[,,"50\\d{8,9}",,,,"5012345678",,,[10,11]],[,,"70\\d{8}",,,,"7012345678",,,[10]],"KR",82,"00(?:[125689]|3(?:[46]5|91)|7(?:00|27|3|55|6[126]))","0",,,"0(8(?:[1-46-8]|5\\d\\d))?",,,,[[,"(\\d{5})","$1",["1[016-9]1","1[016-9]11","1[016-9]114"],
+"0$1"],[,"(\\d{2})(\\d{3,4})","$1-$2",["(?:3[1-3]|[46][1-4]|5[1-5])1"],"0$1","0$CC-$1"],[,"(\\d{4})(\\d{4})","$1-$2",["1"]],[,"(\\d)(\\d{3,4})(\\d{4})","$1-$2-$3",["2"],"0$1","0$CC-$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3",["60|8"],"0$1","0$CC-$1"],[,"(\\d{2})(\\d{3,4})(\\d{4})","$1-$2-$3",["[1346]|5[1-5]"],"0$1","0$CC-$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1-$2-$3",["[57]"],"0$1","0$CC-$1"],[,"(\\d{5})(\\d{3})(\\d{3})","$1 $2 $3",["003","0030"]],[,"(\\d{2})(\\d{5})(\\d{4})","$1-$2-$3",["5"],"0$1",
+"0$CC-$1"],[,"(\\d{5})(\\d{3,4})(\\d{4})","$1 $2 $3",["0"]],[,"(\\d{5})(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3 $4",["0"]]],[[,"(\\d{2})(\\d{3,4})","$1-$2",["(?:3[1-3]|[46][1-4]|5[1-5])1"],"0$1","0$CC-$1"],[,"(\\d{4})(\\d{4})","$1-$2",["1"]],[,"(\\d)(\\d{3,4})(\\d{4})","$1-$2-$3",["2"],"0$1","0$CC-$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1-$2-$3",["60|8"],"0$1","0$CC-$1"],[,"(\\d{2})(\\d{3,4})(\\d{4})","$1-$2-$3",["[1346]|5[1-5]"],"0$1","0$CC-$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1-$2-$3",["[57]"],"0$1","0$CC-$1"],
+[,"(\\d{2})(\\d{5})(\\d{4})","$1-$2-$3",["5"],"0$1","0$CC-$1"]],[,,"15\\d{7,8}",,,,"1523456789",,,[9,10]],,,[,,"00(?:3(?:08\\d{6,7}|68\\d{7})|798\\d{7,9})",,,,,,,[11,12,13,14]],[,,"1(?:5(?:22|33|44|66|77|88|99)|6(?:[07]0|44|6[168]|88)|8(?:00|33|55|77|99))\\d{4}",,,,"15441234",,,[8]],,,[,,,,,,,,,[-1]]],KW:[,[,,"18\\d{5}|(?:[2569]\\d|41)\\d{6}",,,,,,,[7,8]],[,,"2(?:[23]\\d\\d|4(?:[1-35-9]\\d|44)|5(?:0[034]|[2-46]\\d|5[1-3]|7[1-7]))\\d{4}",,,,"22345678",,,[8]],[,,"(?:41\\d\\d|5(?:(?:[05]\\d|1[0-7]|6[56])\\d|2(?:22|5[25])|7(?:55|77)|88[58])|6(?:(?:0[034679]|5[015-9]|6\\d)\\d|1(?:00|11|66)|222|3[36]3|444|7(?:0[013-9]|[67]\\d)|888|9(?:[069]\\d|3[039]))|9(?:(?:0[09]|[4679]\\d|8[057-9])\\d|1(?:1[01]|99)|2(?:00|2\\d)|3(?:00|3[03])|5(?:00|5\\d)))\\d{4}",
+,,,"50012345",,,[8]],[,,"18\\d{5}",,,,"1801234",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"KW",965,"00",,,,,,,,[[,"(\\d{4})(\\d{3,4})","$1 $2",["[169]|2(?:[235]|4[1-35-9])|52"]],[,"(\\d{3})(\\d{5})","$1 $2",["[245]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KY:[,[,,"(?:345|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"345(?:2(?:22|3[23]|44|66)|333|444|6(?:23|38|40)|7(?:30|4[35-79]|6[6-9]|77)|8(?:00|1[45]|[48]8)|9(?:14|4[035-9]))\\d{4}",,,,"3452221234",
+,,,[7]],[,,"345(?:32[1-9]|42[0-4]|5(?:1[67]|2[5-79]|4[6-9]|50|76)|649|82[56]|9(?:1[679]|2[2-9]|3[06-9]|90))\\d{4}",,,,"3453231234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002345678"],[,,"(?:345976|900[2-9]\\d\\d)\\d{4}",,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"KY",1,"011","1",,,"([2-9]\\d{6})$|1","345$1",,,,,[,,"345849\\d{4}",,,,"3458491234"],,"345",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],KZ:[,[,,"(?:33622|8\\d{8})\\d{5}|[78]\\d{9}",,,,,,,[10,14],[5,6,7]],[,,"(?:33622|7(?:1(?:0(?:[23]\\d|4[0-3]|59|63)|1(?:[23]\\d|4[0-79]|59)|2(?:[23]\\d|59)|3(?:2\\d|3[0-79]|4[0-35-9]|59)|4(?:[24]\\d|3[013-9]|5[1-9]|97)|5(?:2\\d|3[1-9]|4[0-7]|59)|6(?:[2-4]\\d|5[19]|61)|72\\d|8(?:[27]\\d|3[1-46-9]|4[0-5]|59))|2(?:1(?:[23]\\d|4[46-9]|5[3469])|2(?:2\\d|3[0679]|46|5[12679])|3(?:[2-4]\\d|5[139])|4(?:2\\d|3[1-35-9]|59)|5(?:[23]\\d|4[0-8]|59|61)|6(?:2\\d|3[1-9]|4[0-4]|59)|7(?:[2379]\\d|40|5[279])|8(?:[23]\\d|4[0-3]|59)|9(?:2\\d|3[124578]|59))))\\d{5}",
+,,,"7123456789",,,[10],[5,6,7]],[,,"7(?:0[0-25-8]|47|6[0-4]|7[15-8]|85)\\d{7}",,,,"7710009998",,,[10]],[,,"8(?:00|108\\d{3})\\d{7}",,,,"8001234567"],[,,"809\\d{7}",,,,"8091234567",,,[10]],[,,,,,,,,,[-1]],[,,"808\\d{7}",,,,"8081234567",,,[10]],[,,"751\\d{7}",,,,"7511234567",,,[10]],"KZ",7,"810","8",,,"8",,"8~10",,,,[,,,,,,,,,[-1]],,"33|7",[,,"751\\d{7}",,,,,,,[10]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],LA:[,[,,"[23]\\d{9}|3\\d{8}|(?:[235-8]\\d|41)\\d{6}",,,,,,,[8,9,10],[6]],[,,"(?:2[13]|[35-7][14]|41|8[1468])\\d{6}",
+,,,"21212862",,,[8],[6]],[,,"(?:20(?:[2359]\\d|7[6-8]|88)|302\\d)\\d{6}",,,,"2023123456",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"LA",856,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["2[13]|3[14]|[4-8]"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3 $4",["30[013-9]"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3 $4",["[23]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"30[013-9]\\d{6}",,,,"301234567",,,[9]],,,[,,,,,,
+,,,[-1]]],LB:[,[,,"[27-9]\\d{7}|[13-9]\\d{6}",,,,,,,[7,8]],[,,"7(?:62|8[0-7]|9[04-9])\\d{4}|(?:[14-69]\\d|2(?:[14-69]\\d|[78][1-9])|7[2-57]|8[02-9])\\d{5}",,,,"1123456"],[,,"793(?:[01]\\d|2[0-4])\\d{3}|(?:(?:3|81)\\d|7(?:[01]\\d|6[013-9]|8[89]|9[12]))\\d{5}",,,,"71123456"],[,,,,,,,,,[-1]],[,,"9[01]\\d{6}",,,,"90123456",,,[8]],[,,"80\\d{6}",,,,"80123456",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"LB",961,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["[13-69]|7(?:[2-57]|62|8[0-7]|9[04-9])|8[02-9]"],
+"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[27-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],LC:[,[,,"(?:[58]\\d\\d|758|900)\\d{7}",,,,,,,[10],[7]],[,,"758(?:234|4(?:30|5\\d|6[2-9]|8[0-2])|57[0-2]|(?:63|75)8)\\d{4}",,,,"7584305678",,,,[7]],[,,"758(?:28[4-7]|384|4(?:6[01]|8[4-9])|5(?:1[89]|20|84)|7(?:1[2-9]|2\\d|3[0-3])|812)\\d{4}",,,,"7582845678",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],
+[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"LC",1,"011","1",,,"([2-8]\\d{6})$|1","758$1",,,,,[,,,,,,,,,[-1]],,"758",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],LI:[,[,,"[68]\\d{8}|(?:[2378]\\d|90)\\d{5}",,,,,,,[7,9]],[,,"(?:2(?:01|1[27]|2[02]|3\\d|6[02-578]|96)|3(?:[24]0|33|7[0135-7]|8[048]|9[0269]))\\d{4}",
+,,,"2345678",,,[7]],[,,"(?:6(?:(?:4[5-9]|5[0-4])\\d|6(?:[0245]\\d|[17]0|3[7-9]))\\d|7(?:[37-9]\\d|42|56))\\d{4}",,,,"660234567"],[,,"8002[28]\\d\\d|80(?:05\\d|9)\\d{4}",,,,"8002222"],[,,"90(?:02[258]|1(?:23|3[14])|66[136])\\d\\d",,,,"9002222",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"LI",423,"00","0",,,"(1001)|0",,,,[[,"(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3",["[2379]|8(?:0[09]|7)","[2379]|8(?:0(?:02|9)|7)"],,"$CC $1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["8"]],[,"(\\d{2})(\\d{3})(\\d{4})",
+"$1 $2 $3",["69"],,"$CC $1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["6"],,"$CC $1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"870(?:28|87)\\d\\d",,,,"8702812",,,[7]],,,[,,"697(?:42|56|[78]\\d)\\d{4}",,,,"697861234",,,[9]]],LK:[,[,,"[1-9]\\d{8}",,,,,,,[9],[7]],[,,"(?:12[2-9]|602|8[12]\\d|9(?:1\\d|22|9[245]))\\d{6}|(?:11|2[13-7]|3[1-8]|4[157]|5[12457]|6[35-7])[2-57]\\d{6}",,,,"112345678",,,,[7]],[,,"7(?:[0-25-8]\\d|4[0-4])\\d{6}",,,,"712345678"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,
+,,,,,[-1]],[,,,,,,,,,[-1]],"LK",94,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["7"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[1-689]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"1973\\d{5}",,,,"197312345"],,,[,,,,,,,,,[-1]]],LR:[,[,,"(?:[25]\\d|33|77|88)\\d{7}|(?:2\\d|[4-6])\\d{6}",,,,,,,[7,8,9]],[,,"2\\d{7}",,,,"21234567",,,[8]],[,,"(?:(?:(?:22|33)0|555|(?:77|88)\\d)\\d|4[67])\\d{5}|[56]\\d{6}",,,,"770123456",,,[7,9]],[,,,,,,,,,[-1]],[,,"332(?:02|[34]\\d)\\d{4}",,,,"332021234",
+,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"LR",231,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["[4-6]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["2"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[23578]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],LS:[,[,,"(?:[256]\\d\\d|800)\\d{5}",,,,,,,[8]],[,,"2\\d{7}",,,,"22123456"],[,,"[56]\\d{7}",,,,"50123456"],[,,"800[256]\\d{4}",,,,"80021234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,
+,,[-1]],[,,,,,,,,,[-1]],"LS",266,"00",,,,,,,,[[,"(\\d{4})(\\d{4})","$1 $2",["[2568]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],LT:[,[,,"(?:[3469]\\d|52|[78]0)\\d{6}",,,,,,,[8]],[,,"(?:3[1478]|4[124-6]|52)\\d{6}",,,,"31234567"],[,,"6\\d{7}",,,,"61234567"],[,,"80[02]\\d{5}",,,,"80012345"],[,,"9(?:0[0239]|10)\\d{5}",,,,"90012345"],[,,"808\\d{5}",,,,"80812345"],[,,"70[05]\\d{5}",,,,"70012345"],[,,"[89]01\\d{5}",,,,"80123456"],"LT",370,"00","8",,,"[08]",,,,[[,"(\\d)(\\d{3})(\\d{4})",
+"$1 $2 $3",["52[0-7]"],"(8-$1)",,1],[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["[7-9]"],"8 $1",,1],[,"(\\d{2})(\\d{6})","$1 $2",["37|4(?:[15]|6[1-8])"],"(8-$1)",,1],[,"(\\d{3})(\\d{5})","$1 $2",["[3-6]"],"(8-$1)",,1]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"70[67]\\d{5}",,,,"70712345"],,,[,,,,,,,,,[-1]]],LU:[,[,,"35[013-9]\\d{4,8}|6\\d{8}|35\\d{2,4}|(?:[2457-9]\\d|3[0-46-9])\\d{2,9}",,,,,,,[4,5,6,7,8,9,10,11]],[,,"(?:35[013-9]|80[2-9]|90[89])\\d{1,8}|(?:2[2-9]|3[0-46-9]|[457]\\d|8[13-9]|9[2-579])\\d{2,9}",
+,,,"27123456"],[,,"6(?:[269][18]|5[1568]|7[189]|81)\\d{6}",,,,"628123456",,,[9]],[,,"800\\d{5}",,,,"80012345",,,[8]],[,,"90[015]\\d{5}",,,,"90012345",,,[8]],[,,"801\\d{5}",,,,"80112345",,,[8]],[,,,,,,,,,[-1]],[,,"20(?:1\\d{5}|[2-689]\\d{1,7})",,,,"20201234",,,[4,5,6,7,8,9,10]],"LU",352,"00",,,,"(15(?:0[06]|1[12]|[35]5|4[04]|6[26]|77|88|99)\\d)",,,,[[,"(\\d{2})(\\d{3})","$1 $2",["2(?:0[2-689]|[2-9])|[3-57]|8(?:0[2-9]|[13-9])|9(?:0[89]|[2-579])"],,"$CC $1"],[,"(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3",["2(?:0[2-689]|[2-9])|[3-57]|8(?:0[2-9]|[13-9])|9(?:0[89]|[2-579])"],
+,"$CC $1"],[,"(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3",["20[2-689]"],,"$CC $1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})","$1 $2 $3 $4",["2(?:[0367]|4[3-8])"],,"$CC $1"],[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["80[01]|90[015]"],,"$CC $1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3 $4",["20"],,"$CC $1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["6"],,"$CC $1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})","$1 $2 $3 $4 $5",["2(?:[0367]|4[3-8])"],,"$CC $1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{1,5})","$1 $2 $3 $4",
+["[3-57]|8[13-9]|9(?:0[89]|[2-579])|(?:2|80)[2-9]"],,"$CC $1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],LV:[,[,,"(?:[268]\\d|90)\\d{6}",,,,,,,[8]],[,,"6\\d{7}",,,,"63123456"],[,,"23(?:23[0-57-9]|33[0238])\\d{3}|2(?:[0-24-9]\\d\\d|3(?:0[07]|[14-9]\\d|2[024-9]|3[0-24-9]))\\d{4}",,,,"21234567"],[,,"80\\d{6}",,,,"80123456"],[,,"90\\d{6}",,,,"90123456"],[,,"81\\d{6}",,,,"81123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"LV",371,"00",,,,,,,,[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",
+["[269]|8[01]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],LY:[,[,,"[2-9]\\d{8}",,,,,,,[9],[7]],[,,"(?:2(?:0[56]|[1-6]\\d|7[124579]|8[124])|3(?:1\\d|2[2356])|4(?:[17]\\d|2[1-357]|5[2-4]|8[124])|5(?:[1347]\\d|2[1-469]|5[13-5]|8[1-4])|6(?:[1-479]\\d|5[2-57]|8[1-5])|7(?:[13]\\d|2[13-79])|8(?:[124]\\d|5[124]|84))\\d{6}",,,,"212345678",,,,[7]],[,,"9[1-6]\\d{7}",,,,"912345678"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"LY",218,"00","0",
+,,"0",,,,[[,"(\\d{2})(\\d{7})","$1-$2",["[2-9]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MA:[,[,,"[5-8]\\d{8}",,,,,,,[9]],[,,"5293[01]\\d{4}|5(?:2(?:[0-25-7]\\d|3[1-578]|4[02-46-8]|8[0235-7]|9[0-289])|3(?:[0-47]\\d|5[02-9]|6[02-8]|8[0189]|9[3-9])|(?:4[067]|5[03])\\d)\\d{5}",,,,"520123456"],[,,"(?:6(?:[0-79]\\d|8[0-247-9])|7(?:[017]\\d|2[0-2]|6[0-8]|8[0-3]))\\d{6}",,,,"650123456"],[,,"80\\d{7}",,,,"801234567"],[,,"89\\d{7}",,,,"891234567"],[,,,,,,,,,[-1]],[,,,
+,,,,,,[-1]],[,,"592(?:4[0-2]|93)\\d{4}",,,,"592401234"],"MA",212,"00","0",,,"0",,,,[[,"(\\d{5})(\\d{4})","$1-$2",["5(?:29|38)","5(?:29[1289]|389)","529(?:1[1-46-9]|2[013-8]|90)|5(?:298|389)[0-46-9]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["5[45]"],"0$1"],[,"(\\d{4})(\\d{5})","$1-$2",["5(?:2[2-489]|3[5-9]|9)|892","5(?:2(?:[2-49]|8[235-9])|3[5-9]|9)|892"],"0$1"],[,"(\\d{2})(\\d{7})","$1-$2",["8"],"0$1"],[,"(\\d{3})(\\d{6})","$1-$2",["[5-7]"],"0$1"]],,[,,,,,,,,,[-1]],1,,[,,,,,,,,
+,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MC:[,[,,"(?:[3489]|6\\d)\\d{7}",,,,,,,[8,9]],[,,"(?:870|9[2-47-9]\\d)\\d{5}",,,,"99123456",,,[8]],[,,"4(?:[46]\\d|5[1-9])\\d{5}|(?:3|6\\d)\\d{7}",,,,"612345678"],[,,"(?:800|90\\d)\\d{5}",,,,"90123456",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"MC",377,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3})(\\d{2})","$1 $2 $3",["87"]],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["4"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[389]"]],
+[,"(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4 $5",["6"],"0$1"]],[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["4"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[389]"]],[,"(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4 $5",["6"],"0$1"]],[,,,,,,,,,[-1]],,,[,,"8[07]0\\d{5}",,,,,,,[8]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MD:[,[,,"(?:[235-7]\\d|[89]0)\\d{6}",,,,,,,[8]],[,,"(?:(?:2[1-9]|3[1-79])\\d|5(?:33|5[257]))\\d{5}",,,,"22212345"],[,,"562\\d{5}|(?:6\\d|7[16-9])\\d{6}",,,,"62112345"],
+[,,"800\\d{5}",,,,"80012345"],[,,"90[056]\\d{5}",,,,"90012345"],[,,"808\\d{5}",,,,"80812345"],[,,,,,,,,,[-1]],[,,"3[08]\\d{6}",,,,"30123456"],"MD",373,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{5})","$1 $2",["[89]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["22|3"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["[25-7]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"803\\d{5}",,,,"80312345"],,,[,,,,,,,,,[-1]]],ME:[,[,,"(?:20|[3-79]\\d)\\d{6}|80\\d{6,7}",,,,,,,[8,9],[6]],[,,"(?:20[2-8]|3(?:[0-2][2-7]|3[24-7])|4(?:0[2-467]|1[2467])|5(?:0[2467]|1[24-7]|2[2-467]))\\d{5}",
+,,,"30234567",,,[8],[6]],[,,"6(?:[07-9]\\d|3[024]|6[0-25])\\d{5}",,,,"67622901",,,[8]],[,,"80(?:[0-2578]|9\\d)\\d{5}",,,,"80080002"],[,,"9(?:4[1568]|5[178])\\d{5}",,,,"94515151",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"78[1-49]\\d{5}",,,,"78108780",,,[8]],"ME",382,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[2-9]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"77[1-9]\\d{5}",,,,"77273012",,,[8]],,,[,,,,,,,,,[-1]]],MF:[,[,,"590\\d{6}|(?:69|80|9\\d)\\d{7}",,,,,,,[9]],[,,"590(?:0[079]|[14]3|[27][79]|30|5[0-268]|87)\\d{4}",
+,,,"590271234"],[,,"69(?:0\\d\\d|1(?:2[2-9]|3[0-5]))\\d{4}",,,,"690001234"],[,,"80[0-5]\\d{6}",,,,"800012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"9(?:(?:395|76[018])\\d|475[0-2])\\d{4}",,,,"976012345"],"MF",590,"00","0",,,"0",,,,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MG:[,[,,"[23]\\d{8}",,,,,,,[9],[7]],[,,"2072[29]\\d{4}|20(?:2\\d|4[47]|5[3467]|6[279]|7[35]|8[268]|9[245])\\d{5}",,,,"202123456",,,,[7]],[,,"3[2-47-9]\\d{7}",,,,"321234567"],[,,,,,,,,,
+[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"22\\d{7}",,,,"221234567"],"MG",261,"00","0",,,"([24-9]\\d{6})$|0","20$1",,,[[,"(\\d{2})(\\d{2})(\\d{3})(\\d{2})","$1 $2 $3 $4",["[23]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MH:[,[,,"329\\d{4}|(?:[256]\\d|45)\\d{5}",,,,,,,[7]],[,,"(?:247|45[78]|528|625)\\d{4}",,,,"2471234"],[,,"(?:(?:23|54)5|329|45[356])\\d{4}",,,,"2351234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"635\\d{4}",
+,,,"6351234"],"MH",692,"011","1",,,"1",,,,[[,"(\\d{3})(\\d{4})","$1-$2",["[2-6]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MK:[,[,,"[2-578]\\d{7}",,,,,,,[8],[6,7]],[,,"(?:(?:2(?:62|77)0|3444)\\d|4[56]440)\\d{3}|(?:34|4[357])700\\d{3}|(?:2(?:[0-3]\\d|5[0-578]|6[01]|82)|3(?:1[3-68]|[23][2-68]|4[23568])|4(?:[23][2-68]|4[3-68]|5[2568]|6[25-8]|7[24-68]|8[4-68]))\\d{5}",,,,"22012345",,,,[6,7]],[,,"7(?:3555|(?:474|9[019]7)7)\\d{3}|7(?:[0-25-8]\\d\\d|3(?:[1-48]\\d|7[01578])|4(?:2\\d|60|7[01578])|9(?:[2-4]\\d|5[01]|7[015]))\\d{4}",
+,,,"72345678"],[,,"800\\d{5}",,,,"80012345"],[,,"5\\d{7}",,,,"50012345"],[,,"8(?:0[1-9]|[1-9]\\d)\\d{5}",,,,"80123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"MK",389,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["2|34[47]|4(?:[37]7|5[47]|64)"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[347]"],"0$1"],[,"(\\d{3})(\\d)(\\d{2})(\\d{2})","$1 $2 $3 $4",["[58]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],ML:[,[,,"[24-9]\\d{7}",,,,,,,[8]],[,,"2(?:07[0-8]|12[67])\\d{4}|(?:2(?:02|1[4-689])|4(?:0[0-4]|4[1-39]))\\d{5}",
+,,,"20212345"],[,,"2(?:0(?:01|79)|17\\d)\\d{4}|(?:5[01]|[679]\\d|8[2-49])\\d{6}",,,,"65012345"],[,,"80\\d{6}",,,,"80012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"ML",223,"00",,,,,,,,[[,"(\\d{4})","$1",["67[057-9]|74[045]","67(?:0[09]|[59]9|77|8[89])|74(?:0[02]|44|55)"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[24-9]"]]],[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[24-9]"]]],[,,,,,,,,,[-1]],,,[,,"80\\d{6}"],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MM:[,
+[,,"1\\d{5,7}|95\\d{6}|(?:[4-7]|9[0-46-9])\\d{6,8}|(?:2|8\\d)\\d{5,8}",,,,,,,[6,7,8,9,10],[5]],[,,"(?:1(?:(?:2\\d|3[56]|[89][0-6])\\d|4(?:2[29]|62|7[0-2]|83)|6)|2(?:2(?:00|8[34])|4(?:0\\d|[26]2|7[0-2]|83)|51\\d\\d)|4(?:2(?:2\\d\\d|48[013])|3(?:20\\d|4(?:70|83)|56)|420\\d|5470)|6(?:0(?:[23]|88\\d)|(?:124|[56]2\\d)\\d|2472|3(?:20\\d|470)|4(?:2[04]\\d|472)|7(?:(?:3\\d|8[01459])\\d|4[67]0)))\\d{4}|5(?:2(?:2\\d{5,6}|47[02]\\d{4})|(?:3472|4(?:2(?:1|86)|470)|522\\d|6(?:20\\d|483)|7(?:20\\d|48[01])|8(?:20\\d|47[02])|9(?:20\\d|470))\\d{4})|7(?:(?:0470|4(?:25\\d|470)|5(?:202|470|96\\d))\\d{4}|1(?:20\\d{4,5}|4(?:70|83)\\d{4}))|8(?:1(?:2\\d{5,6}|4(?:10|7[01]\\d)\\d{3})|2(?:2\\d{5,6}|(?:320|490\\d)\\d{3})|(?:3(?:2\\d\\d|470)|4[24-7]|5(?:(?:2\\d|51)\\d|4(?:[1-35-9]\\d|4[0-57-9]))|6[23])\\d{4})|(?:1[2-6]\\d|4(?:2[24-8]|3[2-7]|[46][2-6]|5[3-5])|5(?:[27][2-8]|3[2-68]|4[24-8]|5[23]|6[2-4]|8[24-7]|9[2-7])|6(?:[19]20|42[03-6]|(?:52|7[45])\\d)|7(?:[04][24-8]|[15][2-7]|22|3[2-4])|8(?:1[2-689]|2[2-8]|[35]2\\d))\\d{4}|25\\d{5,6}|(?:2[2-9]|6(?:1[2356]|[24][2-6]|3[24-6]|5[2-4]|6[2-8]|7[235-7]|8[245]|9[24])|8(?:3[24]|5[245]))\\d{4}",
+,,,"1234567",,,[6,7,8,9],[5]],[,,"(?:17[01]|9(?:2(?:[0-4]|[56]\\d\\d)|(?:3(?:[0-36]|4\\d)|(?:6\\d|8[89]|9[4-8])\\d|7(?:3|40|[5-9]\\d))\\d|4(?:(?:[0245]\\d|[1379])\\d|88)|5[0-6])\\d)\\d{4}|9[69]1\\d{6}|9(?:[68]\\d|9[089])\\d{5}",,,,"92123456",,,[7,8,9,10]],[,,"80080(?:0[1-9]|2\\d)\\d{3}",,,,"8008001234",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"1333\\d{4}|[12]468\\d{4}",,,,"13331234",,,[8]],"MM",95,"00","0",,,"0",,,,[[,"(\\d)(\\d{2})(\\d{3})","$1 $2 $3",["16|2"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{3})",
+"$1 $2 $3",["[45]|6(?:0[23]|[1-689]|7[235-7])|7(?:[0-4]|5[2-7])|8[1-6]"],"0$1"],[,"(\\d)(\\d{3})(\\d{3,4})","$1 $2 $3",["[12]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[4-7]|8[1-35]"],"0$1"],[,"(\\d)(\\d{3})(\\d{4,6})","$1 $2 $3",["9(?:2[0-4]|[35-9]|4[137-9])"],"0$1"],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["2"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["8"],"0$1"],[,"(\\d)(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["92"],"0$1"],[,"(\\d)(\\d{5})(\\d{4})","$1 $2 $3",["9"],"0$1"]],,[,,,
+,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MN:[,[,,"[12]\\d{7,9}|[5-9]\\d{7}",,,,,,,[8,9,10],[4,5,6]],[,,"[12]2[1-3]\\d{5,6}|(?:(?:[12](?:1|27)|5[368])\\d\\d|7(?:0(?:[0-5]\\d|7[078]|80)|128))\\d{4}|[12](?:3[2-8]|4[2-68]|5[1-4689])\\d{6,7}",,,,"53123456",,,,[4,5,6]],[,,"(?:83[01]|92[039])\\d{5}|(?:5[05]|6[069]|8[015689]|9[013-9])\\d{6}",,,,"88123456",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"712[0-79]\\d{4}|7(?:1[013-9]|[25-9]\\d)\\d{5}",,,,"75123456",
+,,[8]],"MN",976,"001","0",,,"0",,,,[[,"(\\d{2})(\\d{2})(\\d{4})","$1 $2 $3",["[12]1"],"0$1"],[,"(\\d{4})(\\d{4})","$1 $2",["[5-9]"]],[,"(\\d{3})(\\d{5,6})","$1 $2",["[12]2[1-3]"],"0$1"],[,"(\\d{4})(\\d{5,6})","$1 $2",["[12](?:27|3[2-8]|4[2-68]|5[1-4689])","[12](?:27|3[2-8]|4[2-68]|5[1-4689])[0-3]"],"0$1"],[,"(\\d{5})(\\d{4,5})","$1 $2",["[12]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MO:[,[,,"0800\\d{3}|(?:28|[68]\\d)\\d{6}",,,,,,,[7,8]],[,,"(?:28[2-9]|8(?:11|[2-57-9]\\d))\\d{5}",
+,,,"28212345",,,[8]],[,,"6800[0-79]\\d{3}|6(?:[235]\\d\\d|6(?:0[0-5]|[1-9]\\d)|8(?:0[1-9]|[14-8]\\d|2[5-9]|[39][0-4]))\\d{4}",,,,"66123456",,,[8]],[,,"0800\\d{3}",,,,"0800501",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"MO",853,"00",,,,,,,,[[,"(\\d{4})(\\d{3})","$1 $2",["0"]],[,"(\\d{4})(\\d{4})","$1 $2",["[268]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MP:[,[,,"[58]\\d{9}|(?:67|90)0\\d{7}",,,,,,,[10],[7]],[,,"670(?:2(?:3[3-7]|56|8[4-8])|32[1-38]|4(?:33|8[348])|5(?:32|55|88)|6(?:64|70|82)|78[3589]|8[3-9]8|989)\\d{4}",
+,,,"6702345678",,,,[7]],[,,"670(?:2(?:3[3-7]|56|8[4-8])|32[1-38]|4(?:33|8[348])|5(?:32|55|88)|6(?:64|70|82)|78[3589]|8[3-9]8|989)\\d{4}",,,,"6702345678",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"MP",1,"011","1",,,"([2-9]\\d{6})$|1","670$1",,1,,,[,,,,,,,,,[-1]],,"670",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MQ:[,[,,"596\\d{6}|(?:69|80|9\\d)\\d{7}",,,,,,,[9]],[,,"596(?:[03-7]\\d|10|2[7-9]|8[09]|9[4-9])\\d{4}",,,,"596301234"],[,,"69(?:6(?:[0-46-9]\\d|5[0-6])|727)\\d{4}",,,,"696201234"],[,,"80[0-5]\\d{6}",,,,"800012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"9(?:397[01]|477[0-2]|76(?:6\\d|7[0-367]))\\d{4}",,,,"976612345"],"MQ",596,"00",
+"0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[569]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MR:[,[,,"(?:[2-4]\\d\\d|800)\\d{5}",,,,,,,[8]],[,,"(?:25[08]|35\\d|45[1-7])\\d{5}",,,,"35123456"],[,,"[2-4][0-46-9]\\d{6}",,,,"22123456"],[,,"800\\d{5}",,,,"80012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"MR",222,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["[2-48]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MS:[,[,,"(?:[58]\\d\\d|664|900)\\d{7}",,,,,,,[10],[7]],[,,"6644(?:1[0-3]|91)\\d{4}",,,,"6644912345",,,,[7]],[,,"664(?:3(?:49|9[1-6])|49[2-6])\\d{4}",,,,"6644923456",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"MS",1,"011","1",,,"([34]\\d{6})$|1","664$1",,,,,[,,,,,,,,,[-1]],,"664",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MT:[,[,,"3550\\d{4}|(?:[2579]\\d\\d|800)\\d{5}",,,,,,,[8]],[,,"20(?:3[1-4]|6[059])\\d{4}|2(?:0[19]|[1-357]\\d|60)\\d{5}",,,,"21001234"],[,,"(?:7(?:210|[79]\\d\\d)|9(?:[29]\\d\\d|69[67]|8(?:1[1-3]|89|97)))\\d{4}",,,,"96961234"],[,,"800(?:02|[3467]\\d)\\d{3}",,,,"80071234"],[,,"5(?:0(?:0(?:37|43)|(?:6\\d|70|9[0168])\\d)|[12]\\d0[1-5])\\d{3}",,,,
+"50037123"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"3550\\d{4}",,,,"35501234"],"MT",356,"00",,,,,,,,[[,"(\\d{4})(\\d{4})","$1 $2",["[2357-9]"]]],,[,,"7117\\d{4}",,,,"71171234"],,,[,,,,,,,,,[-1]],[,,"501\\d{5}",,,,"50112345"],,,[,,,,,,,,,[-1]]],MU:[,[,,"(?:[57]|8\\d\\d)\\d{7}|[2-468]\\d{6}",,,,,,,[7,8,10]],[,,"(?:2(?:[0346-8]\\d|1[0-7])|4(?:[013568]\\d|2[4-7])|54(?:[3-5]\\d|71)|6\\d\\d|8(?:14|3[129]))\\d{4}",,,,"54480123",,,[7,8]],[,,"5(?:4(?:2[1-389]|7[1-9])|87[15-8])\\d{4}|(?:5(?:2[5-9]|4[3-689]|[57]\\d|8[0-689]|9[0-8])|7(?:0[0-2]|3[013]))\\d{5}",
+,,,"52512345",,,[8]],[,,"802\\d{7}|80[0-2]\\d{4}",,,,"8001234",,,[7,10]],[,,"30\\d{5}",,,,"3012345",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"3(?:20|9\\d)\\d{4}",,,,"3201234",,,[7]],"MU",230,"0(?:0|[24-7]0|3[03])",,,,,,"020",,[[,"(\\d{3})(\\d{4})","$1 $2",["[2-46]|8[013]"]],[,"(\\d{4})(\\d{4})","$1 $2",["[57]"]],[,"(\\d{5})(\\d{5})","$1 $2",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MV:[,[,,"(?:800|9[0-57-9]\\d)\\d{7}|[34679]\\d{6}",,,,,,,[7,10]],[,,"(?:3(?:0[0-3]|3[0-59])|6(?:[58][024689]|6[024-68]|7[02468]))\\d{4}",
+,,,"6701234",,,[7]],[,,"(?:46[46]|[79]\\d\\d)\\d{4}",,,,"7712345",,,[7]],[,,"800\\d{7}",,,,"8001234567",,,[10]],[,,"900\\d{7}",,,,"9001234567",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"MV",960,"0(?:0|19)",,,,,,"00",,[[,"(\\d{3})(\\d{4})","$1-$2",["[34679]"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["[89]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"4(?:0[01]|50)\\d{4}",,,,"4001234",,,[7]],,,[,,,,,,,,,[-1]]],MW:[,[,,"(?:[1289]\\d|31|77)\\d{7}|1\\d{6}",,,,,,,[7,9]],[,,"(?:1[2-9]|2[12]\\d\\d)\\d{5}",
+,,,"1234567"],[,,"111\\d{6}|(?:31|77|[89][89])\\d{7}",,,,"991234567",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"MW",265,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["1[2-9]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["2"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[137-9]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MX:[,[,,"1(?:(?:[27]2|44|99)[1-9]|65[0-689])\\d{7}|(?:1(?:[01]\\d|2[13-9]|[35][1-9]|4[0-35-9]|6[0-46-9]|7[013-9]|8[1-79]|9[1-8])|[2-9]\\d)\\d{8}",
+,,,,,,[10,11],[7,8]],[,,"657[12]\\d{6}|(?:2(?:0[01]|2\\d|3[1-35-8]|4[13-9]|7[1-689]|8[1-578]|9[467])|3(?:1[1-79]|[2458][1-9]|3\\d|7[1-8]|9[1-5])|4(?:1[1-57-9]|[25-7][1-9]|3[1-8]|4\\d|8[1-35-9]|9[2-689])|5(?:[56]\\d|88|9[1-79])|6(?:1[2-68]|[2-4][1-9]|5[1-3689]|6[1-57-9]|7[1-7]|8[67]|9[4-8])|7(?:[13467][1-9]|2\\d|5[13-9]|8[1-69]|9[17])|8(?:1\\d|2[13-689]|3[1-6]|4[124-6]|6[1246-9]|7[1-378]|9[12479])|9(?:1[346-9]|2[1-4]|3[2-46-8]|5[1348]|6[1-9]|7[12]|8[1-8]|9\\d))\\d{7}",,,,"2001234567",,,[10],[7,8]],
+[,,"657[12]\\d{6}|(?:1(?:2(?:2[1-9]|3[1-35-8]|4[13-9]|7[1-689]|8[1-578]|9[467])|3(?:1[1-79]|[2458][1-9]|3\\d|7[1-8]|9[1-5])|4(?:1[1-57-9]|[24-7][1-9]|3[1-8]|8[1-35-9]|9[2-689])|5(?:[56]\\d|88|9[1-79])|6(?:1[2-68]|[2-4][1-9]|5[1-3689]|6[1-57-9]|7[1-7]|8[67]|9[4-8])|7(?:[1-467][1-9]|5[13-9]|8[1-69]|9[17])|8(?:1\\d|2[13-689]|3[1-6]|4[124-6]|6[1246-9]|7[1-378]|9[12479])|9(?:1[346-9]|2[1-4]|3[2-46-8]|5[1348]|[69][1-9]|7[12]|8[1-8]))|2(?:2\\d|3[1-35-8]|4[13-9]|7[1-689]|8[1-578]|9[467])|3(?:1[1-79]|[2458][1-9]|3\\d|7[1-8]|9[1-5])|4(?:1[1-57-9]|[25-7][1-9]|3[1-8]|4\\d|8[1-35-9]|9[2-689])|5(?:[56]\\d|88|9[1-79])|6(?:1[2-68]|[2-4][1-9]|5[1-3689]|6[1-57-9]|7[1-7]|8[67]|9[4-8])|7(?:[13467][1-9]|2\\d|5[13-9]|8[1-69]|9[17])|8(?:1\\d|2[13-689]|3[1-6]|4[124-6]|6[1246-9]|7[1-378]|9[12479])|9(?:1[346-9]|2[1-4]|3[2-46-8]|5[1348]|6[1-9]|7[12]|8[1-8]|9\\d))\\d{7}",
+,,,"12221234567",,,,[7,8]],[,,"8(?:00|88)\\d{7}",,,,"8001234567",,,[10]],[,,"900\\d{7}",,,,"9001234567",,,[10]],[,,"300\\d{7}",,,,"3001234567",,,[10]],[,,"500\\d{7}",,,,"5001234567",,,[10]],[,,,,,,,,,[-1]],"MX",52,"0[09]","01",,,"0(?:[12]|4[45])|1",,"00",,[[,"(\\d{5})","$1",["53"]],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["33|5[56]|81"],,,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["[2-9]"],,,1],[,"(\\d)(\\d{2})(\\d{4})(\\d{4})","$2 $3 $4",["1(?:33|5[56]|81)"],,,1],[,"(\\d)(\\d{3})(\\d{3})(\\d{4})",
+"$2 $3 $4",["1"],,,1]],[[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["33|5[56]|81"],,,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["[2-9]"],,,1],[,"(\\d)(\\d{2})(\\d{4})(\\d{4})","$2 $3 $4",["1(?:33|5[56]|81)"],,,1],[,"(\\d)(\\d{3})(\\d{3})(\\d{4})","$2 $3 $4",["1"],,,1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MY:[,[,,"1\\d{8,9}|(?:3\\d|[4-9])\\d{7}",,,,,,,[8,9,10],[6,7]],[,,"(?:3(?:2[0-36-9]|3[0-368]|4[0-278]|5[0-24-8]|6[0-467]|7[1246-9]|8\\d|9[0-57])\\d|4(?:2[0-689]|[3-79]\\d|8[1-35689])|5(?:2[0-589]|[3468]\\d|5[0-489]|7[1-9]|9[23])|6(?:2[2-9]|3[1357-9]|[46]\\d|5[0-6]|7[0-35-9]|85|9[015-8])|7(?:[2579]\\d|3[03-68]|4[0-8]|6[5-9]|8[0-35-9])|8(?:[24][2-8]|3[2-5]|5[2-7]|6[2-589]|7[2-578]|[89][2-9])|9(?:0[57]|13|[25-7]\\d|[3489][0-8]))\\d{5}",
+,,,"323856789",,,[8,9],[6,7]],[,,"1(?:1888[689]|4400|8(?:47|8[27])[0-4])\\d{4}|1(?:0(?:[23568]\\d|4[0-6]|7[016-9]|9[0-8])|1(?:[1-5]\\d\\d|6(?:0[5-9]|[1-9]\\d)|7(?:[0-4]\\d|5[0-6]))|(?:[269]\\d|[37][1-9]|4[235-9])\\d|5(?:31|9\\d\\d)|8(?:1[23]|[236]\\d|4[06]|5(?:46|[7-9])|7[016-9]|8[01]|9[0-8]))\\d{5}",,,,"123456789",,,[9,10]],[,,"1[378]00\\d{6}",,,,"1300123456",,,[10]],[,,"1600\\d{6}",,,,"1600123456",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"15(?:4(?:6[0-4]\\d|8(?:0[125]|[17]\\d|21|3[01]|4[01589]|5[014]|6[02]))|6(?:32[0-6]|78\\d))\\d{4}",
+,,,"1546012345",,,[10]],"MY",60,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{4})","$1-$2 $3",["[4-79]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1-$2 $3",["1(?:[02469]|[378][1-9]|53)|8","1(?:[02469]|[37][1-9]|53|8(?:[1-46-9]|5[7-9]))|8"],"0$1"],[,"(\\d)(\\d{4})(\\d{4})","$1-$2 $3",["3"],"0$1"],[,"(\\d)(\\d{3})(\\d{2})(\\d{4})","$1-$2-$3-$4",["1(?:[367]|80)"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1-$2 $3",["15"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4})","$1-$2 $3",["1"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,
+,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],MZ:[,[,,"(?:2|8\\d)\\d{7}",,,,,,,[8,9]],[,,"2(?:[1346]\\d|5[0-2]|[78][12]|93)\\d{5}",,,,"21123456",,,[8]],[,,"8[2-79]\\d{7}",,,,"821234567",,,[9]],[,,"800\\d{6}",,,,"800123456",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"MZ",258,"00",,,,,,,,[[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["2|8[2-79]"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NA:[,[,,"[68]\\d{7,8}",
+,,,,,,[8,9]],[,,"64426\\d{3}|6(?:1(?:2[2-7]|3[01378]|4[0-4])|254|32[0237]|4(?:27|41|5[25])|52[236-8]|626|7(?:2[2-4]|30))\\d{4,5}|6(?:1(?:(?:0\\d|2[0189]|3[24-69]|4[5-9])\\d|17|69|7[014])|2(?:17|5[0-36-8]|69|70)|3(?:17|2[14-689]|34|6[289]|7[01]|81)|4(?:17|2[0-2]|4[06]|5[0137]|69|7[01])|5(?:17|2[0459]|69|7[01])|6(?:17|25|38|42|69|7[01])|7(?:17|2[569]|3[13]|6[89]|7[01]))\\d{4}",,,,"61221234"],[,,"(?:60|8[1245])\\d{7}",,,,"811234567",,,[9]],[,,"80\\d{7}",,,,"800123456",,,[9]],[,,"8701\\d{5}",,,,"870123456",
+,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"8(?:3\\d\\d|86)\\d{5}",,,,"88612345"],"NA",264,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["88"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["6"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["87"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NC:[,[,,"(?:050|[2-57-9]\\d\\d)\\d{3}",,,,,,,[6]],[,,"(?:2[03-9]|3[0-5]|4[1-7]|88)\\d{4}",,,,"201234"],[,
+,"(?:5[0-4]|[79]\\d|8[0-79])\\d{4}",,,,"751234"],[,,"050\\d{3}",,,,"050012"],[,,"36\\d{4}",,,,"366711"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NC",687,"00",,,,,,,,[[,"(\\d{3})","$1",["5[6-8]"]],[,"(\\d{2})(\\d{2})(\\d{2})","$1.$2.$3",["[02-57-9]"]]],[[,"(\\d{2})(\\d{2})(\\d{2})","$1.$2.$3",["[02-57-9]"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NE:[,[,,"[027-9]\\d{7}",,,,,,,[8]],[,,"2(?:0(?:20|3[1-8]|4[13-5]|5[14]|6[14578]|7[1-578])|1(?:4[145]|5[14]|6[14-68]|7[169]|88))\\d{4}",
+,,,"20201234"],[,,"(?:23|7[047]|[89]\\d)\\d{6}",,,,"93123456"],[,,"08\\d{6}",,,,"08123456"],[,,"09\\d{6}",,,,"09123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NE",227,"00",,,,,,,,[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["08"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[089]|2[013]|7[047]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NF:[,[,,"[13]\\d{5}",,,,,,,[6],[5]],[,,"(?:1(?:06|17|28|39)|3[0-2]\\d)\\d{3}",,,,"106609",,,,[5]],[,,"(?:14|3[58])\\d{4}",
+,,,"381234",,,,[5]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NF",672,"00",,,,"([0-258]\\d{4})$","3$1",,,[[,"(\\d{2})(\\d{4})","$1 $2",["1[0-3]"]],[,"(\\d)(\\d{5})","$1 $2",["[13]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NG:[,[,,"(?:[124-7]|9\\d{3})\\d{6}|[1-9]\\d{7}|[78]\\d{9,13}",,,,,,,[7,8,10,11,12,13,14],[5,6]],[,,"(?:(?:[1-356]\\d|4[02-8]|8[2-9])\\d|9(?:0[3-9]|[1-9]\\d))\\d{5}|7(?:0(?:[013-689]\\d|2[0-24-9])\\d{3,4}|[1-79]\\d{6})|(?:[12]\\d|4[147]|5[14579]|6[1578]|7[1-3578])\\d{5}",
+,,,"18040123",,,[7,8],[5,6]],[,,"(?:702[0-24-9]|819[01])\\d{6}|(?:70[13-689]|8(?:0[1-9]|1[0-8])|9(?:0[1-9]|1[1-356]))\\d{7}",,,,"8021234567",,,[10]],[,,"800\\d{7,11}",,,,"80017591759",,,[10,11,12,13,14]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NG",234,"009","0",,,"0",,,,[[,"(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3",["78"],"0$1"],[,"(\\d)(\\d{3})(\\d{3,4})","$1 $2 $3",["[12]|9(?:0[3-9]|[1-9])"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2,3})","$1 $2 $3",["[3-7]|8[2-9]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3,4})",
+"$1 $2 $3",["[7-9]"],"0$1"],[,"(\\d{3})(\\d{4})(\\d{4,5})","$1 $2 $3",["[78]"],"0$1"],[,"(\\d{3})(\\d{5})(\\d{5,6})","$1 $2 $3",["[78]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"700\\d{7,11}",,,,"7001234567",,,[10,11,12,13,14]],,,[,,,,,,,,,[-1]]],NI:[,[,,"(?:1800|[25-8]\\d{3})\\d{4}",,,,,,,[8]],[,,"2\\d{7}",,,,"21234567"],[,,"(?:5(?:5[0-7]|[78]\\d)|6(?:20|3[035]|4[045]|5[05]|77|8[1-9]|9[059])|(?:7[5-8]|8\\d)\\d)\\d{5}",,,,"81234567"],[,,"1800\\d{4}",,,,"18001234"],[,,,,,,,,,[-1]],[,,,,,,,,,
+[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NI",505,"00",,,,,,,,[[,"(\\d{4})(\\d{4})","$1 $2",["[125-8]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NL:[,[,,"(?:[124-7]\\d\\d|3(?:[02-9]\\d|1[0-8]))\\d{6}|8\\d{6,9}|9\\d{6,10}|1\\d{4,5}",,,,,,,[5,6,7,8,9,10,11]],[,,"(?:1(?:[035]\\d|1[13-578]|6[124-8]|7[24]|8[0-467])|2(?:[0346]\\d|2[2-46-9]|5[125]|9[479])|3(?:[03568]\\d|1[3-8]|2[01]|4[1-8])|4(?:[0356]\\d|1[1-368]|7[58]|8[15-8]|9[23579])|5(?:[0358]\\d|[19][1-9]|2[1-57-9]|4[13-8]|6[126]|7[0-3578])|7\\d\\d)\\d{6}",
+,,,"101234567",,,[9]],[,,"(?:6[1-58]|970\\d)\\d{7}",,,,"612345678",,,[9,11]],[,,"800\\d{4,7}",,,,"8001234",,,[7,8,9,10]],[,,"90[069]\\d{4,7}",,,,"9061234",,,[7,8,9,10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:85|91)\\d{7}",,,,"851234567",,,[9]],"NL",31,"00","0",,,"0",,,,[[,"(\\d{4})","$1",["1[238]|[34]"]],[,"(\\d{2})(\\d{3,4})","$1 $2",["14"]],[,"(\\d{6})","$1",["1"]],[,"(\\d{3})(\\d{4,7})","$1 $2",["[89]0"],"0$1"],[,"(\\d{2})(\\d{7})","$1 $2",["66"],"0$1"],[,"(\\d)(\\d{8})","$1 $2",["6"],"0$1"],[,
+"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["1[16-8]|2[259]|3[124]|4[17-9]|5[124679]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[1-578]|91"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{5})","$1 $2 $3",["9"],"0$1"]],[[,"(\\d{3})(\\d{4,7})","$1 $2",["[89]0"],"0$1"],[,"(\\d{2})(\\d{7})","$1 $2",["66"],"0$1"],[,"(\\d)(\\d{8})","$1 $2",["6"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["1[16-8]|2[259]|3[124]|4[17-9]|5[124679]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[1-578]|91"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{5})",
+"$1 $2 $3",["9"],"0$1"]],[,,"66\\d{7}",,,,"662345678",,,[9]],,,[,,"140(?:1[035]|2[0346]|3[03568]|4[0356]|5[0358]|8[458])|140(?:1[16-8]|2[259]|3[124]|4[17-9]|5[124679]|7)\\d",,,,,,,[5,6]],[,,"140(?:1[035]|2[0346]|3[03568]|4[0356]|5[0358]|8[458])|(?:140(?:1[16-8]|2[259]|3[124]|4[17-9]|5[124679]|7)|8[478]\\d{6})\\d",,,,"14020",,,[5,6,9]],,,[,,,,,,,,,[-1]]],NO:[,[,,"(?:0|[2-9]\\d{3})\\d{4}",,,,,,,[5,8]],[,,"(?:2[1-4]|3[1-3578]|5[1-35-7]|6[1-4679]|7[0-8])\\d{6}",,,,"21234567",,,[8]],[,,"(?:4[015-8]|59|9\\d)\\d{6}",
+,,,"40612345",,,[8]],[,,"80[01]\\d{5}",,,,"80012345",,,[8]],[,,"82[09]\\d{5}",,,,"82012345",,,[8]],[,,"810(?:0[0-6]|[2-8]\\d)\\d{3}",,,,"81021234",,,[8]],[,,"880\\d{5}",,,,"88012345",,,[8]],[,,"85[0-5]\\d{5}",,,,"85012345",,,[8]],"NO",47,"00",,,,,,,,[[,"(\\d{3})(\\d{2})(\\d{3})","$1 $2 $3",["8"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[2-79]"]]],,[,,,,,,,,,[-1]],1,"[02-689]|7[0-8]",[,,,,,,,,,[-1]],[,,"(?:0[2-9]|81(?:0(?:0[7-9]|1\\d)|5\\d\\d))\\d{3}",,,,"02000"],,,[,,"81[23]\\d{5}",,
+,,"81212345",,,[8]]],NP:[,[,,"(?:1\\d|9)\\d{9}|[1-9]\\d{7}",,,,,,,[8,10,11],[6,7]],[,,"(?:1[0-6]\\d|99[02-6])\\d{5}|(?:2[13-79]|3[135-8]|4[146-9]|5[135-7]|6[13-9]|7[15-9]|8[1-46-9]|9[1-7])[2-6]\\d{5}",,,,"14567890",,,[8],[6,7]],[,,"9(?:6[0-3]|7[024-6]|8[0-24-68])\\d{7}",,,,"9841234567",,,[10]],[,,"1(?:66001|800\\d\\d)\\d{5}",,,,"16600101234",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NP",977,"00","0",,,"0",,,,[[,"(\\d)(\\d{7})","$1-$2",["1[2-6]"],"0$1"],[,"(\\d{2})(\\d{6})",
+"$1-$2",["1[01]|[2-8]|9(?:[1-59]|[67][2-6])"],"0$1"],[,"(\\d{3})(\\d{7})","$1-$2",["9"]],[,"(\\d{4})(\\d{2})(\\d{5})","$1-$2-$3",["1"]]],[[,"(\\d)(\\d{7})","$1-$2",["1[2-6]"],"0$1"],[,"(\\d{2})(\\d{6})","$1-$2",["1[01]|[2-8]|9(?:[1-59]|[67][2-6])"],"0$1"],[,"(\\d{3})(\\d{7})","$1-$2",["9"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NR:[,[,,"(?:444|(?:55|8\\d)\\d|666)\\d{4}",,,,,,,[7]],[,,"444\\d{4}",,,,"4441234"],[,,"(?:55[3-9]|666|8\\d\\d)\\d{4}",,,,"5551234"],[,,,,,,
+,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NR",674,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[4-68]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NU:[,[,,"(?:[47]|888\\d)\\d{3}",,,,,,,[4,7]],[,,"[47]\\d{3}",,,,"7012",,,[4]],[,,"888[4-9]\\d{3}",,,,"8884012",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"NU",683,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,
+,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],NZ:[,[,,"[29]\\d{7,9}|50\\d{5}(?:\\d{2,3})?|6[0-35-9]\\d{6}|7\\d{7,8}|8\\d{4,9}|(?:11\\d|[34])\\d{7}",,,,,,,[5,6,7,8,9,10]],[,,"24099\\d{3}|(?:3[2-79]|[49][2-9]|6[235-9]|7[2-57-9])\\d{6}",,,,"32345678",,,[8],[7]],[,,"2[0-27-9]\\d{7,8}|2(?:1\\d|75)\\d{5}",,,,"211234567",,,[8,9,10]],[,,"508\\d{6,7}|80\\d{6,8}",,,,"800123456",,,[8,9,10]],[,,"(?:11\\d{5}|50(?:0[08]|30|66|77|88))\\d{3}|90\\d{6,8}",,,,"900123456",,,[7,8,9,10]],[,,,,,,,,,[-1]],[,,"70\\d{7}",,,,"701234567",
+,,[9]],[,,,,,,,,,[-1]],"NZ",64,"0(?:0|161)","0",,,"0",,"00",,[[,"(\\d{2})(\\d{3,8})","$1 $2",["8[1-579]"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2,3})","$1 $2 $3",["50[036-8]|[89]0","50(?:[0367]|88)|[89]0"],"0$1"],[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["24|[346]|7[2-57-9]|9[2-9]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["2(?:10|74)|[59]|80"],"0$1"],[,"(\\d{2})(\\d{3,4})(\\d{4})","$1 $2 $3",["1|2[028]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,5})","$1 $2 $3",["2(?:[169]|7[0-35-9])|7|86"],"0$1"]],,[,,"[28]6\\d{6,7}",
+,,,"26123456",,,[8,9]],,,[,,,,,,,,,[-1]],[,,"8(?:1[6-9]|22|3\\d|4[045]|5[459]|7[0-3579]|90)\\d{2,7}",,,,"83012378"],,,[,,,,,,,,,[-1]]],OM:[,[,,"(?:1505|[279]\\d{3}|500)\\d{4}|800\\d{5,6}",,,,,,,[7,8,9]],[,,"2[1-6]\\d{6}",,,,"23123456",,,[8]],[,,"1505\\d{4}|(?:7(?:[1289]\\d|69|7[0-5])|9(?:0[1-9]|[1-9]\\d))\\d{5}",,,,"92123456",,,[8]],[,,"8007\\d{4,5}|(?:500|800[05])\\d{4}",,,,"80071234"],[,,"900\\d{5}",,,,"90012345",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"OM",968,"00",,,,,,,,[[,"(\\d{3})(\\d{4,6})",
+"$1 $2",["[58]"]],[,"(\\d{2})(\\d{6})","$1 $2",["2"]],[,"(\\d{4})(\\d{4})","$1 $2",["[179]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PA:[,[,,"(?:00800|8\\d{3})\\d{6}|[68]\\d{7}|[1-57-9]\\d{6}",,,,,,,[7,8,10,11]],[,,"(?:1(?:0\\d|1[479]|2[37]|3[0137]|4[17]|5[05]|6[58]|7[0167]|8[2358]|9[1389])|2(?:[0235-79]\\d|1[0-7]|4[013-9]|8[02-9])|3(?:[089]\\d|1[0-7]|2[0-5]|33|4[0-79]|5[0-35]|6[068]|7[0-8])|4(?:00|3[0-579]|4\\d|7[0-57-9])|5(?:[01]\\d|2[0-7]|[56]0|79)|7(?:0[09]|2[0-26-8]|3[03]|4[04]|5[05-9]|6[056]|7[0-24-9]|8[5-9]|90)|8(?:09|2[89]|3\\d|4[0-24-689]|5[014]|8[02])|9(?:0[5-9]|1[0135-8]|2[036-9]|3[35-79]|40|5[0457-9]|6[05-9]|7[04-9]|8[35-8]|9\\d))\\d{4}",
+,,,"2001234",,,[7]],[,,"(?:1[16]1|21[89]|6\\d{3}|8(?:1[01]|7[23]))\\d{4}",,,,"61234567",,,[7,8]],[,,"800\\d{4,5}|(?:00800|800\\d)\\d{6}",,,,"8001234"],[,,"(?:8(?:22|55|60|7[78]|86)|9(?:00|81))\\d{4}",,,,"8601234",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"PA",507,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1-$2",["[1-57-9]"]],[,"(\\d{4})(\\d{4})","$1-$2",["[68]"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PE:[,[,,"(?:[14-8]|9\\d)\\d{7}",
+,,,,,,[8,9],[6,7]],[,,"(?:(?:4[34]|5[14])[0-8]\\d|7(?:173|3[0-8]\\d)|8(?:10[05689]|6(?:0[06-9]|1[6-9]|29)|7(?:0[569]|[56]0)))\\d{4}|(?:1[0-8]|4[12]|5[236]|6[1-7]|7[246]|8[2-4])\\d{6}",,,,"11234567",,,[8],[6,7]],[,,"9\\d{8}",,,,"912345678",,,[9]],[,,"800\\d{5}",,,,"80012345",,,[8]],[,,"805\\d{5}",,,,"80512345",,,[8]],[,,"801\\d{5}",,,,"80112345",,,[8]],[,,"80[24]\\d{5}",,,,"80212345",,,[8]],[,,,,,,,,,[-1]],"PE",51,"00|19(?:1[124]|77|90)00","0"," Anexo ",,"0",,"00",,[[,"(\\d{3})(\\d{5})","$1 $2",["80"],
+"(0$1)"],[,"(\\d)(\\d{7})","$1 $2",["1"],"(0$1)"],[,"(\\d{2})(\\d{6})","$1 $2",["[4-8]"],"(0$1)"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["9"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PF:[,[,,"4\\d{5}(?:\\d{2})?|8\\d{7,8}",,,,,,,[6,8,9]],[,,"4(?:0[4-689]|9[4-68])\\d{5}",,,,"40412345",,,[8]],[,,"8[7-9]\\d{6}",,,,"87123456",,,[8]],[,,"80[0-5]\\d{6}",,,,"800012345",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"499\\d{5}",,,,"49901234",,,[8]],"PF",689,"00",
+,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3",["44"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["4|8[7-9]"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"]]],,[,,,,,,,,,[-1]],,,[,,"44\\d{4}",,,,,,,[6]],[,,"44\\d{4}",,,,"440123",,,[6]],,,[,,,,,,,,,[-1]]],PG:[,[,,"(?:180|[78]\\d{3})\\d{4}|(?:[2-589]\\d|64)\\d{5}",,,,,,,[7,8]],[,,"(?:(?:3[0-2]|4[257]|5[34]|9[78])\\d|64[1-9]|85[02-46-9])\\d{4}",,,,"3123456",,,[7]],[,,"(?:7\\d|8[128])\\d{6}",,,,"70123456",,,[8]],[,,"180\\d{4}",,,
+,"1801234",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"2(?:0[0-57]|7[568])\\d{4}",,,,"2751234",,,[7]],"PG",675,"00|140[1-3]",,,,,,"00",,[[,"(\\d{3})(\\d{4})","$1 $2",["18|[2-69]|85"]],[,"(\\d{4})(\\d{4})","$1 $2",["[78]"]]],,[,,"27[01]\\d{4}",,,,"2700123",,,[7]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PH:[,[,,"(?:[2-7]|9\\d)\\d{8}|2\\d{5}|(?:1800|8)\\d{7,9}",,,,,,,[6,8,9,10,11,12,13],[4,5,7]],[,,"(?:(?:2[3-8]|3[2-68]|4[2-9]|5[2-6]|6[2-58]|7[24578])\\d{3}|88(?:22\\d\\d|42))\\d{4}|(?:2|8[2-8]\\d\\d)\\d{5}",
+,,,"232345678",,,[6,8,9,10],[4,5,7]],[,,"(?:8(?:1[37]|9[5-8])|9(?:0[5-9]|1[0-24-9]|[235-7]\\d|4[2-9]|8[135-9]|9[1-9]))\\d{7}",,,,"9051234567",,,[10]],[,,"1800\\d{7,9}",,,,"180012345678",,,[11,12,13]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"PH",63,"00","0",,,"0",,,,[[,"(\\d)(\\d{5})","$1 $2",["2"],"(0$1)"],[,"(\\d{4})(\\d{4,6})","$1 $2",["3(?:23|39|46)|4(?:2[3-6]|[35]9|4[26]|76)|544|88[245]|(?:52|64|86)2","3(?:230|397|461)|4(?:2(?:35|[46]4|51)|396|4(?:22|63)|59[347]|76[15])|5(?:221|446)|642[23]|8(?:622|8(?:[24]2|5[13]))"],
+"(0$1)"],[,"(\\d{5})(\\d{4})","$1 $2",["346|4(?:27|9[35])|883","3469|4(?:279|9(?:30|56))|8834"],"(0$1)"],[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["2"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[3-7]|8[2-8]"],"(0$1)"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["[89]"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["1"]],[,"(\\d{4})(\\d{1,2})(\\d{3})(\\d{4})","$1 $2 $3 $4",["1"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PK:[,[,,"122\\d{6}|[24-8]\\d{10,11}|9(?:[013-9]\\d{8,10}|2(?:[01]\\d\\d|2(?:[06-8]\\d|1[01]))\\d{7})|(?:[2-8]\\d{3}|92(?:[0-7]\\d|8[1-9]))\\d{6}|[24-9]\\d{8}|[89]\\d{7}",
+,,,,,,[8,9,10,11,12],[5,6,7]],[,,"(?:(?:21|42)[2-9]|58[126])\\d{7}|(?:2[25]|4[0146-9]|5[1-35-7]|6[1-8]|7[14]|8[16]|91)[2-9]\\d{6,7}|(?:2(?:3[2358]|4[2-4]|9[2-8])|45[3479]|54[2-467]|60[468]|72[236]|8(?:2[2-689]|3[23578]|4[3478]|5[2356])|9(?:2[2-8]|3[27-9]|4[2-6]|6[3569]|9[25-8]))[2-9]\\d{5,6}",,,,"2123456789",,,[9,10],[5,6,7,8]],[,,"3(?:[0-24]\\d|3[0-7]|55|64)\\d{7}",,,,"3012345678",,,[10]],[,,"800\\d{5}(?:\\d{3})?",,,,"80012345",,,[8,11]],[,,"900\\d{5}",,,,"90012345",,,[8]],[,,,,,,,,,[-1]],[,,"122\\d{6}",
+,,,"122044444",,,[9]],[,,,,,,,,,[-1]],"PK",92,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3})(\\d{2,7})","$1 $2 $3",["[89]0"],"0$1"],[,"(\\d{4})(\\d{5})","$1 $2",["1"]],[,"(\\d{3})(\\d{6,7})","$1 $2",["2(?:3[2358]|4[2-4]|9[2-8])|45[3479]|54[2-467]|60[468]|72[236]|8(?:2[2-689]|3[23578]|4[3478]|5[2356])|9(?:2[2-8]|3[27-9]|4[2-6]|6[3569]|9[25-8])","9(?:2[3-8]|98)|(?:2(?:3[2358]|4[2-4]|9[2-8])|45[3479]|54[2-467]|60[468]|72[236]|8(?:2[2-689]|3[23578]|4[3478]|5[2356])|9(?:22|3[27-9]|4[2-6]|6[3569]|9[25-7]))[2-9]"],
+"(0$1)"],[,"(\\d{2})(\\d{7,8})","$1 $2",["(?:2[125]|4[0-246-9]|5[1-35-7]|6[1-8]|7[14]|8[16]|91)[2-9]"],"(0$1)"],[,"(\\d{5})(\\d{5})","$1 $2",["58"],"(0$1)"],[,"(\\d{3})(\\d{7})","$1 $2",["3"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["2[125]|4[0-246-9]|5[1-35-7]|6[1-8]|7[14]|8[16]|91"],"(0$1)"],[,"(\\d{3})(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["[24-9]"],"(0$1)"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"(?:2(?:[125]|3[2358]|4[2-4]|9[2-8])|4(?:[0-246-9]|5[3479])|5(?:[1-35-7]|4[2-467])|6(?:0[468]|[1-8])|7(?:[14]|2[236])|8(?:[16]|2[2-689]|3[23578]|4[3478]|5[2356])|9(?:1|22|3[27-9]|4[2-6]|6[3569]|9[2-7]))111\\d{6}",
+,,,"21111825888",,,[11,12]],,,[,,,,,,,,,[-1]]],PL:[,[,,"(?:6|8\\d\\d)\\d{7}|[1-9]\\d{6}(?:\\d{2})?|[26]\\d{5}",,,,,,,[6,7,8,9,10]],[,,"47\\d{7}|(?:1[2-8]|2[2-69]|3[2-4]|4[1-468]|5[24-689]|6[1-3578]|7[14-7]|8[1-79]|9[145])(?:[02-9]\\d{6}|1(?:[0-8]\\d{5}|9\\d{3}(?:\\d{2})?))",,,,"123456789",,,[7,9]],[,,"21(?:1(?:[145]\\d|3[1-5])|2[0-4]\\d)\\d{4}|(?:45|5[0137]|6[069]|7[2389]|88)\\d{7}",,,,"512345678",,,[9]],[,,"800\\d{6,7}",,,,"800123456",,,[9,10]],[,,"70[01346-8]\\d{6}",,,,"701234567",,,[9]],[,,"801\\d{6}",
+,,,"801234567",,,[9]],[,,,,,,,,,[-1]],[,,"39\\d{7}",,,,"391234567",,,[9]],"PL",48,"00",,,,,,,,[[,"(\\d{5})","$1",["19"]],[,"(\\d{3})(\\d{3})","$1 $2",["11|20|64"]],[,"(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3",["(?:1[2-8]|2[2-69]|3[2-4]|4[1-468]|5[24-689]|6[1-3578]|7[14-7]|8[1-79]|9[145])1","(?:1[2-8]|2[2-69]|3[2-4]|4[1-468]|5[24-689]|6[1-3578]|7[14-7]|8[1-79]|9[145])19"]],[,"(\\d{3})(\\d{2})(\\d{2,3})","$1 $2 $3",["64"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["21|39|45|5[0137]|6[0469]|7[02389]|8(?:0[14]|8)"]],
+[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["1[2-8]|[2-7]|8[1-79]|9[145]"]],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["8"]]],,[,,"64\\d{4,7}",,,,"641234567",,,[6,7,8,9]],,,[,,,,,,,,,[-1]],[,,"804\\d{6}",,,,"804123456",,,[9]],,,[,,,,,,,,,[-1]]],PM:[,[,,"[45]\\d{5}|(?:708|80\\d)\\d{6}",,,,,,,[6,9]],[,,"(?:4[1-356]|50)\\d{4}",,,,"430123",,,[6]],[,,"(?:4[02-4]|5[056]|708[45][0-5])\\d{4}",,,,"551234"],[,,"80[0-5]\\d{6}",,,,"800012345",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,
+,,,,,,,[-1]],"PM",508,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3",["[45]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["7"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PR:[,[,,"(?:[589]\\d\\d|787)\\d{7}",,,,,,,[10],[7]],[,,"(?:787|939)[2-9]\\d{6}",,,,"7872345678",,,,[7]],[,,"(?:787|939)[2-9]\\d{6}",,,,"7872345678",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002345678"],[,,"900[2-9]\\d{6}",
+,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"PR",1,"011","1",,,"1",,,1,,,[,,,,,,,,,[-1]],,"787|939",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PS:[,[,,"[2489]2\\d{6}|(?:1\\d|5)\\d{8}",,,,,,,[8,9,10],[7]],[,,"(?:22[2-47-9]|42[45]|82[014-68]|92[3569])\\d{5}",
+,,,"22234567",,,[8],[7]],[,,"5[69]\\d{7}",,,,"599123456",,,[9]],[,,"1800\\d{6}",,,,"1800123456",,,[10]],[,,,,,,,,,[-1]],[,,"1700\\d{6}",,,,"1700123456",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"PS",970,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["[2489]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["5"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PT:[,[,,"1693\\d{5}|(?:[26-9]\\d|30)\\d{7}",,,,,,,[9]],
+[,,"2(?:[12]\\d|3[1-689]|4[1-59]|[57][1-9]|6[1-35689]|8[1-69]|9[1256])\\d{6}",,,,"212345678"],[,,"6(?:[06]92(?:30|9\\d)|[35]92(?:3[03]|9\\d))\\d{3}|(?:(?:16|6[0356])93|9(?:[1-36]\\d\\d|480))\\d{5}",,,,"912345678"],[,,"80[02]\\d{6}",,,,"800123456"],[,,"(?:6(?:0[178]|4[68])\\d|76(?:0[1-57]|1[2-47]|2[237]))\\d{5}",,,,"760123456"],[,,"80(?:8\\d|9[1579])\\d{5}",,,,"808123456"],[,,"884[0-4689]\\d{5}",,,,"884123456"],[,,"30\\d{7}",,,,"301234567"],"PT",351,"00",,,,,,,,[[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",
+["2[12]"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["16|[236-9]"]]],,[,,"6222\\d{5}",,,,"622212345"],,,[,,,,,,,,,[-1]],[,,"70(?:38[01]|596|(?:7\\d|8[17])\\d)\\d{4}",,,,"707123456"],,,[,,"600\\d{6}|6[06]9233\\d{3}",,,,"600110000"]],PW:[,[,,"(?:[24-8]\\d\\d|345|900)\\d{4}",,,,,,,[7]],[,,"(?:2(?:55|77)|345|488|5(?:35|44|87)|6(?:22|54|79)|7(?:33|47)|8(?:24|55|76)|900)\\d{4}",,,,"2771234"],[,,"(?:(?:46|83)[0-5]|6[2-4689]0)\\d{4}|(?:45|77|88)\\d{5}",,,,"6201234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,
+,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"PW",680,"01[12]",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[2-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],PY:[,[,,"59\\d{4,6}|9\\d{5,10}|(?:[2-46-8]\\d|5[0-8])\\d{4,7}",,,,,,,[6,7,8,9,10,11],[5]],[,,"(?:[26]1|3[289]|4[1246-8]|7[1-3]|8[1-36])\\d{5,7}|(?:2(?:2[4-68]|[4-68]\\d|7[15]|9[1-5])|3(?:18|3[167]|4[2357]|51|[67]\\d)|4(?:3[12]|5[13]|9[1-47])|5(?:[1-4]\\d|5[02-4])|6(?:3[1-3]|44|7[1-8])|7(?:4[0-4]|5\\d|6[1-578]|75|8[0-8])|858)\\d{5,6}",
+,,,"212345678",,,[7,8,9],[5,6]],[,,"9(?:51|6[129]|[78][1-6]|9[1-5])\\d{6}",,,,"961456789",,,[9]],[,,"9800\\d{5,7}",,,,"98000123456",,,[9,10,11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"8700[0-4]\\d{4}",,,,"870012345",,,[9]],"PY",595,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3,6})","$1 $2",["[2-9]0"],"0$1"],[,"(\\d{2})(\\d{5})","$1 $2",["[26]1|3[289]|4[1246-8]|7[1-3]|8[1-36]"],"(0$1)"],[,"(\\d{3})(\\d{4,5})","$1 $2",["2[279]|3[13-5]|4[359]|5|6(?:[34]|7[1-46-8])|7[46-8]|85"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{3,4})",
+"$1 $2 $3",["2[14-68]|3[26-9]|4[1246-8]|6(?:1|75)|7[1-35]|8[1-36]"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["87"]],[,"(\\d{3})(\\d{6})","$1 $2",["9(?:[5-79]|8[1-6])"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[2-8]"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["9"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"[2-9]0\\d{4,7}",,,,"201234567",,,[6,7,8,9]],,,[,,,,,,,,,[-1]]],QA:[,[,,"800\\d{4}|(?:2|800)\\d{6}|(?:0080|[3-7])\\d{7}",,,,,,,[7,8,9,11]],[,,"4(?:1111|2022)\\d{3}|4(?:[04]\\d\\d|14[0-6]|999)\\d{4}",
+,,,"44123456",,,[8]],[,,"[35-7]\\d{7}",,,,"33123456",,,[8]],[,,"800\\d{4}|(?:0080[01]|800)\\d{6}",,,,"8001234",,,[7,9,11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"QA",974,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["2[16]|8"]],[,"(\\d{4})(\\d{4})","$1 $2",["[3-7]"]]],,[,,"2[16]\\d{5}",,,,"2123456",,,[7]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],RE:[,[,,"(?:26|[689]\\d)\\d{7}",,,,,,,[9]],[,,"26(?:2\\d\\d|3(?:0\\d|1[0-3]))\\d{4}",,,,"262161234"],[,,"(?:69(?:2\\d\\d|3(?:0[0-46]|1[013]|2[0-2]|3[0-39]|4\\d|5[0-5]|6[0-6]|7[0-27]|8[0-8]|9[0-479]))|9(?:399[0-3]|479[0-2]|76(?:2[27]|3[0-37]|9\\d)))\\d{4}",
+,,,"692123456"],[,,"80\\d{7}",,,,"801234567"],[,,"89[1-37-9]\\d{6}",,,,"891123456"],[,,"8(?:1[019]|2[0156]|84|90)\\d{6}",,,,"810123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"RE",262,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[2689]"],"0$1"]],,[,,,,,,,,,[-1]],1,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],RO:[,[,,"(?:[2378]\\d|90)\\d{7}|[23]\\d{5}",,,,,,,[6,9]],[,,"[23][13-6]\\d{7}|(?:2(?:19\\d|[3-6]\\d9)|31\\d\\d)\\d\\d",,,,"211234567"],[,,"7020\\d{5}|7(?:0[013-9]|1[0-3]|[2-7]\\d|8[03-8]|9[0-29])\\d{6}",
+,,,"712034567",,,[9]],[,,"800\\d{6}",,,,"800123456",,,[9]],[,,"90[0136]\\d{6}",,,,"900123456",,,[9]],[,,"801\\d{6}",,,,"801123456",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"RO",40,"00","0"," int ",,"0",,,,[[,"(\\d{3})(\\d{3})","$1 $2",["2[3-6]","2[3-6]\\d9"],"0$1"],[,"(\\d{2})(\\d{4})","$1 $2",["219|31"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[23]1"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[237-9]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"(?:37\\d|80[578])\\d{6}",,,,"372123456",
+,,[9]],,,[,,,,,,,,,[-1]]],RS:[,[,,"38[02-9]\\d{6,9}|6\\d{7,9}|90\\d{4,8}|38\\d{5,6}|(?:7\\d\\d|800)\\d{3,9}|(?:[12]\\d|3[0-79])\\d{5,10}",,,,,,,[6,7,8,9,10,11,12],[4,5]],[,,"(?:11[1-9]\\d|(?:2[389]|39)(?:0[2-9]|[2-9]\\d))\\d{3,8}|(?:1[02-9]|2[0-24-7]|3[0-8])[2-9]\\d{4,9}",,,,"10234567",,,[7,8,9,10,11,12],[4,5,6]],[,,"6(?:[0-689]|7\\d)\\d{6,7}",,,,"601234567",,,[8,9,10]],[,,"800\\d{3,9}",,,,"80012345"],[,,"(?:78\\d|90[0169])\\d{3,7}",,,,"90012345",,,[6,7,8,9,10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,
+,,,,,,,,[-1]],"RS",381,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3,9})","$1 $2",["(?:2[389]|39)0|[7-9]"],"0$1"],[,"(\\d{2})(\\d{5,10})","$1 $2",["[1-36]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"7[06]\\d{4,10}",,,,"700123456"],,,[,,,,,,,,,[-1]]],RU:[,[,,"8\\d{13}|[347-9]\\d{9}",,,,,,,[10,14],[7]],[,,"(?:3(?:0[12]|4[1-35-79]|5[1-3]|65|8[1-58]|9[0145])|4(?:01|1[1356]|2[13467]|7[1-5]|8[1-7]|9[1-689])|8(?:1[1-8]|2[01]|3[13-6]|4[0-8]|5[15]|6[1-35-79]|7[1-37-9]))\\d{7}",,,,"3011234567",,,[10],[7]],[,,"9\\d{9}",
+,,,"9123456789",,,[10]],[,,"8(?:0[04]|108\\d{3})\\d{7}",,,,"8001234567"],[,,"80[39]\\d{7}",,,,"8091234567",,,[10]],[,,,,,,,,,[-1]],[,,"808\\d{7}",,,,"8081234567",,,[10]],[,,,,,,,,,[-1]],"RU",7,"810","8",,,"8",,"8~10",,[[,"(\\d{3})(\\d{2})(\\d{2})","$1-$2-$3",["[0-79]"]],[,"(\\d{4})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["7(?:1[0-8]|2[1-9])","7(?:1(?:[0-356]2|4[29]|7|8[27])|2(?:1[23]|[2-9]2))","7(?:1(?:[0-356]2|4[29]|7|8[27])|2(?:13[03-69]|62[013-9]))|72[1-57-9]2"],"8 ($1)",,1],[,"(\\d{5})(\\d)(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["7(?:1[0-68]|2[1-9])","7(?:1(?:[06][3-6]|[18]|2[35]|[3-5][3-5])|2(?:[13][3-5]|[24-689]|7[457]))","7(?:1(?:0(?:[356]|4[023])|[18]|2(?:3[013-9]|5)|3[45]|43[013-79]|5(?:3[1-8]|4[1-7]|5)|6(?:3[0-35-9]|[4-6]))|2(?:1(?:3[178]|[45])|[24-689]|3[35]|7[457]))|7(?:14|23)4[0-8]|71(?:33|45)[1-79]"],"8 ($1)",,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["7"],"8 ($1)",,1],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})","$1 $2-$3-$4",["[349]|8(?:[02-7]|1[1-8])"],"8 ($1)",,1],[,"(\\d{4})(\\d{4})(\\d{3})(\\d{3})",
+"$1 $2 $3 $4",["8"],"8 ($1)"]],[[,"(\\d{4})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["7(?:1[0-8]|2[1-9])","7(?:1(?:[0-356]2|4[29]|7|8[27])|2(?:1[23]|[2-9]2))","7(?:1(?:[0-356]2|4[29]|7|8[27])|2(?:13[03-69]|62[013-9]))|72[1-57-9]2"],"8 ($1)",,1],[,"(\\d{5})(\\d)(\\d{2})(\\d{2})","$1 $2 $3 $4",["7(?:1[0-68]|2[1-9])","7(?:1(?:[06][3-6]|[18]|2[35]|[3-5][3-5])|2(?:[13][3-5]|[24-689]|7[457]))","7(?:1(?:0(?:[356]|4[023])|[18]|2(?:3[013-9]|5)|3[45]|43[013-79]|5(?:3[1-8]|4[1-7]|5)|6(?:3[0-35-9]|[4-6]))|2(?:1(?:3[178]|[45])|[24-689]|3[35]|7[457]))|7(?:14|23)4[0-8]|71(?:33|45)[1-79]"],
+"8 ($1)",,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["7"],"8 ($1)",,1],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})","$1 $2-$3-$4",["[349]|8(?:[02-7]|1[1-8])"],"8 ($1)",,1],[,"(\\d{4})(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3 $4",["8"],"8 ($1)"]],[,,,,,,,,,[-1]],1,"3[04-689]|[489]",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],RW:[,[,,"(?:06|[27]\\d\\d|[89]00)\\d{6}",,,,,,,[8,9]],[,,"(?:06|2[23568]\\d)\\d{6}",,,,"250123456"],[,,"7[2389]\\d{7}",,,,"720123456",,,[9]],[,,"800\\d{6}",,,,"800123456",,,[9]],[,,
+"900\\d{6}",,,,"900123456",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"RW",250,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["0"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[7-9]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["2"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SA:[,[,,"92\\d{7}|(?:[15]|8\\d)\\d{8}",,,,,,,[9,10],[7]],[,,"1(?:1\\d|2[24-8]|3[35-8]|4[3-68]|6[2-5]|7[235-7])\\d{6}",,,,"112345678",,,[9],[7]],[,,"579[01]\\d{5}|5(?:[013-689]\\d|7[0-35-8])\\d{6}",
+,,,"512345678",,,[9]],[,,"800\\d{7}",,,,"8001234567",,,[10]],[,,"925\\d{6}",,,,"925012345",,,[9]],[,,"920\\d{6}",,,,"920012345",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"SA",966,"00","0",,,"0",,,,[[,"(\\d{4})(\\d{5})","$1 $2",["9"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["1"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["5"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["81"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"811\\d{7}",,,,"8110123456",
+,,[10]],,,[,,,,,,,,,[-1]]],SB:[,[,,"(?:[1-6]|[7-9]\\d\\d)\\d{4}",,,,,,,[5,7]],[,,"(?:1[4-79]|[23]\\d|4[0-2]|5[03]|6[0-37])\\d{3}",,,,"40123",,,[5]],[,,"48\\d{3}|(?:(?:7[1-9]|8[4-9])\\d|9(?:1[2-9]|2[013-9]|3[0-2]|[46]\\d|5[0-46-9]|7[0-689]|8[0-79]|9[0-8]))\\d{4}",,,,"7421234"],[,,"1[38]\\d{3}",,,,"18123",,,[5]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"5[12]\\d{3}",,,,"51123",,,[5]],"SB",677,"0[01]",,,,,,,,[[,"(\\d{2})(\\d{5})","$1 $2",["7|8[4-9]|9(?:[1-8]|9[0-8])"]]],,[,,,,,,,,,[-1]],,,
+[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SC:[,[,,"800\\d{4}|(?:[249]\\d|64)\\d{5}",,,,,,,[7]],[,,"4[2-46]\\d{5}",,,,"4217123"],[,,"2[125-8]\\d{5}",,,,"2510123"],[,,"800[08]\\d{3}",,,,"8000000"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"971\\d{4}|(?:64|95)\\d{5}",,,,"6412345"],"SC",248,"010|0[0-2]",,,,,,"00",,[[,"(\\d)(\\d{3})(\\d{3})","$1 $2 $3",["[246]|9[57]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SD:[,[,,"[19]\\d{8}",,,,,,,[9]],[,,"1(?:5\\d|8[35-7])\\d{6}",
+,,,"153123456"],[,,"(?:1[0-2]|9[0-3569])\\d{7}",,,,"911231234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"SD",249,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[19]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SE:[,[,,"(?:[26]\\d\\d|9)\\d{9}|[1-9]\\d{8}|[1-689]\\d{7}|[1-4689]\\d{6}|2\\d{5}",,,,,,,[6,7,8,9,10,12]],[,,"(?:(?:[12][136]|3[356]|4[0246]|6[03]|8\\d)\\d|90[1-9])\\d{4,6}|(?:1(?:2[0-35]|4[0-4]|5[0-25-9]|7[13-6]|[89]\\d)|2(?:2[0-7]|4[0136-8]|5[0138]|7[018]|8[01]|9[0-57])|3(?:0[0-4]|1\\d|2[0-25]|4[056]|7[0-2]|8[0-3]|9[023])|4(?:1[013-8]|3[0135]|5[14-79]|7[0-246-9]|8[0156]|9[0-689])|5(?:0[0-6]|[15][0-5]|2[0-68]|3[0-4]|4\\d|6[03-5]|7[013]|8[0-79]|9[01])|6(?:1[1-3]|2[0-4]|4[02-57]|5[0-37]|6[0-3]|7[0-2]|8[0247]|9[0-356])|9(?:1[0-68]|2\\d|3[02-5]|4[0-3]|5[0-4]|[68][01]|7[0135-8]))\\d{5,6}",
+,,,"8123456",,,[7,8,9]],[,,"7[02369]\\d{7}",,,,"701234567",,,[9]],[,,"20\\d{4,7}",,,,"20123456",,,[6,7,8,9]],[,,"649\\d{6}|99[1-59]\\d{4}(?:\\d{3})?|9(?:00|39|44)[1-8]\\d{3,6}",,,,"9001234567",,,[7,8,9,10]],[,,"77[0-7]\\d{6}",,,,"771234567",,,[9]],[,,"75[1-8]\\d{6}",,,,"751234567",,,[9]],[,,,,,,,,,[-1]],"SE",46,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{2,3})(\\d{2})","$1-$2 $3",["20"],"0$1"],[,"(\\d{3})(\\d{4})","$1-$2",["9(?:00|39|44|9)"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})","$1-$2 $3",["[12][136]|3[356]|4[0246]|6[03]|90[1-9]"],
+"0$1"],[,"(\\d)(\\d{2,3})(\\d{2})(\\d{2})","$1-$2 $3 $4",["8"],"0$1"],[,"(\\d{3})(\\d{2,3})(\\d{2})","$1-$2 $3",["1[2457]|2(?:[247-9]|5[0138])|3[0247-9]|4[1357-9]|5[0-35-9]|6(?:[125689]|4[02-57]|7[0-2])|9(?:[125-8]|3[02-5]|4[0-3])"],"0$1"],[,"(\\d{3})(\\d{2,3})(\\d{3})","$1-$2 $3",["9(?:00|39|44)"],"0$1"],[,"(\\d{2})(\\d{2,3})(\\d{2})(\\d{2})","$1-$2 $3 $4",["1[13689]|2[0136]|3[1356]|4[0246]|54|6[03]|90[1-9]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1-$2 $3 $4",["10|7"],"0$1"],[,"(\\d)(\\d{3})(\\d{3})(\\d{2})",
+"$1-$2 $3 $4",["8"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1-$2 $3 $4",["[13-5]|2(?:[247-9]|5[0138])|6(?:[124-689]|7[0-2])|9(?:[125-8]|3[02-5]|4[0-3])"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{3})","$1-$2 $3 $4",["9"],"0$1"],[,"(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1-$2 $3 $4 $5",["[26]"],"0$1"]],[[,"(\\d{2})(\\d{2,3})(\\d{2})","$1 $2 $3",["20"]],[,"(\\d{3})(\\d{4})","$1 $2",["9(?:00|39|44|9)"]],[,"(\\d{2})(\\d{3})(\\d{2})","$1 $2 $3",["[12][136]|3[356]|4[0246]|6[03]|90[1-9]"]],[,"(\\d)(\\d{2,3})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["8"]],[,"(\\d{3})(\\d{2,3})(\\d{2})","$1 $2 $3",["1[2457]|2(?:[247-9]|5[0138])|3[0247-9]|4[1357-9]|5[0-35-9]|6(?:[125689]|4[02-57]|7[0-2])|9(?:[125-8]|3[02-5]|4[0-3])"]],[,"(\\d{3})(\\d{2,3})(\\d{3})","$1 $2 $3",["9(?:00|39|44)"]],[,"(\\d{2})(\\d{2,3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["1[13689]|2[0136]|3[1356]|4[0246]|54|6[03]|90[1-9]"]],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["10|7"]],[,"(\\d)(\\d{3})(\\d{3})(\\d{2})","$1 $2 $3 $4",["8"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["[13-5]|2(?:[247-9]|5[0138])|6(?:[124-689]|7[0-2])|9(?:[125-8]|3[02-5]|4[0-3])"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{3})","$1 $2 $3 $4",["9"]],[,"(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4 $5",["[26]"]]],[,,"74[02-9]\\d{6}",,,,"740123456",,,[9]],,,[,,,,,,,,,[-1]],[,,"10[1-8]\\d{6}",,,,"102345678",,,[9]],,,[,,"(?:25[245]|67[3-68])\\d{9}",,,,"254123456789",,,[12]]],SG:[,[,,"(?:(?:1\\d|8)\\d\\d|7000)\\d{7}|[3689]\\d{7}",,,,,,,[8,10,11]],[,,"662[0-24-9]\\d{4}|6(?:[0-578]\\d|6[013-57-9]|9[0-35-9])\\d{5}",
+,,,"61234567",,,[8]],[,,"8(?:06[0-689]|95[0-2])\\d{4}|(?:8(?:0[1-5]|[1-8]\\d|9[0-4])|9[0-8]\\d)\\d{5}",,,,"81234567",,,[8]],[,,"(?:18|8)00\\d{7}",,,,"18001234567",,,[10,11]],[,,"1900\\d{7}",,,,"19001234567",,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:3[12]\\d|666)\\d{5}",,,,"31234567",,,[8]],"SG",65,"0[0-3]\\d",,,,,,,,[[,"(\\d{4,5})","$1",["1[013-9]|77","1(?:[013-8]|9(?:0[1-9]|[1-9]))|77"]],[,"(\\d{4})(\\d{4})","$1 $2",["[369]|8(?:0[1-6]|[1-9])"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["8"]],
+[,"(\\d{4})(\\d{4})(\\d{3})","$1 $2 $3",["7"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["1"]]],[[,"(\\d{4})(\\d{4})","$1 $2",["[369]|8(?:0[1-6]|[1-9])"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["8"]],[,"(\\d{4})(\\d{4})(\\d{3})","$1 $2 $3",["7"]],[,"(\\d{4})(\\d{3})(\\d{4})","$1 $2 $3",["1"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"7000\\d{7}",,,,"70001234567",,,[11]],,,[,,,,,,,,,[-1]]],SH:[,[,,"(?:[256]\\d|8)\\d{3}",,,,,,,[4,5]],[,,"2(?:[0-57-9]\\d|6[4-9])\\d\\d",,,,"22158"],[,,"[56]\\d{4}",,,,"51234",
+,,[5]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"262\\d\\d",,,,"26212",,,[5]],"SH",290,"00",,,,,,,,,,[,,,,,,,,,[-1]],1,"[256]",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SI:[,[,,"[1-7]\\d{7}|8\\d{4,7}|90\\d{4,6}",,,,,,,[5,6,7,8]],[,,"(?:[1-357][2-8]|4[24-8])\\d{6}",,,,"12345678",,,[8],[7]],[,,"65(?:[178]\\d|5[56]|6[01])\\d{4}|(?:[37][01]|4[0139]|51|6[489])\\d{6}",,,,"31234567",,,[8]],[,,"80\\d{4,6}",,,,"80123456",,,[6,7,8]],[,,"89[1-3]\\d{2,5}|90\\d{4,6}",,,,"90123456"],
+[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:59\\d\\d|8(?:1(?:[67]\\d|8[0-589])|2(?:0\\d|2[0-37-9]|8[0-2489])|3[389]\\d))\\d{4}",,,,"59012345",,,[8]],"SI",386,"00|10(?:22|66|88|99)","0",,,"0",,"00",,[[,"(\\d{2})(\\d{3,6})","$1 $2",["8[09]|9"],"0$1"],[,"(\\d{3})(\\d{5})","$1 $2",["59|8"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[37][01]|4[0139]|51|6"],"0$1"],[,"(\\d)(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[1-57]"],"(0$1)"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],
+SJ:[,[,,"0\\d{4}|(?:[489]\\d|[57]9)\\d{6}",,,,,,,[5,8]],[,,"79\\d{6}",,,,"79123456",,,[8]],[,,"(?:4[015-8]|59|9\\d)\\d{6}",,,,"41234567",,,[8]],[,,"80[01]\\d{5}",,,,"80012345",,,[8]],[,,"82[09]\\d{5}",,,,"82012345",,,[8]],[,,"810(?:0[0-6]|[2-8]\\d)\\d{3}",,,,"81021234",,,[8]],[,,"880\\d{5}",,,,"88012345",,,[8]],[,,"85[0-5]\\d{5}",,,,"85012345",,,[8]],"SJ",47,"00",,,,,,,,,,[,,,,,,,,,[-1]],,"79",[,,,,,,,,,[-1]],[,,"(?:0[2-9]|81(?:0(?:0[7-9]|1\\d)|5\\d\\d))\\d{3}",,,,"02000"],,,[,,"81[23]\\d{5}",,,,
+"81212345",,,[8]]],SK:[,[,,"[2-689]\\d{8}|[2-59]\\d{6}|[2-5]\\d{5}",,,,,,,[6,7,9]],[,,"(?:2(?:16|[2-9]\\d{3})|(?:(?:[3-5][1-8]\\d|819)\\d|601[1-5])\\d)\\d{4}|(?:2|[3-5][1-8])1[67]\\d{3}|[3-5][1-8]16\\d\\d",,,,"221234567"],[,,"909[1-9]\\d{5}|9(?:0[1-8]|1[0-24-9]|4[03-57-9]|5\\d)\\d{6}",,,,"912123456",,,[9]],[,,"800\\d{6}",,,,"800123456",,,[9]],[,,"9(?:00|[78]\\d)\\d{6}",,,,"900123456",,,[9]],[,,"8[5-9]\\d{7}",,,,"850123456",,,[9]],[,,,,,,,,,[-1]],[,,"6(?:02|5[0-4]|9[0-6])\\d{6}",,,,"690123456",,,[9]],
+"SK",421,"00","0",,,"0",,,,[[,"(\\d)(\\d{2})(\\d{3,4})","$1 $2 $3",["21"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2,3})","$1 $2 $3",["[3-5][1-8]1","[3-5][1-8]1[67]"],"0$1"],[,"(\\d{4})(\\d{3})","$1 $2",["909","9090"],"0$1"],[,"(\\d)(\\d{3})(\\d{3})(\\d{2})","$1/$2 $3 $4",["2"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[689]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1/$2 $3 $4",["[3-5]"],"0$1"]],[[,"(\\d)(\\d{2})(\\d{3,4})","$1 $2 $3",["21"],"0$1"],[,"(\\d{2})(\\d{2})(\\d{2,3})","$1 $2 $3",["[3-5][1-8]1",
+"[3-5][1-8]1[67]"],"0$1"],[,"(\\d)(\\d{3})(\\d{3})(\\d{2})","$1/$2 $3 $4",["2"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[689]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1/$2 $3 $4",["[3-5]"],"0$1"]],[,,"9090\\d{3}",,,,"9090123",,,[7]],,,[,,"9090\\d{3}|(?:602|8(?:00|[5-9]\\d)|9(?:00|[78]\\d))\\d{6}",,,,,,,[7,9]],[,,"96\\d{7}",,,,"961234567",,,[9]],,,[,,,,,,,,,[-1]]],SL:[,[,,"(?:[237-9]\\d|66)\\d{6}",,,,,,,[8],[6]],[,,"22[2-4][2-9]\\d{4}",,,,"22221234",,,,[6]],[,,"(?:25|3[0-5]|66|7[2-9]|8[08]|9[09])\\d{6}",
+,,,"25123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"SL",232,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{6})","$1 $2",["[236-9]"],"(0$1)"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SM:[,[,,"(?:0549|[5-7]\\d)\\d{6}",,,,,,,[8,10],[6]],[,,"0549(?:8[0157-9]|9\\d)\\d{4}",,,,"0549886377",,,[10],[6]],[,,"6[16]\\d{6}",,,,"66661212",,,[8]],[,,,,,,,,,[-1]],[,,"7[178]\\d{6}",,,,"71123456",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"5[158]\\d{6}",
+,,,"58001110",,,[8]],"SM",378,"00",,,,"([89]\\d{5})$","0549$1",,,[[,"(\\d{6})","$1",["[89]"]],[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[5-7]"]],[,"(\\d{4})(\\d{6})","$1 $2",["0"]]],[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[5-7]"]],[,"(\\d{4})(\\d{6})","$1 $2",["0"]]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SN:[,[,,"(?:[378]\\d|93)\\d{7}",,,,,,,[9]],[,,"3(?:0(?:1[0-2]|80)|282|3(?:8[1-9]|9[3-9])|611)\\d{5}",,,,"301012345"],[,,"7(?:(?:[06-8]\\d|21|90)\\d|5(?:01|[19]0|25|[38]3|[4-7]\\d))\\d{5}",
+,,,"701234567"],[,,"800\\d{6}",,,,"800123456"],[,,"88[4689]\\d{6}",,,,"884123456"],[,,"81[02468]\\d{6}",,,,"810123456"],[,,,,,,,,,[-1]],[,,"(?:3(?:392|9[01]\\d)\\d|93(?:3[13]0|929))\\d{4}",,,,"933301234"],"SN",221,"00",,,,,,,,[[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"]],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[379]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SO:[,[,,"[346-9]\\d{8}|[12679]\\d{7}|[1-5]\\d{6}|[1348]\\d{5}",,,,,,,[6,7,8,9]],[,,
+"(?:1\\d|2[0-79]|3[0-46-8]|4[0-7]|5[57-9])\\d{5}|(?:[134]\\d|8[125])\\d{4}",,,,"4012345",,,[6,7]],[,,"(?:(?:15|(?:3[59]|4[89]|6\\d|79|8[08])\\d|9(?:0\\d|[2-9]))\\d|2(?:4\\d|8))\\d{5}|(?:[67]\\d\\d|904)\\d{5}",,,,"71123456",,,[7,8,9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"SO",252,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{4})","$1 $2",["8[125]"]],[,"(\\d{6})","$1",["[134]"]],[,"(\\d)(\\d{6})","$1 $2",["[15]|2[0-79]|3[0-46-8]|4[0-7]"]],[,"(\\d)(\\d{7})","$1 $2",["(?:2|90)4|[67]"]],
+[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[3478]|64|90"]],[,"(\\d{2})(\\d{5,7})","$1 $2",["1|28|6[0-35-9]|9[2-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SR:[,[,,"(?:[2-5]|68|[78]\\d)\\d{5}",,,,,,,[6,7]],[,,"(?:2[1-3]|3[0-7]|(?:4|68)\\d|5[2-58])\\d{4}",,,,"211234"],[,,"(?:7[124-7]|8[124-9])\\d{5}",,,,"7412345",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"56\\d{4}",,,,"561234",,,[6]],"SR",597,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})","$1-$2-$3",
+["56"]],[,"(\\d{3})(\\d{3})","$1-$2",["[2-5]"]],[,"(\\d{3})(\\d{4})","$1-$2",["[6-8]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SS:[,[,,"[19]\\d{8}",,,,,,,[9]],[,,"1[89]\\d{7}",,,,"181234567"],[,,"(?:12|9[1257-9])\\d{7}",,,,"977123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"SS",211,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[19]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],
+ST:[,[,,"(?:22|9\\d)\\d{5}",,,,,,,[7]],[,,"22\\d{5}",,,,"2221234"],[,,"900[5-9]\\d{3}|9(?:0[1-9]|[89]\\d)\\d{4}",,,,"9812345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"ST",239,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[29]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SV:[,[,,"[267]\\d{7}|[89]00\\d{4}(?:\\d{4})?",,,,,,,[7,8,11]],[,,"2(?:(?:[1-6]\\d\\d|990)\\d|790[034]|890[0245])\\d{3}",,,,"21234567",,,[8]],[,,"66(?:[02-9]\\d\\d|1(?:[02-9]\\d|16))\\d{3}|(?:6[0-57-9]|7\\d)\\d{6}",
+,,,"70123456",,,[8]],[,,"800\\d{4}(?:\\d{4})?",,,,"8001234",,,[7,11]],[,,"900\\d{4}(?:\\d{4})?",,,,"9001234",,,[7,11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"SV",503,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[89]"]],[,"(\\d{4})(\\d{4})","$1 $2",["[267]"]],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["[89]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SX:[,[,,"7215\\d{6}|(?:[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"7215(?:4[2-8]|8[239]|9[056])\\d{4}",,,,"7215425678",
+,,,[7]],[,,"7215(?:1[02]|2\\d|5[034679]|8[014-8])\\d{4}",,,,"7215205678",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002123456"],[,,"900[2-9]\\d{6}",,,,"9002123456"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"SX",1,"011","1",,,"(5\\d{6})$|1","721$1",
+,,,,[,,,,,,,,,[-1]],,"721",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SY:[,[,,"[1-39]\\d{8}|[1-5]\\d{7}",,,,,,,[8,9],[6,7]],[,,"21\\d{6,7}|(?:1(?:[14]\\d|[2356])|2[235]|3(?:[13]\\d|4)|4[134]|5[1-3])\\d{6}",,,,"112345678",,,,[6,7]],[,,"9[1-689]\\d{7}",,,,"944567890",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"SY",963,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[1-5]"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["9"],"0$1",
+,1]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],SZ:[,[,,"0800\\d{4}|(?:[237]\\d|900)\\d{6}",,,,,,,[8,9]],[,,"[23][2-5]\\d{6}",,,,"22171234",,,[8]],[,,"7[6-9]\\d{6}",,,,"76123456",,,[8]],[,,"0800\\d{4}",,,,"08001234",,,[8]],[,,"900\\d{6}",,,,"900012345",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"70\\d{6}",,,,"70012345",,,[8]],"SZ",268,"00",,,,,,,,[[,"(\\d{4})(\\d{4})","$1 $2",["[0237]"]],[,"(\\d{5})(\\d{4})","$1 $2",["9"]]],,[,,,,,,,,,[-1]],,,[,,"0800\\d{4}",,,,,,,[8]],[,
+,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TA:[,[,,"8\\d{3}",,,,,,,[4]],[,,"8\\d{3}",,,,"8999"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TA",290,"00",,,,,,,,,,[,,,,,,,,,[-1]],,"8",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TC:[,[,,"(?:[58]\\d\\d|649|900)\\d{7}",,,,,,,[10],[7]],[,,"649(?:266|712|9(?:4\\d|50))\\d{4}",,,,"6497121234",,,,[7]],[,,"649(?:2(?:3[129]|4[1-79])|3\\d\\d|4[34][1-3])\\d{4}",,,,"6492311234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",
+,,,"8002345678"],[,,"900[2-9]\\d{6}",,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,"649(?:71[01]|966)\\d{4}",,,,"6497101234",,,,[7]],"TC",1,"011","1",,,"([2-479]\\d{6})$|1","649$1",,,,,[,,,,,,,,,[-1]],,"649",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],
+TD:[,[,,"(?:22|[69]\\d|77)\\d{6}",,,,,,,[8]],[,,"22(?:[37-9]0|5[0-5]|6[89])\\d{4}",,,,"22501234"],[,,"(?:6[0235689]|77|9\\d)\\d{6}",,,,"63012345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TD",235,"00|16",,,,,,"00",,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[2679]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TG:[,[,,"[279]\\d{7}",,,,,,,[8]],[,,"2(?:2[2-7]|3[23]|4[45]|55|6[67]|77)\\d{5}",,,,"22212345"],[,,"(?:7[019]|9[0-36-9])\\d{6}",
+,,,"90112345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TG",228,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[279]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TH:[,[,,"(?:001800|[2-57]|[689]\\d)\\d{7}|1\\d{7,9}",,,,,,,[8,9,10,13]],[,,"(?:1[0689]|2\\d|3[2-9]|4[2-5]|5[2-6]|7[3-7])\\d{6}",,,,"21234567",,,[8]],[,,"671[0-8]\\d{5}|(?:14|6[1-6]|[89]\\d)\\d{7}",,,,"812345678",,,[9]],[,,"(?:001800\\d|1800)\\d{6}",,,
+,"1800123456",,,[10,13]],[,,"1900\\d{6}",,,,"1900123456",,,[10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"6[08]\\d{7}",,,,"601234567",,,[9]],"TH",66,"00[1-9]","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{4})","$1 $2 $3",["2"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[13-9]"],"0$1"],[,"(\\d{4})(\\d{3})(\\d{3})","$1 $2 $3",["1"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TJ:[,[,,"[0-57-9]\\d{8}",,,,,,,[9],[3,5,6,7]],[,,"(?:3(?:1[3-5]|2[245]|3[12]|4[24-7]|5[25]|72)|4(?:46|74|87))\\d{6}",
+,,,"372123456",,,,[3,5,6,7]],[,,"41[18]\\d{6}|(?:0[0-27]|1[017]|2[02]|[34]0|5[05]|7[0178]|8[078]|9\\d)\\d{7}",,,,"917123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TJ",992,"810",,,,,,"8~10",,[[,"(\\d{6})(\\d)(\\d{2})","$1 $2 $3",["331","3317"]],[,"(\\d{3})(\\d{2})(\\d{4})","$1 $2 $3",["[34]7|91[78]"]],[,"(\\d{4})(\\d)(\\d{4})","$1 $2 $3",["3[1-5]"]],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[0-57-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],
+,,[,,,,,,,,,[-1]]],TK:[,[,,"[2-47]\\d{3,6}",,,,,,,[4,5,6,7]],[,,"(?:2[2-4]|[34]\\d)\\d{2,5}",,,,"3101"],[,,"7[2-4]\\d{2,5}",,,,"7290"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TK",690,"00",,,,,,,,,,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TL:[,[,,"7\\d{7}|(?:[2-47]\\d|[89]0)\\d{5}",,,,,,,[7,8]],[,,"(?:2[1-5]|3[1-9]|4[1-4])\\d{5}",,,,"2112345",,,[7]],[,,"7[2-8]\\d{6}",,,,"77212345",,,[8]],[,,"80\\d{5}",,,,"8012345",,,[7]],[,,"90\\d{5}",
+,,,"9012345",,,[7]],[,,,,,,,,,[-1]],[,,"70\\d{5}",,,,"7012345",,,[7]],[,,,,,,,,,[-1]],"TL",670,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[2-489]|70"]],[,"(\\d{4})(\\d{4})","$1 $2",["7"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TM:[,[,,"[1-6]\\d{7}",,,,,,,[8]],[,,"(?:1(?:2\\d|3[1-9])|2(?:22|4[0-35-8])|3(?:22|4[03-9])|4(?:22|3[128]|4\\d|6[15])|5(?:22|5[7-9]|6[014-689]))\\d{5}",,,,"12345678"],[,,"6\\d{7}",,,,"66123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],
+[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TM",993,"810","8",,,"8",,"8~10",,[[,"(\\d{2})(\\d{2})(\\d{2})(\\d{2})","$1 $2-$3-$4",["12"],"(8 $1)"],[,"(\\d{3})(\\d)(\\d{2})(\\d{2})","$1 $2-$3-$4",["[1-5]"],"(8 $1)"],[,"(\\d{2})(\\d{6})","$1 $2",["6"],"8 $1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TN:[,[,,"[2-57-9]\\d{7}",,,,,,,[8]],[,,"81200\\d{3}|(?:3[0-2]|7\\d)\\d{6}",,,,"30010123"],[,,"3(?:001|[12]40)\\d{4}|(?:(?:[259]\\d|4[0-7])\\d|3(?:1[1-35]|6[0-4]|91))\\d{5}",,,,"20123456"],
+[,,"8010\\d{4}",,,,"80101234"],[,,"88\\d{6}",,,,"88123456"],[,,"8[12]10\\d{4}",,,,"81101234"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TN",216,"00",,,,,,,,[[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[2-57-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TO:[,[,,"(?:0800|(?:[5-8]\\d\\d|999)\\d)\\d{3}|[2-8]\\d{4}",,,,,,,[5,7]],[,,"(?:2\\d|3[0-8]|4[0-4]|50|6[09]|7[0-24-69]|8[05])\\d{3}",,,,"20123",,,[5]],[,,"(?:55[4-6]|6(?:[09]\\d|3[02]|8[15-9])|(?:7\\d|8[46-9])\\d|999)\\d{4}",,,,
+"7715123",,,[7]],[,,"0800\\d{3}",,,,"0800222",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"55[0-37-9]\\d{4}",,,,"5510123",,,[7]],"TO",676,"00",,,,,,,,[[,"(\\d{2})(\\d{3})","$1-$2",["[2-4]|50|6[09]|7[0-24-69]|8[05]"]],[,"(\\d{4})(\\d{3})","$1 $2",["0"]],[,"(\\d{3})(\\d{4})","$1 $2",["[5-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TR:[,[,,"4\\d{6}|8\\d{11,12}|(?:[2-58]\\d\\d|900)\\d{7}",,,,,,,[7,10,12,13]],[,,"(?:2(?:[13][26]|[28][2468]|[45][268]|[67][246])|3(?:[13][28]|[24-6][2468]|[78][02468]|92)|4(?:[16][246]|[23578][2468]|4[26]))\\d{7}",
+,,,"2123456789",,,[10]],[,,"56161\\d{5}|5(?:0[15-7]|1[06]|24|[34]\\d|5[1-59]|9[46])\\d{7}",,,,"5012345678",,,[10]],[,,"8(?:00\\d{7}(?:\\d{2,3})?|11\\d{7})",,,,"8001234567",,,[10,12,13]],[,,"(?:8[89]8|900)\\d{7}",,,,"9001234567",,,[10]],[,,,,,,,,,[-1]],[,,"592(?:21[12]|461)\\d{4}",,,,"5922121234",,,[10]],[,,"850\\d{7}",,,,"8500123456",,,[10]],"TR",90,"00","0",,,"0",,,,[[,"(\\d{3})(\\d)(\\d{3})","$1 $2 $3",["444"],,,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["512|8[01589]|90"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})",
+"$1 $2 $3 $4",["5(?:[0-59]|61)","5(?:[0-59]|616)","5(?:[0-59]|6161)"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[24][1-8]|3[1-9]"],"(0$1)",,1],[,"(\\d{3})(\\d{3})(\\d{6,7})","$1 $2 $3",["80"],"0$1",,1]],[[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["512|8[01589]|90"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["5(?:[0-59]|61)","5(?:[0-59]|616)","5(?:[0-59]|6161)"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[24][1-8]|3[1-9]"],"(0$1)",,1],[,"(\\d{3})(\\d{3})(\\d{6,7})",
+"$1 $2 $3",["80"],"0$1",,1]],[,,"512\\d{7}",,,,"5123456789",,,[10]],,,[,,"(?:444|811\\d{3})\\d{4}",,,,,,,[7,10]],[,,"444\\d{4}",,,,"4441444",,,[7]],,,[,,,,,,,,,[-1]]],TT:[,[,,"(?:[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"868(?:2(?:01|1[5-9]|[23]\\d|4[0-2])|6(?:0[7-9]|1[02-8]|2[1-9]|[3-69]\\d|7[0-79])|82[124])\\d{4}",,,,"8682211234",,,,[7]],[,,"868(?:(?:2[5-9]|3\\d)\\d|4(?:3[0-6]|[6-9]\\d)|6(?:20|78|8\\d)|7(?:0[1-9]|1[02-9]|[2-9]\\d))\\d{4}",,,,"8682911234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",
+,,,"8002345678"],[,,"900[2-9]\\d{6}",,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"TT",1,"011","1",,,"([2-46-8]\\d{6})$|1","868$1",,,,,[,,,,,,,,,[-1]],,"868",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,"868619\\d{4}",,,,"8686191234",,,,[7]]],TV:[,[,,
+"(?:2|7\\d\\d|90)\\d{4}",,,,,,,[5,6,7]],[,,"2[02-9]\\d{3}",,,,"20123",,,[5]],[,,"(?:7[01]\\d|90)\\d{4}",,,,"901234",,,[6,7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"TV",688,"00",,,,,,,,[[,"(\\d{2})(\\d{3})","$1 $2",["2"]],[,"(\\d{2})(\\d{4})","$1 $2",["90"]],[,"(\\d{2})(\\d{5})","$1 $2",["7"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],TW:[,[,,"[2-689]\\d{8}|7\\d{9,10}|[2-8]\\d{7}|2\\d{6}",,,,,,,[7,8,9,10,11]],[,,"(?:2[2-8]\\d|370|55[01]|7[1-9])\\d{6}|4(?:(?:0(?:0[1-9]|[2-48]\\d)|1[023]\\d)\\d{4,5}|(?:[239]\\d\\d|4(?:0[56]|12|49))\\d{5})|6(?:[01]\\d{7}|4(?:0[56]|12|24|4[09])\\d{4,5})|8(?:(?:2(?:3\\d|4[0-269]|[578]0|66)|36[24-9]|90\\d\\d)\\d{4}|4(?:0[56]|12|24|4[09])\\d{4,5})|(?:2(?:2(?:0\\d\\d|4(?:0[68]|[249]0|3[0-467]|5[0-25-9]|6[0235689]))|(?:3(?:[09]\\d|1[0-4])|(?:4\\d|5[0-49]|6[0-29]|7[0-5])\\d)\\d)|(?:(?:3[2-9]|5[2-8]|6[0-35-79]|8[7-9])\\d\\d|4(?:2(?:[089]\\d|7[1-9])|(?:3[0-4]|[78]\\d|9[01])\\d))\\d)\\d{3}",
+,,,"221234567",,,[8,9]],[,,"(?:40001[0-2]|9[0-8]\\d{4})\\d{3}",,,,"912345678",,,[9]],[,,"80[0-79]\\d{6}|800\\d{5}",,,,"800123456",,,[8,9]],[,,"20(?:[013-9]\\d\\d|2)\\d{4}",,,,"203123456",,,[7,9]],[,,,,,,,,,[-1]],[,,"99\\d{7}",,,,"990123456",,,[9]],[,,"7010(?:[0-2679]\\d|3[0-7]|8[0-5])\\d{5}|70\\d{8}",,,,"7012345678",,,[10,11]],"TW",886,"0(?:0[25-79]|19)","0","#",,"0",,,,[[,"(\\d{2})(\\d)(\\d{4})","$1 $2 $3",["202"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["[258]0"],"0$1"],[,"(\\d)(\\d{3,4})(\\d{4})",
+"$1 $2 $3",["[23568]|4(?:0[02-48]|[1-47-9])|7[1-9]","[23568]|4(?:0[2-48]|[1-47-9])|(?:400|7)[1-9]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[49]"],"0$1"],[,"(\\d{2})(\\d{4})(\\d{4,5})","$1 $2 $3",["7"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"50[0-46-9]\\d{6}",,,,"500123456",,,[9]],,,[,,,,,,,,,[-1]]],TZ:[,[,,"(?:[25-8]\\d|41|90)\\d{7}",,,,,,,[9]],[,,"2[2-8]\\d{7}",,,,"222345678"],[,,"77[2-9]\\d{6}|(?:6[125-9]|7[13-689])\\d{7}",,,,"621234567"],[,,"80[08]\\d{6}",,,,"800123456"],[,,"90\\d{7}",
+,,,"900123456"],[,,"8(?:40|6[01])\\d{6}",,,,"840123456"],[,,,,,,,,,[-1]],[,,"41\\d{7}",,,,"412345678"],"TZ",255,"00[056]","0",,,"0",,,,[[,"(\\d{3})(\\d{2})(\\d{4})","$1 $2 $3",["[89]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[24]"],"0$1"],[,"(\\d{2})(\\d{7})","$1 $2",["5"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[67]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,"(?:8(?:[04]0|6[01])|90\\d)\\d{6}"],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],UA:[,[,,"[89]\\d{9}|[3-9]\\d{8}",,,,,,,[9,10],[5,6,7]],[,,"(?:3[1-8]|4[13-8]|5[1-7]|6[12459])\\d{7}",
+,,,"311234567",,,[9],[5,6,7]],[,,"(?:39|50|6[36-8]|7[1-3]|9[1-9])\\d{7}",,,,"501234567",,,[9]],[,,"800[1-8]\\d{5,6}",,,,"800123456"],[,,"900[239]\\d{5,6}",,,,"900212345"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"89[1-579]\\d{6}",,,,"891234567",,,[9]],"UA",380,"00","0",,,"0",,"0~0",,[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["6[12][29]|(?:3[1-8]|4[136-8]|5[12457]|6[49])2|(?:56|65)[24]","6[12][29]|(?:35|4[1378]|5[12457]|6[49])2|(?:56|65)[24]|(?:3[1-46-8]|46)2[013-9]"],"0$1"],[,"(\\d{4})(\\d{5})","$1 $2",
+["3[1-8]|4(?:[1367]|[45][6-9]|8[4-6])|5(?:[1-5]|6[0135689]|7[4-6])|6(?:[12][3-7]|[459])","3[1-8]|4(?:[1367]|[45][6-9]|8[4-6])|5(?:[1-5]|6(?:[015689]|3[02389])|7[4-6])|6(?:[12][3-7]|[459])"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[3-7]|89|9[1-9]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["[89]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],UG:[,[,,"800\\d{6}|(?:[29]0|[347]\\d)\\d{7}",,,,,,,[9],[5,6,7]],[,,"20(?:(?:240|30[67])\\d|6(?:00[0-2]|30[0-4]))\\d{3}|(?:20(?:[017]\\d|2[5-9]|32|5[0-4]|6[15-9])|[34]\\d{3})\\d{5}",
+,,,"312345678",,,,[5,6,7]],[,,"726[01]\\d{5}|7(?:[01578]\\d|20|36|[46][0-4]|9[89])\\d{6}",,,,"712345678"],[,,"800[1-3]\\d{5}",,,,"800123456"],[,,"90[1-3]\\d{6}",,,,"901123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"UG",256,"00[057]","0",,,"0",,,,[[,"(\\d{4})(\\d{5})","$1 $2",["202","2024"],"0$1"],[,"(\\d{3})(\\d{6})","$1 $2",["[27-9]|4(?:6[45]|[7-9])"],"0$1"],[,"(\\d{2})(\\d{7})","$1 $2",["[34]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],US:[,[,,"[2-9]\\d{9}|3\\d{6}",
+,,,,,,[10],[7]],[,,"5056(?:[0-35-9]\\d|4[46])\\d{4}|(?:4722|505[2-57-9])\\d{6}|(?:2(?:0[1-35-9]|1[02-9]|2[03-589]|3[149]|4[08]|5[1-46]|6[0279]|7[0269]|8[13])|3(?:0[1-57-9]|1[02-9]|2[01356]|3[0-24679]|4[167]|5[0-2]|6[014]|8[056])|4(?:0[124-9]|1[02-579]|2[3-5]|3[0245]|4[023578]|58|6[349]|7[0589]|8[04])|5(?:0[1-47-9]|1[0235-8]|20|3[0149]|4[01]|5[179]|6[1-47]|7[0-5]|8[0256])|6(?:0[1-35-9]|1[024-9]|2[03689]|[34][016]|5[01679]|6[0-279]|78|8[0-29])|7(?:0[1-46-8]|1[2-9]|2[04-7]|3[1247]|4[037]|5[47]|6[02359]|7[0-59]|8[156])|8(?:0[1-68]|1[02-8]|2[068]|3[0-2589]|4[03578]|5[046-9]|6[02-5]|7[028])|9(?:0[1346-9]|1[02-9]|2[0589]|3[0146-8]|4[01357-9]|5[12469]|7[0-389]|8[04-69]))[2-9]\\d{6}",
+,,,"2015550123",,,,[7]],[,,"5056(?:[0-35-9]\\d|4[46])\\d{4}|(?:4722|505[2-57-9])\\d{6}|(?:2(?:0[1-35-9]|1[02-9]|2[03-589]|3[149]|4[08]|5[1-46]|6[0279]|7[0269]|8[13])|3(?:0[1-57-9]|1[02-9]|2[01356]|3[0-24679]|4[167]|5[0-2]|6[014]|8[056])|4(?:0[124-9]|1[02-579]|2[3-5]|3[0245]|4[023578]|58|6[349]|7[0589]|8[04])|5(?:0[1-47-9]|1[0235-8]|20|3[0149]|4[01]|5[179]|6[1-47]|7[0-5]|8[0256])|6(?:0[1-35-9]|1[024-9]|2[03689]|[34][016]|5[01679]|6[0-279]|78|8[0-29])|7(?:0[1-46-8]|1[2-9]|2[04-7]|3[1247]|4[037]|5[47]|6[02359]|7[0-59]|8[156])|8(?:0[1-68]|1[02-8]|2[068]|3[0-2589]|4[03578]|5[046-9]|6[02-5]|7[028])|9(?:0[1346-9]|1[02-9]|2[0589]|3[0146-8]|4[01357-9]|5[12469]|7[0-389]|8[04-69]))[2-9]\\d{6}",
+,,,"2015550123",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002345678"],[,,"900[2-9]\\d{6}",,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"US",1,"011","1",,,"1",,,1,[[,"(\\d{3})(\\d{4})","$1-$2",["310"],,,1],[,"(\\d{3})(\\d{4})","$1-$2",
+["[24-9]|3(?:[02-9]|1[1-9])"]],[,"(\\d{3})(\\d{3})(\\d{4})","($1) $2-$3",["[2-9]"],,,1]],[[,"(\\d{3})(\\d{4})","$1-$2",["310"],,,1],[,"(\\d{3})(\\d{3})(\\d{4})","$1-$2-$3",["[2-9]"]]],[,,,,,,,,,[-1]],1,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],UY:[,[,,"(?:0004|4)\\d{9}|[1249]\\d{7}|(?:[49]\\d|80)\\d{5}",,,,,,,[7,8,10,13]],[,,"(?:1(?:770|987)|(?:2\\d|4[2-7])\\d\\d)\\d{4}",,,,"21231234",,,[8],[7]],[,,"9[1-9]\\d{6}",,,,"94231234",,,[8]],[,,"(?:(?:0004|4)\\d{5}|80[05])\\d{4}|405\\d{4}",,,,"8001234",
+,,[7,10,13]],[,,"90[0-8]\\d{4}",,,,"9001234",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"UY",598,"0(?:0|1[3-9]\\d)","0"," int. ",,"0",,"00",,[[,"(\\d{3})(\\d{4})","$1 $2",["405|8|90"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["9"],"0$1"],[,"(\\d{4})(\\d{4})","$1 $2",["[124]"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["4"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3 $4",["0"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],UZ:[,[,,"(?:33|[5-79]\\d|88)\\d{7}",
+,,,,,,[9]],[,,"(?:55\\d\\d|6(?:1(?:22|3[124]|4[1-4]|5[1-3578]|64)|2(?:22|3[0-57-9]|41)|5(?:22|3[3-7]|5[024-8])|6\\d\\d|7(?:[23]\\d|7[69])|9(?:22|4[1-8]|6[135]))|7(?:0(?:5[4-9]|6[0146]|7[124-6]|9[135-8])|(?:1[12]|8\\d)\\d|2(?:22|3[13-57-9]|4[1-3579]|5[14])|3(?:2\\d|3[1578]|4[1-35-7]|5[1-57]|61)|4(?:2\\d|3[1-579]|7[1-79])|5(?:22|5[1-9]|6[1457])|6(?:22|3[12457]|4[13-8])|9(?:22|5[1-9])))\\d{5}",,,,"669050123"],[,,"(?:(?:33|50|88|9[0-57-9])\\d{3}|6(?:1(?:2(?:2[01]|98)|35[0-4]|50\\d|61[23]|7(?:[01][017]|4\\d|55|9[5-9]))|2(?:(?:11|7\\d)\\d|2(?:[12]1|9[01379])|5(?:[126]\\d|3[0-4]))|5(?:19[01]|2(?:27|9[26])|(?:30|59|7\\d)\\d)|6(?:2(?:1[5-9]|2[0367]|38|41|52|60)|(?:3[79]|9[0-3])\\d|4(?:56|83)|7(?:[07]\\d|1[017]|3[07]|4[047]|5[057]|67|8[0178]|9[79]))|7(?:2(?:24|3[237]|4[5-9]|7[15-8])|5(?:7[12]|8[0589])|7(?:0\\d|[39][07])|9(?:0\\d|7[079]))|9(?:2(?:1[1267]|3[01]|5\\d|7[0-4])|(?:5[67]|7\\d)\\d|6(?:2[0-26]|8\\d)))|7(?:[07]\\d{3}|1(?:13[01]|6(?:0[47]|1[67]|66)|71[3-69]|98\\d)|2(?:2(?:2[79]|95)|3(?:2[5-9]|6[0-6])|57\\d|7(?:0\\d|1[17]|2[27]|3[37]|44|5[057]|66|88))|3(?:2(?:1[0-6]|21|3[469]|7[159])|(?:33|9[4-6])\\d|5(?:0[0-4]|5[579]|9\\d)|7(?:[0-3579]\\d|4[0467]|6[67]|8[078]))|4(?:2(?:29|5[0257]|6[0-7]|7[1-57])|5(?:1[0-4]|8\\d|9[5-9])|7(?:0\\d|1[024589]|2[0-27]|3[0137]|[46][07]|5[01]|7[5-9]|9[079])|9(?:7[015-9]|[89]\\d))|5(?:112|2(?:0\\d|2[29]|[49]4)|3[1568]\\d|52[6-9]|7(?:0[01578]|1[017]|[23]7|4[047]|[5-7]\\d|8[78]|9[079]))|6(?:2(?:2[1245]|4[2-4])|39\\d|41[179]|5(?:[349]\\d|5[0-2])|7(?:0[017]|[13]\\d|22|44|55|67|88))|9(?:22[128]|3(?:2[0-4]|7\\d)|57[02569]|7(?:2[05-9]|3[37]|4\\d|60|7[2579]|87|9[07]))))\\d{4}",
+,,,"912345678"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"UZ",998,"810","8",,,"8",,"8~10",,[[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[35-9]"],"8 $1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],VA:[,[,,"0\\d{5,10}|3[0-8]\\d{7,10}|55\\d{8}|8\\d{5}(?:\\d{2,4})?|(?:1\\d|39)\\d{7,8}",,,,,,,[6,7,8,9,10,11,12]],[,,"06698\\d{1,6}",,,,"0669812345",,,[6,7,8,9,10,11]],[,,"3[1-9]\\d{8}|3[2-9]\\d{7}",,,,"3123456789",,,[9,10]],[,,"80(?:0\\d{3}|3)\\d{3}",
+,,,"800123456",,,[6,9]],[,,"(?:0878\\d{3}|89(?:2\\d|3[04]|4(?:[0-4]|[5-9]\\d\\d)|5[0-4]))\\d\\d|(?:1(?:44|6[346])|89(?:38|5[5-9]|9))\\d{6}",,,,"899123456",,,[6,8,9,10]],[,,"84(?:[08]\\d{3}|[17])\\d{3}",,,,"848123456",,,[6,9]],[,,"1(?:78\\d|99)\\d{6}",,,,"1781234567",,,[9,10]],[,,"55\\d{8}",,,,"5512345678",,,[10]],"VA",39,"00",,,,,,,,,,[,,,,,,,,,[-1]],,"06698",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,"3[2-8]\\d{9,10}",,,,"33101234501",,,[11,12]]],VC:[,[,,"(?:[58]\\d\\d|784|900)\\d{7}",,,,,,,[10],[7]],
+[,,"784(?:266|3(?:6[6-9]|7\\d|8[0-6])|4(?:38|5[0-36-8]|8[0-8])|5(?:55|7[0-2]|93)|638|784)\\d{4}",,,,"7842661234",,,,[7]],[,,"784(?:4(?:3[0-5]|5[45]|89|9[0-8])|5(?:2[6-9]|3[0-4])|720)\\d{4}",,,,"7844301234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002345678"],[,,"900[2-9]\\d{6}",,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,"78451[0-2]\\d{4}",,,,"7845101234",,,,[7]],"VC",1,"011","1",,,"([2-7]\\d{6})$|1","784$1",,,,,[,,,,,,,,,[-1]],,"784",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],VE:[,[,,"[68]00\\d{7}|(?:[24]\\d|[59]0)\\d{8}",,,,,,,[10],[7]],[,,"(?:2(?:12|3[457-9]|[467]\\d|[58][1-9]|9[1-6])|[4-6]00)\\d{7}",,,,"2121234567",,,,[7]],[,,"4(?:1[24-8]|2[46])\\d{7}",,,,"4121234567"],[,,"800\\d{7}",,,,"8001234567"],[,,"90[01]\\d{7}",,,,"9001234567"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],
+"VE",58,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{7})","$1-$2",["[24-689]"],"0$1","$CC $1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"501\\d{7}",,,,"5010123456",,,,[7]],,,[,,,,,,,,,[-1]]],VG:[,[,,"(?:284|[58]\\d\\d|900)\\d{7}",,,,,,,[10],[7]],[,,"284(?:229|4(?:22|9[45])|774|8(?:52|6[459]))\\d{4}",,,,"2842291234",,,,[7]],[,,"284(?:245|3(?:0[0-3]|4[0-7]|68|9[34])|4(?:4[0-6]|68|9[69])|5(?:4[0-7]|68|9[69]))\\d{4}",,,,"2843001234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002345678"],[,,"900[2-9]\\d{6}",
+,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",,,,"5002345678"],[,,,,,,,,,[-1]],"VG",1,"011","1",,,"([2-578]\\d{6})$|1","284$1",,,,,[,,,,,,,,,[-1]],,"284",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],VI:[,[,,"[58]\\d{9}|(?:34|90)0\\d{7}",,,,,,,[10],[7]],[,,"340(?:2(?:0[0-368]|2[06-8]|4[49]|77)|3(?:32|44)|4(?:2[23]|44|7[34]|89)|5(?:1[34]|55)|6(?:2[56]|4[23]|77|9[023])|7(?:1[2-57-9]|2[57]|7\\d)|884|998)\\d{4}",
+,,,"3406421234",,,,[7]],[,,"340(?:2(?:0[0-368]|2[06-8]|4[49]|77)|3(?:32|44)|4(?:2[23]|44|7[34]|89)|5(?:1[34]|55)|6(?:2[56]|4[23]|77|9[023])|7(?:1[2-57-9]|2[57]|7\\d)|884|998)\\d{4}",,,,"3406421234",,,,[7]],[,,"8(?:00|33|44|55|66|77|88)[2-9]\\d{6}",,,,"8002345678"],[,,"900[2-9]\\d{6}",,,,"9002345678"],[,,,,,,,,,[-1]],[,,"52(?:3(?:[2-46-9][02-9]\\d|5(?:[02-46-9]\\d|5[0-46-9]))|4(?:[2-478][02-9]\\d|5(?:[034]\\d|2[024-9]|5[0-46-9])|6(?:0[1-9]|[2-9]\\d)|9(?:[05-9]\\d|2[0-5]|49)))\\d{4}|52[34][2-9]1[02-9]\\d{4}|5(?:00|2[125-9]|33|44|66|77|88)[2-9]\\d{6}",
+,,,"5002345678"],[,,,,,,,,,[-1]],"VI",1,"011","1",,,"([2-9]\\d{6})$|1","340$1",,1,,,[,,,,,,,,,[-1]],,"340",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],VN:[,[,,"[12]\\d{9}|[135-9]\\d{8}|[16]\\d{7}|[16-8]\\d{6}",,,,,,,[7,8,9,10]],[,,"2(?:0[3-9]|1[0-689]|2[0-25-9]|[38][2-9]|4[2-8]|5[124-9]|6[0-39]|7[0-7]|9[0-4679])\\d{7}",,,,"2101234567",,,[10]],[,,"(?:5(?:2[238]|59)|89[6-9]|99[013-9])\\d{6}|(?:3\\d|5[689]|7[06-9]|8[1-8]|9[0-8])\\d{7}",,,,"912345678",,,[9]],[,,"1800\\d{4,6}|12(?:0[13]|28)\\d{4}",
+,,,"1800123456",,,[8,9,10]],[,,"1900\\d{4,6}",,,,"1900123456",,,[8,9,10]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"672\\d{6}",,,,"672012345",,,[9]],"VN",84,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[17]99"],"0$1",,1],[,"(\\d{2})(\\d{5})","$1 $2",["80"],"0$1",,1],[,"(\\d{3})(\\d{4,5})","$1 $2",["69"],"0$1",,1],[,"(\\d{4})(\\d{4,6})","$1 $2",["1"],,,1],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[69]"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[3578]"],"0$1",,1],[,"(\\d{2})(\\d{4})(\\d{4})",
+"$1 $2 $3",["2[48]"],"0$1",,1],[,"(\\d{3})(\\d{4})(\\d{3})","$1 $2 $3",["2"],"0$1",,1]],[[,"(\\d{2})(\\d{5})","$1 $2",["80"],"0$1",,1],[,"(\\d{4})(\\d{4,6})","$1 $2",["1"],,,1],[,"(\\d{2})(\\d{3})(\\d{2})(\\d{2})","$1 $2 $3 $4",["[69]"],"0$1",,1],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[3578]"],"0$1",,1],[,"(\\d{2})(\\d{4})(\\d{4})","$1 $2 $3",["2[48]"],"0$1",,1],[,"(\\d{3})(\\d{4})(\\d{3})","$1 $2 $3",["2"],"0$1",,1]],[,,,,,,,,,[-1]],,,[,,"[17]99\\d{4}|69\\d{5,6}",,,,,,,[7,8]],[,,"(?:[17]99|80\\d)\\d{4}|69\\d{5,6}",
+,,,"1992000",,,[7,8]],,,[,,,,,,,,,[-1]]],VU:[,[,,"[57-9]\\d{6}|(?:[238]\\d|48)\\d{3}",,,,,,,[5,7]],[,,"(?:38[0-8]|48[4-9])\\d\\d|(?:2[02-9]|3[4-7]|88)\\d{3}",,,,"22123",,,[5]],[,,"(?:[58]\\d|7[013-7])\\d{5}",,,,"5912345",,,[7]],[,,"81[18]\\d\\d",,,,"81123",,,[5]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"9(?:0[1-9]|1[01])\\d{4}",,,,"9010123",,,[7]],"VU",678,"00",,,,,,,,[[,"(\\d{3})(\\d{4})","$1 $2",["[57-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"(?:3[03]|900\\d)\\d{3}",,,,"30123"],,
+,[,,,,,,,,,[-1]]],WF:[,[,,"(?:40|72)\\d{4}|8\\d{5}(?:\\d{3})?",,,,,,,[6,9]],[,,"72\\d{4}",,,,"721234",,,[6]],[,,"(?:72|8[23])\\d{4}",,,,"821234",,,[6]],[,,"80[0-5]\\d{6}",,,,"800012345",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"WF",681,"00",,,,,,,,[[,"(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3",["[478]"]],[,"(\\d{3})(\\d{2})(\\d{2})(\\d{2})","$1 $2 $3 $4",["8"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,"[48]0\\d{4}",,,,"401234",,,[6]]],WS:[,[,,"(?:[2-6]|8\\d{5})\\d{4}|[78]\\d{6}|[68]\\d{5}",
+,,,,,,[5,6,7,10]],[,,"6[1-9]\\d{3}|(?:[2-5]|60)\\d{4}",,,,"22123",,,[5,6]],[,,"(?:7[1-35-7]|8(?:[3-7]|9\\d{3}))\\d{5}",,,,"7212345",,,[7,10]],[,,"800\\d{3}",,,,"800123",,,[6]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"WS",685,"0",,,,,,,,[[,"(\\d{5})","$1",["[2-5]|6[1-9]"]],[,"(\\d{3})(\\d{3,7})","$1 $2",["[68]"]],[,"(\\d{2})(\\d{5})","$1 $2",["7"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],XK:[,[,,"[23]\\d{7,8}|(?:4\\d\\d|[89]00)\\d{5}",,,,,,,[8,
+9]],[,,"(?:2[89]|39)0\\d{6}|[23][89]\\d{6}",,,,"28012345"],[,,"4[3-9]\\d{6}",,,,"43201234",,,[8]],[,,"800\\d{5}",,,,"80001234",,,[8]],[,,"900\\d{5}",,,,"90001234",,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"XK",383,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{5})","$1 $2",["[89]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{3})","$1 $2 $3",["[2-4]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[23]"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],YE:[,[,,"(?:1|7\\d)\\d{7}|[1-7]\\d{6}",
+,,,,,,[7,8,9],[6]],[,,"78[0-7]\\d{4}|17\\d{6}|(?:[12][2-68]|3[2358]|4[2-58]|5[2-6]|6[3-58]|7[24-6])\\d{5}",,,,"1234567",,,[7,8],[6]],[,,"7[01378]\\d{7}",,,,"712345678",,,[9]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"YE",967,"00","0",,,"0",,,,[[,"(\\d)(\\d{3})(\\d{3,4})","$1 $2 $3",["[1-6]|7(?:[24-6]|8[0-7])"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["7"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],YT:[,[,,"(?:(?:(?:26|63)9|80\\d)\\d|9398)\\d{5}",
+,,,,,,[9]],[,,"269(?:0[0-467]|5[0-3]|6\\d|[78]0)\\d{4}",,,,"269601234"],[,,"(?:639(?:0[0-79]|1[019]|[267]\\d|3[09]|40|5[05-9]|9[04-79])|9398[01])\\d{4}",,,,"639012345"],[,,"80\\d{7}",,,,"801234567"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"YT",262,"00","0",,,"0",,,,,,[,,,,,,,,,[-1]],,"269|63|9398",[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],ZA:[,[,,"[1-79]\\d{8}|8\\d{4,9}",,,,,,,[5,6,7,8,9,10]],[,,"(?:2(?:0330|4302)|52087)0\\d{3}|(?:1[0-8]|2[1-378]|3[1-69]|4\\d|5[1346-8])\\d{7}",
+,,,"101234567",,,[9]],[,,"(?:1(?:3492[0-25]|4495[0235]|549(?:20|5[01]))|4[34]492[01])\\d{3}|8[1-4]\\d{3,7}|(?:2[27]|47|54)4950\\d{3}|(?:1(?:049[2-4]|9[12]\\d\\d)|(?:6\\d|7[0-46-9])\\d{3}|8(?:5\\d{3}|7(?:08[67]|158|28[5-9]|310)))\\d{4}|(?:1[6-8]|28|3[2-69]|4[025689]|5[36-8])4920\\d{3}|(?:12|[2-5]1)492\\d{4}",,,,"711234567",,,[5,6,7,8,9]],[,,"80\\d{7}",,,,"801234567",,,[9]],[,,"(?:86[2-9]|9[0-2]\\d)\\d{6}",,,,"862345678",,,[9]],[,,"860\\d{6}",,,,"860123456",,,[9]],[,,,,,,,,,[-1]],[,,"87(?:08[0-589]|15[0-79]|28[0-4]|31[1-9])\\d{4}|87(?:[02][0-79]|1[0-46-9]|3[02-9]|[4-9]\\d)\\d{5}",
+,,,"871234567",,,[9]],"ZA",27,"00","0",,,"0",,,,[[,"(\\d{2})(\\d{3,4})","$1 $2",["8[1-4]"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{2,3})","$1 $2 $3",["8[1-4]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["860"],"0$1"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["[1-9]"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["8"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"861\\d{6,7}",,,,"861123456",,,[9,10]],,,[,,,,,,,,,[-1]]],ZM:[,[,,"800\\d{6}|(?:21|63|[79]\\d)\\d{7}",,,,,,,[9],[6]],[,,"21[1-8]\\d{6}",,,,
+"211234567",,,,[6]],[,,"(?:7[5-79]|9[5-8])\\d{7}",,,,"955123456"],[,,"800\\d{6}",,,,"800123456"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"63\\d{7}",,,,"630123456"],"ZM",260,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3})","$1 $2",["[1-9]"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[28]"],"0$1"],[,"(\\d{2})(\\d{7})","$1 $2",["[79]"],"0$1"]],[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[28]"],"0$1"],[,"(\\d{2})(\\d{7})","$1 $2",["[79]"],"0$1"]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,
+,,,,,,,,[-1]]],ZW:[,[,,"2(?:[0-57-9]\\d{6,8}|6[0-24-9]\\d{6,7})|[38]\\d{9}|[35-8]\\d{8}|[3-6]\\d{7}|[1-689]\\d{6}|[1-3569]\\d{5}|[1356]\\d{4}",,,,,,,[5,6,7,8,9,10],[3,4]],[,,"(?:1(?:(?:3\\d|9)\\d|[4-8])|2(?:(?:(?:0(?:2[014]|5)|(?:2[0157]|31|84|9)\\d\\d|[56](?:[14]\\d\\d|20)|7(?:[089]|2[03]|[35]\\d\\d))\\d|4(?:2\\d\\d|8))\\d|1(?:2|[39]\\d{4}))|3(?:(?:123|(?:29\\d|92)\\d)\\d\\d|7(?:[19]|[56]\\d))|5(?:0|1[2-478]|26|[37]2|4(?:2\\d{3}|83)|5(?:25\\d\\d|[78])|[689]\\d)|6(?:(?:[16-8]21|28|52[013])\\d\\d|[39])|8(?:[1349]28|523)\\d\\d)\\d{3}|(?:4\\d\\d|9[2-9])\\d{4,5}|(?:(?:2(?:(?:(?:0|8[146])\\d|7[1-7])\\d|2(?:[278]\\d|92)|58(?:2\\d|3))|3(?:[26]|9\\d{3})|5(?:4\\d|5)\\d\\d)\\d|6(?:(?:(?:[0-246]|[78]\\d)\\d|37)\\d|5[2-8]))\\d\\d|(?:2(?:[569]\\d|8[2-57-9])|3(?:[013-59]\\d|8[37])|6[89]8)\\d{3}",
+,,,"1312345",,,,[3,4]],[,,"7(?:[178]\\d|3[1-9])\\d{6}",,,,"712345678",,,[9]],[,,"80(?:[01]\\d|20|8[0-8])\\d{3}",,,,"8001234",,,[7]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"86(?:1[12]|22|30|44|55|77|8[368])\\d{6}",,,,"8686123456",,,[10]],"ZW",263,"00","0",,,"0",,,,[[,"(\\d{3})(\\d{3,5})","$1 $2",["2(?:0[45]|2[278]|[49]8)|3(?:[09]8|17)|6(?:[29]8|37|75)|[23][78]|(?:33|5[15]|6[68])[78]"],"0$1"],[,"(\\d)(\\d{3})(\\d{2,4})","$1 $2 $3",["[49]"],"0$1"],[,"(\\d{3})(\\d{4})","$1 $2",["80"],"0$1"],
+[,"(\\d{2})(\\d{7})","$1 $2",["24|8[13-59]|(?:2[05-79]|39|5[45]|6[15-8])2","2(?:02[014]|4|[56]20|[79]2)|392|5(?:42|525)|6(?:[16-8]21|52[013])|8[13-59]"],"(0$1)"],[,"(\\d{2})(\\d{3})(\\d{4})","$1 $2 $3",["7"],"0$1"],[,"(\\d{3})(\\d{3})(\\d{3,4})","$1 $2 $3",["2(?:1[39]|2[0157]|[378]|[56][14])|3(?:12|29)","2(?:1[39]|2[0157]|[378]|[56][14])|3(?:123|29)"],"0$1"],[,"(\\d{4})(\\d{6})","$1 $2",["8"],"0$1"],[,"(\\d{2})(\\d{3,5})","$1 $2",["1|2(?:0[0-36-9]|12|29|[56])|3(?:1[0-689]|[24-6])|5(?:[0236-9]|1[2-4])|6(?:[013-59]|7[0-46-9])|(?:33|55|6[68])[0-69]|(?:29|3[09]|62)[0-79]"],
+"0$1"],[,"(\\d{2})(\\d{3})(\\d{3,4})","$1 $2 $3",["29[013-9]|39|54"],"0$1"],[,"(\\d{4})(\\d{3,5})","$1 $2",["(?:25|54)8","258|5483"],"0$1"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],800:[,[,,"(?:00|[1-9]\\d)\\d{6}",,,,,,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:00|[1-9]\\d)\\d{6}",,,,"12345678"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"001",800,,,,,,,,1,[[,"(\\d{4})(\\d{4})","$1 $2",["\\d"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],
+,,[,,,,,,,,,[-1]]],808:[,[,,"[1-9]\\d{7}",,,,,,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"[1-9]\\d{7}",,,,"12345678"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"001",808,,,,,,,,1,[[,"(\\d{4})(\\d{4})","$1 $2",["[1-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],870:[,[,,"7\\d{11}|[35-7]\\d{8}",,,,,,,[9,12]],[,,,,,,,,,[-1]],[,,"(?:[356]|774[45])\\d{8}|7[6-8]\\d{7}",,,,"301234567"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,
+,,,,,,[-1]],"001",870,,,,,,,,,[[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["[35-7]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],878:[,[,,"10\\d{10}",,,,,,,[12]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"10\\d{10}",,,,"101234567890"],"001",878,,,,,,,,1,[[,"(\\d{2})(\\d{5})(\\d{5})","$1 $2 $3",["1"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],881:[,[,,"[0-36-9]\\d{8}",,,,,,,[9]],[,,,,,,,,
+,[-1]],[,,"[0-36-9]\\d{8}",,,,"612345678"],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"001",881,,,,,,,,,[[,"(\\d)(\\d{3})(\\d{5})","$1 $2 $3",["[0-36-9]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],882:[,[,,"[13]\\d{6}(?:\\d{2,5})?|[19]\\d{7}|(?:[25]\\d\\d|4)\\d{7}(?:\\d{2})?",,,,,,,[7,8,9,10,11,12]],[,,,,,,,,,[-1]],[,,"342\\d{4}|(?:337|49)\\d{6}|(?:3(?:2|47|7\\d{3})|50\\d{3})\\d{7}",,,,"3421234",,,[7,8,9,10,12]],[,,,,,,,,,[-1]],[,
+,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"1(?:3(?:0[0347]|[13][0139]|2[035]|4[013568]|6[0459]|7[06]|8[15-8]|9[0689])\\d{4}|6\\d{5,10})|(?:345\\d|9[89])\\d{6}|(?:10|2(?:3|85\\d)|3(?:[15]|[69]\\d\\d)|4[15-8]|51)\\d{8}",,,,"390123456789"],"001",882,,,,,,,,,[[,"(\\d{2})(\\d{5})","$1 $2",["16|342"]],[,"(\\d{2})(\\d{6})","$1 $2",["49"]],[,"(\\d{2})(\\d{2})(\\d{4})","$1 $2 $3",["1[36]|9"]],[,"(\\d{2})(\\d{4})(\\d{3})","$1 $2 $3",["3[23]"]],[,"(\\d{2})(\\d{3,4})(\\d{4})","$1 $2 $3",["16"]],[,"(\\d{2})(\\d{4})(\\d{4})",
+"$1 $2 $3",["10|23|3(?:[15]|4[57])|4|51"]],[,"(\\d{3})(\\d{4})(\\d{4})","$1 $2 $3",["34"]],[,"(\\d{2})(\\d{4,5})(\\d{5})","$1 $2 $3",["[1-35]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,"348[57]\\d{7}",,,,"34851234567",,,[11]]],883:[,[,,"(?:[1-4]\\d|51)\\d{6,10}",,,,,,,[8,9,10,11,12]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"(?:2(?:00\\d\\d|10)|(?:370[1-9]|51\\d0)\\d)\\d{7}|51(?:00\\d{5}|[24-9]0\\d{4,7})|(?:1[013-79]|2[24-689]|3[02-689]|4[0-4])0\\d{5,9}",
+,,,"510012345"],"001",883,,,,,,,,1,[[,"(\\d{3})(\\d{3})(\\d{2,8})","$1 $2 $3",["[14]|2[24-689]|3[02-689]|51[24-9]"]],[,"(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3",["510"]],[,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["21"]],[,"(\\d{4})(\\d{4})(\\d{4})","$1 $2 $3",["51[13]"]],[,"(\\d{3})(\\d{3})(\\d{3})(\\d{3})","$1 $2 $3 $4",["[235]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]],888:[,[,,"\\d{11}",,,,,,,[11]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,
+,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"001",888,,,,,,,,1,[[,"(\\d{3})(\\d{3})(\\d{5})","$1 $2 $3"]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,"\\d{11}",,,,"12345678901"],,,[,,,,,,,,,[-1]]],979:[,[,,"[1359]\\d{8}",,,,,,,[9],[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,"[1359]\\d{8}",,,,"123456789",,,,[8]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],"001",979,,,,,,,,1,[[,"(\\d)(\\d{4})(\\d{4})","$1 $2 $3",["[1359]"]]],,[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]],[,,,,,,,,,[-1]],,,[,,,,,,,,,[-1]]]};/*
+
+ Copyright (C) 2010 The Libphonenumber Authors.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+function J(){this.g={}}J.i=void 0;J.g=function(){return J.i?J.i:J.i=new J};
+var va={0:"0",1:"1",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9","\uff10":"0","\uff11":"1","\uff12":"2","\uff13":"3","\uff14":"4","\uff15":"5","\uff16":"6","\uff17":"7","\uff18":"8","\uff19":"9","\u0660":"0","\u0661":"1","\u0662":"2","\u0663":"3","\u0664":"4","\u0665":"5","\u0666":"6","\u0667":"7","\u0668":"8","\u0669":"9","\u06f0":"0","\u06f1":"1","\u06f2":"2","\u06f3":"3","\u06f4":"4","\u06f5":"5","\u06f6":"6","\u06f7":"7","\u06f8":"8","\u06f9":"9"},wa={0:"0",1:"1",2:"2",3:"3",4:"4",5:"5",6:"6",
+7:"7",8:"8",9:"9","\uff10":"0","\uff11":"1","\uff12":"2","\uff13":"3","\uff14":"4","\uff15":"5","\uff16":"6","\uff17":"7","\uff18":"8","\uff19":"9","\u0660":"0","\u0661":"1","\u0662":"2","\u0663":"3","\u0664":"4","\u0665":"5","\u0666":"6","\u0667":"7","\u0668":"8","\u0669":"9","\u06f0":"0","\u06f1":"1","\u06f2":"2","\u06f3":"3","\u06f4":"4","\u06f5":"5","\u06f6":"6","\u06f7":"7","\u06f8":"8","\u06f9":"9",A:"2",B:"2",C:"2",D:"3",E:"3",F:"3",G:"4",H:"4",I:"4",J:"5",K:"5",L:"5",M:"6",N:"6",O:"6",P:"7",
+Q:"7",R:"7",S:"7",T:"8",U:"8",V:"8",W:"9",X:"9",Y:"9",Z:"9"},K=RegExp("^[+\uff0b]+"),xa=RegExp("([0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9])"),ya=RegExp("[+\uff0b0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]"),za=/[\\\/] *x/,Aa=RegExp("[^0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9A-Za-z#]+$"),Ba=/(?:.*?[A-Za-z]){3}.*/,Ca=RegExp("^\\+([0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]|[\\-\\.\\(\\)]?)*[0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]([0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]|[\\-\\.\\(\\)]?)*$"),
+Da=RegExp("^([A-Za-z0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]+((\\-)*[A-Za-z0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9])*\\.)*[A-Za-z]+((\\-)*[A-Za-z0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9])*\\.?$");function L(a){return"([0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]{1,"+a+"})"}
+function Ea(){return";ext="+L("20")+"|[ \u00a0\\t,]*(?:e?xt(?:ensi(?:o\u0301?|\u00f3))?n?|\uff45?\uff58\uff54\uff4e?|\u0434\u043e\u0431|anexo)[:\\.\uff0e]?[ \u00a0\\t,-]*"+(L("20")+"#?|[ \u00a0\\t,]*(?:[x\uff58#\uff03~\uff5e]|int|\uff49\uff4e\uff54)[:\\.\uff0e]?[ \u00a0\\t,-]*")+(L("9")+"#?|[- ]+")+(L("6")+"#|[ \u00a0\\t]*(?:,{2}|;)[:\\.\uff0e]?[ \u00a0\\t,-]*")+(L("15")+"#?|[ \u00a0\\t]*(?:,)+[:\\.\uff0e]?[ \u00a0\\t,-]*")+(L("9")+"#?")}
+var Fa=new RegExp("(?:"+Ea()+")$","i"),Ga=new RegExp("^[0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]{2}$|^[+\uff0b]*(?:[-x\u2010-\u2015\u2212\u30fc\uff0d-\uff0f \u00a0\u00ad\u200b\u2060\u3000()\uff08\uff09\uff3b\uff3d.\\[\\]/~\u2053\u223c\uff5e*]*[0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]){3,}[-x\u2010-\u2015\u2212\u30fc\uff0d-\uff0f \u00a0\u00ad\u200b\u2060\u3000()\uff08\uff09\uff3b\uff3d.\\[\\]/~\u2053\u223c\uff5e*A-Za-z0-9\uff10-\uff19\u0660-\u0669\u06f0-\u06f9]*(?:"+Ea()+")?$","i"),Ha=/(\$\d)/;
+function Ia(a){return 2>a.length?!1:M(Ga,a)}function Ja(a){return M(Ba,a)?N(a,wa):N(a,va)}function Ka(a){var b=Ja(a.toString());a.i="";a.g(b)}function La(a){return null!=a&&(1!=w(a,9)||-1!=t(a,9)[0])}function N(a,b){for(var c=new C,d,f=a.length,e=0;e<f;++e)d=a.charAt(e),d=b[d.toUpperCase()],null!=d&&c.g(d);return c.toString()}function O(a){return null!=a&&isNaN(a)&&a.toUpperCase()in ua}
+function Ma(a,b,c){if(0==p(b,2)&&null!=b.g[5]){var d=v(b,5);if(0<d.length)return d}d=v(b,1);var f=P(b);if(0==c)return Na(d,0,f,"");if(!(d in I))return f;a=Q(a,d,R(d));b=null!=b.g[3]&&0!=p(b,3).length?3==c?";ext="+p(b,3):null!=a.g[13]?p(a,13)+v(b,3):" ext. "+v(b,3):"";a:{a=0==t(a,20).length||2==c?t(a,19):t(a,20);for(var e,g=a.length,h=0;h<g;++h){e=a[h];var l=w(e,3);if(0==l||0==f.search(p(e,3,l-1)))if(l=new RegExp(p(e,1)),M(l,f)){a=e;break a}}a=null}null!=a&&(g=a,a=v(g,2),e=new RegExp(p(g,1)),v(g,5),
+g=v(g,4),f=2==c&&null!=g&&0<g.length?f.replace(e,a.replace(Ha,g)):f.replace(e,a),3==c&&(f=f.replace(RegExp("^[-x\u2010-\u2015\u2212\u30fc\uff0d-\uff0f \u00a0\u00ad\u200b\u2060\u3000()\uff08\uff09\uff3b\uff3d.\\[\\]/~\u2053\u223c\uff5e]+"),""),f=f.replace(RegExp("[-x\u2010-\u2015\u2212\u30fc\uff0d-\uff0f \u00a0\u00ad\u200b\u2060\u3000()\uff08\uff09\uff3b\uff3d.\\[\\]/~\u2053\u223c\uff5e]+","g"),"-")));return Na(d,c,f,b)}function Q(a,b,c){return"001"==c?S(a,""+b):S(a,c)}
+function P(a){if(null==a.g[2])return"";var b=""+p(a,2);return null!=a.g[4]&&p(a,4)&&0<v(a,8)?Array(v(a,8)+1).join("0")+b:b}function Na(a,b,c,d){switch(b){case 0:return"+"+a+c+d;case 1:return"+"+a+" "+c+d;case 3:return"tel:+"+a+"-"+c+d;default:return c+d}}
+function T(a,b){switch(b){case 4:return p(a,5);case 3:return p(a,4);case 1:return p(a,3);case 0:case 2:return p(a,2);case 5:return p(a,6);case 6:return p(a,8);case 7:return p(a,7);case 8:return p(a,21);case 9:return p(a,25);case 10:return p(a,28);default:return p(a,1)}}function U(a,b){return V(a,p(b,1))?V(a,p(b,5))?4:V(a,p(b,4))?3:V(a,p(b,6))?5:V(a,p(b,8))?6:V(a,p(b,7))?7:V(a,p(b,21))?8:V(a,p(b,25))?9:V(a,p(b,28))?10:V(a,p(b,2))?p(b,18)||V(a,p(b,3))?2:0:!p(b,18)&&V(a,p(b,3))?1:-1:-1}
+function S(a,b){if(null==b)return null;b=b.toUpperCase();var c=a.g[b];if(null==c){c=ua[b];if(null==c)return null;c=(new B).g(F.j(),c);a.g[b]=c}return c}function V(a,b){var c=a.length;return 0<w(b,9)&&-1==t(b,9).indexOf(c)?!1:M(v(b,2),a)}
+function Oa(a,b){if(null==b)return null;var c=v(b,1);c=I[c];if(null==c)a=null;else if(1==c.length)a=c[0];else a:{b=P(b);for(var d,f=c.length,e=0;e<f;e++){d=c[e];var g=S(a,d);if(null!=g.g[23]){if(0==b.search(p(g,23))){a=d;break a}}else if(-1!=U(b,g)){a=d;break a}}a=null}return a}function R(a){a=I[a];return null==a?"ZZ":a[0]}
+function W(a,b,c,d){var f=T(c,d),e=0==w(f,9)?t(p(c,1),9):t(f,9);f=t(f,10);if(2==d)if(La(T(c,0)))a=T(c,1),La(a)&&(e=e.concat(0==w(a,9)?t(p(c,1),9):t(a,9)),e.sort(),0==f.length?f=t(a,10):(f=f.concat(t(a,10)),f.sort()));else return W(a,b,c,1);if(-1==e[0])return 5;b=b.length;if(-1<f.indexOf(b))return 4;c=e[0];return c==b?0:c>b?2:e[e.length-1]<b?3:-1<e.indexOf(b,1)?0:5}function X(a,b){var c=P(b);b=v(b,1);if(!(b in I))return 1;b=Q(a,b,R(b));return W(a,c,b,-1)}
+function Pa(a,b,c,d,f,e){if(0==b.length)return 0;b=new C(b);var g;null!=c&&(g=p(c,11));null==g&&(g="NonMatch");var h=b.toString();if(0==h.length)g=20;else if(K.test(h))h=h.replace(K,""),b.i="",b.g(Ja(h)),g=1;else{h=new RegExp(g);Ka(b);g=b.toString();if(0==g.search(h)){h=g.match(h)[0].length;var l=g.substring(h).match(xa);l&&null!=l[1]&&0<l[1].length&&"0"==N(l[1],va)?g=!1:(b.i="",b.g(g.substring(h)),g=!0)}else g=!1;g=g?5:20}f&&q(e,6,g);if(20!=g){if(2>=b.i.length)throw Error("Phone number too short after IDD");
+a:{a=b.toString();if(0!=a.length&&"0"!=a.charAt(0))for(f=a.length,b=1;3>=b&&b<=f;++b)if(c=parseInt(a.substring(0,b),10),c in I){d.g(a.substring(b));d=c;break a}d=0}if(0!=d)return q(e,1,d),d;throw Error("Invalid country calling code");}if(null!=c&&(g=v(c,10),h=""+g,l=b.toString(),0==l.lastIndexOf(h,0)&&(h=new C(l.substring(h.length)),l=p(c,1),l=new RegExp(v(l,2)),Qa(h,c,null),h=h.toString(),!M(l,b.toString())&&M(l,h)||3==W(a,b.toString(),c,-1))))return d.g(h),f&&q(e,6,10),q(e,1,g),g;q(e,1,0);return 0}
+function Qa(a,b,c){var d=a.toString(),f=d.length,e=p(b,15);if(0!=f&&null!=e&&0!=e.length){var g=new RegExp("^(?:"+e+")");if(f=g.exec(d)){e=new RegExp(v(p(b,1),2));var h=M(e,d),l=f.length-1;b=p(b,16);if(null==b||0==b.length||null==f[l]||0==f[l].length){if(!h||M(e,d.substring(f[0].length)))null!=c&&0<l&&null!=f[l]&&c.g(f[1]),a.set(d.substring(f[0].length))}else if(d=d.replace(g,b),!h||M(e,d))null!=c&&0<l&&c.g(f[1]),a.set(d)}}}
+function Z(a,b,c){if(!O(c)&&0<b.length&&"+"!=b.charAt(0))throw Error("Invalid country calling code");return Ra(a,b,c,!0)}
+function Ra(a,b,c,d){if(null==b)throw Error("The string supplied did not seem to be a phone number");if(250<b.length)throw Error("The string supplied is too long to be a phone number");var f=new C;var e=b.indexOf(";phone-context=");if(-1===e)e=null;else if(e+=15,e>=b.length)e="";else{var g=b.indexOf(";",e);e=-1!==g?b.substring(e,g):b.substring(e)}var h=e;null==h?g=!0:0===h.length?g=!1:(g=Ca.exec(h),h=Da.exec(h),g=null!==g||null!==h);if(!g)throw Error("The string supplied did not seem to be a phone number");
+null!=e?("+"===e.charAt(0)&&f.g(e),e=b.indexOf("tel:"),f.g(b.substring(0<=e?e+4:0,b.indexOf(";phone-context=")))):(e=f.g,g=b??"",h=g.search(ya),0<=h?(g=g.substring(h),g=g.replace(Aa,""),h=g.search(za),0<=h&&(g=g.substring(0,h))):g="",e.call(f,g));e=f.toString();g=e.indexOf(";isub=");0<g&&(f.i="",f.g(e.substring(0,g)));if(!Ia(f.toString()))throw Error("The string supplied did not seem to be a phone number");e=f.toString();if(!(O(c)||null!=e&&0<e.length&&K.test(e)))throw Error("Invalid country calling code");
+e=new H;d&&q(e,5,b);a:{b=f.toString();g=b.search(Fa);if(0<=g&&Ia(b.substring(0,g))){h=b.match(Fa);for(var l=h.length,A=1;A<l;++A)if(null!=h[A]&&0<h[A].length){f.i="";f.g(b.substring(0,g));b=h[A];break a}}b=""}0<b.length&&q(e,3,b);g=S(a,c);b=new C;h=0;l=f.toString();try{h=Pa(a,l,g,b,d,e)}catch(G){if("Invalid country calling code"==G.message&&K.test(l)){if(l=l.replace(K,""),h=Pa(a,l,g,b,d,e),0==h)throw G;}else throw G;}0!=h?(f=R(h),f!=c&&(g=Q(a,h,f))):(Ka(f),b.g(f.toString()),null!=c?(h=v(g,10),q(e,
+1,h)):d&&(delete e.g[6],e.i&&delete e.i[6]));if(2>b.i.length)throw Error("The string supplied is too short to be a phone number");null!=g&&(c=new C,f=new C(b.toString()),Qa(f,g,c),a=W(a,f.toString(),g,-1),2!=a&&4!=a&&5!=a&&(b=f,d&&0<c.toString().length&&q(e,7,c.toString())));d=b.toString();a=d.length;if(2>a)throw Error("The string supplied is too short to be a phone number");if(17<a)throw Error("The string supplied is too long to be a phone number");if(1<d.length&&"0"==d.charAt(0)){q(e,4,!0);for(a=
+1;a<d.length-1&&"0"==d.charAt(a);)a++;1!=a&&q(e,8,a)}q(e,2,parseInt(d,10));return e}function M(a,b){return(a="string"==typeof a?b.match("^(?:"+a+")$"):b.match(a))&&a[0].length==b.length?!0:!1};k("intlTelInputUtils",{});k("intlTelInputUtils.formatNumber",(a,b,c)=>{try{const f=J.g(),e=Z(f,a,b);var d=X(f,e);return 0==d||4==d?Ma(f,e,"undefined"===typeof c?0:c):a}catch(f){return a}});k("intlTelInputUtils.getExampleNumber",(a,b,c)=>{try{const h=J.g();a:{var d=h;if(O(a)){var f=T(S(d,a),c);try{if(null!=f.g[6]){var e=p(f,6);var g=Ra(d,e,a,!1);break a}}catch(l){}}g=null}return Ma(h,g,b?2:1)}catch(h){return""}});k("intlTelInputUtils.getExtension",(a,b)=>{try{return p(Z(J.g(),a,b),3)}catch(c){return""}});
+k("intlTelInputUtils.getNumberType",(a,b)=>{try{const h=J.g();var c=Z(h,a,b);a=h;var d=Oa(a,c),f=Q(a,v(c,1),d);if(null==f)var e=-1;else{var g=P(c);e=U(g,f)}return e}catch(h){return-99}});
+k("intlTelInputUtils.getValidationError",(a,b)=>{try{const c=J.g(),d=Z(c,a,b);return X(c,d)}catch(c){return"Invalid country calling code"===c.message?1:"Phone number too short after IDD"===c.message||"The string supplied is too short to be a phone number"===c.message?2:"The string supplied is too long to be a phone number"===c.message?3:-99}});
+k("intlTelInputUtils.isValidNumber",(a,b)=>{try{const Y=J.g();var c=Z(Y,a,b);a=Y;var d=Oa(a,c);var f=v(c,1),e=Q(a,f,d),g;if(!(g=null==e)){var h;if(h="001"!=d){var l=S(a,d);if(null==l)throw Error("Invalid region code: "+d);var A=v(l,10);h=f!=A}g=h}if(g)var G=!1;else{var Sa=P(c);G=-1!=U(Sa,e)}return G}catch(Y){return!1}});k("intlTelInputUtils.isPossibleNumber",(a,b)=>{try{const c=J.g(),d=Z(c,a,b);return 0===X(c,d)}catch(c){return!1}});
+k("intlTelInputUtils.numberFormat",{E164:0,INTERNATIONAL:1,NATIONAL:2,RFC3966:3});k("intlTelInputUtils.numberType",{FIXED_LINE:0,MOBILE:1,FIXED_LINE_OR_MOBILE:2,TOLL_FREE:3,PREMIUM_RATE:4,SHARED_COST:5,VOIP:6,PERSONAL_NUMBER:7,PAGER:8,UAN:9,VOICEMAIL:10,UNKNOWN:-1});k("intlTelInputUtils.validationError",{IS_POSSIBLE:0,INVALID_COUNTRY_CODE:1,TOO_SHORT:2,TOO_LONG:3,IS_POSSIBLE_LOCAL_ONLY:4,INVALID_LENGTH:5});})();
+
+
+/***/ }),
+
+/***/ "./node_modules/intl-tel-input/index.js":
+/*!**********************************************!*\
+  !*** ./node_modules/intl-tel-input/index.js ***!
+  \**********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * Exposing intl-tel-input as a component
+ */
+module.exports = __webpack_require__(/*! ./build/js/intlTelInput */ "./node_modules/intl-tel-input/build/js/intlTelInput.js");
+
+
+/***/ }),
+
+/***/ "./node_modules/just-validate/dist/just-validate.es.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/just-validate/dist/just-validate.es.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CustomStyleTagIds: () => (/* binding */ CustomStyleTagIds),
+/* harmony export */   GroupRules: () => (/* binding */ GroupRules),
+/* harmony export */   Rules: () => (/* binding */ Rules),
+/* harmony export */   "default": () => (/* binding */ JustValidate)
+/* harmony export */ });
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+const EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const NUMBER_REGEXP = /^[0-9]+$/;
+const PASSWORD_REGEXP = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+const STRONG_PASSWORD_REGEXP = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const isEmpty = (value) => {
+  let newVal = value;
+  if (typeof value === "string") {
+    newVal = value.trim();
+  }
+  return !newVal;
+};
+const isEmail = (value) => {
+  return EMAIL_REGEXP.test(value);
+};
+const isLengthMoreThanMax = (value, len) => {
+  return value.length > len;
+};
+const isLengthLessThanMin = (value, len) => {
+  return value.length < len;
+};
+const isNumber = (value) => {
+  return NUMBER_REGEXP.test(value);
+};
+const isPassword = (value) => {
+  return PASSWORD_REGEXP.test(value);
+};
+const isStrongPassword = (value) => {
+  return STRONG_PASSWORD_REGEXP.test(value);
+};
+const isNumberMoreThanMax = (value, len) => {
+  return value > len;
+};
+const isNumberLessThanMin = (value, len) => {
+  return value < len;
+};
+var Rules = /* @__PURE__ */ ((Rules2) => {
+  Rules2["Required"] = "required";
+  Rules2["Email"] = "email";
+  Rules2["MinLength"] = "minLength";
+  Rules2["MaxLength"] = "maxLength";
+  Rules2["Password"] = "password";
+  Rules2["Number"] = "number";
+  Rules2["MaxNumber"] = "maxNumber";
+  Rules2["MinNumber"] = "minNumber";
+  Rules2["StrongPassword"] = "strongPassword";
+  Rules2["CustomRegexp"] = "customRegexp";
+  Rules2["MinFilesCount"] = "minFilesCount";
+  Rules2["MaxFilesCount"] = "maxFilesCount";
+  Rules2["Files"] = "files";
+  return Rules2;
+})(Rules || {});
+var GroupRules = /* @__PURE__ */ ((GroupRules2) => {
+  GroupRules2["Required"] = "required";
+  return GroupRules2;
+})(GroupRules || {});
+var CustomStyleTagIds = /* @__PURE__ */ ((CustomStyleTagIds2) => {
+  CustomStyleTagIds2["Label"] = "label";
+  CustomStyleTagIds2["LabelArrow"] = "labelArrow";
+  return CustomStyleTagIds2;
+})(CustomStyleTagIds || {});
+const defaultDictionary = [
+  {
+    key: Rules.Required,
+    dict: {
+      en: "The field is required"
+    }
+  },
+  {
+    key: Rules.Email,
+    dict: {
+      en: "Email has invalid format"
+    }
+  },
+  {
+    key: Rules.MaxLength,
+    dict: {
+      en: "The field must contain a maximum of :value characters"
+    }
+  },
+  {
+    key: Rules.MinLength,
+    dict: {
+      en: "The field must contain a minimum of :value characters"
+    }
+  },
+  {
+    key: Rules.Password,
+    dict: {
+      en: "Password must contain minimum eight characters, at least one letter and one number"
+    }
+  },
+  {
+    key: Rules.StrongPassword,
+    dict: {
+      en: "Password should contain minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character"
+    }
+  },
+  {
+    key: Rules.Number,
+    dict: {
+      en: "Value should be a number"
+    }
+  },
+  {
+    key: Rules.MaxNumber,
+    dict: {
+      en: "Number should be less or equal than :value"
+    }
+  },
+  {
+    key: Rules.MinNumber,
+    dict: {
+      en: "Number should be more or equal than :value"
+    }
+  },
+  {
+    key: Rules.MinFilesCount,
+    dict: {
+      en: "Files count should be more or equal than :value"
+    }
+  },
+  {
+    key: Rules.MaxFilesCount,
+    dict: {
+      en: "Files count should be less or equal than :value"
+    }
+  },
+  {
+    key: Rules.Files,
+    dict: {
+      en: "Uploaded files have one or several invalid properties (extension/size/type etc)."
+    }
+  }
+];
+const DEFAULT_ERROR_FIELD_MESSAGE = "Value is incorrect";
+const isPromise = (val) => typeof val === "object" && val !== null && "then" in val && typeof val.then === "function";
+const getNodeParents = (el) => {
+  let elem = el;
+  const els = [];
+  while (elem) {
+    els.unshift(elem);
+    elem = elem.parentNode;
+  }
+  return els;
+};
+const getClosestParent = (groups, parents) => {
+  const reversedParents = [...parents].reverse();
+  for (let i = 0, len = reversedParents.length; i < len; ++i) {
+    const parent = reversedParents[i];
+    for (const key in groups) {
+      const group = groups[key];
+      if (group.groupElem === parent) {
+        return [key, group];
+      }
+    }
+  }
+  return null;
+};
+const getClassList = (classList) => {
+  if (Array.isArray(classList)) {
+    return classList.filter((cls) => cls.length > 0);
+  }
+  if (typeof classList === "string" && classList.trim()) {
+    return [...classList.split(" ").filter((cls) => cls.length > 0)];
+  }
+  return [];
+};
+const isElement = (element) => {
+  return element instanceof Element || element instanceof HTMLDocument;
+};
+const errorLabelCss = `.just-validate-error-label[data-tooltip=true]{position:fixed;padding:4px 8px;background:#423f3f;color:#fff;white-space:nowrap;z-index:10;border-radius:4px;transform:translateY(-5px)}.just-validate-error-label[data-tooltip=true]:before{content:'';width:0;height:0;border-left:solid 5px transparent;border-right:solid 5px transparent;border-bottom:solid 5px #423f3f;position:absolute;z-index:3;display:block;bottom:-5px;transform:rotate(180deg);left:calc(50% - 5px)}.just-validate-error-label[data-tooltip=true][data-direction=left]{transform:translateX(-5px)}.just-validate-error-label[data-tooltip=true][data-direction=left]:before{right:-7px;bottom:auto;left:auto;top:calc(50% - 2px);transform:rotate(90deg)}.just-validate-error-label[data-tooltip=true][data-direction=right]{transform:translateX(5px)}.just-validate-error-label[data-tooltip=true][data-direction=right]:before{right:auto;bottom:auto;left:-7px;top:calc(50% - 2px);transform:rotate(-90deg)}.just-validate-error-label[data-tooltip=true][data-direction=bottom]{transform:translateY(5px)}.just-validate-error-label[data-tooltip=true][data-direction=bottom]:before{right:auto;bottom:auto;left:calc(50% - 5px);top:-5px;transform:rotate(0)}`;
+const TOOLTIP_ARROW_HEIGHT = 5;
+const defaultGlobalConfig = {
+  errorFieldStyle: {
+    color: "#b81111",
+    border: "1px solid #B81111"
+  },
+  errorFieldCssClass: "just-validate-error-field",
+  successFieldCssClass: "just-validate-success-field",
+  errorLabelStyle: {
+    color: "#b81111"
+  },
+  errorLabelCssClass: "just-validate-error-label",
+  successLabelCssClass: "just-validate-success-label",
+  focusInvalidField: true,
+  lockForm: true,
+  testingMode: false,
+  validateBeforeSubmitting: false
+};
+class JustValidate {
+  constructor(form, globalConfig, dictLocale) {
+    __publicField(this, "form", null);
+    __publicField(this, "fields", {});
+    __publicField(this, "groupFields", {});
+    __publicField(this, "errors", {});
+    __publicField(this, "isValid", false);
+    __publicField(this, "isSubmitted", false);
+    __publicField(this, "globalConfig", defaultGlobalConfig);
+    __publicField(this, "errorLabels", {});
+    __publicField(this, "successLabels", {});
+    __publicField(this, "eventListeners", []);
+    __publicField(this, "dictLocale", defaultDictionary);
+    __publicField(this, "currentLocale", "en");
+    __publicField(this, "customStyleTags", {});
+    __publicField(this, "onSuccessCallback");
+    __publicField(this, "onFailCallback");
+    __publicField(this, "tooltips", []);
+    __publicField(this, "lastScrollPosition");
+    __publicField(this, "isScrollTick");
+    __publicField(this, "fieldIds", /* @__PURE__ */ new Map());
+    __publicField(this, "getKeyByFieldSelector", (field) => {
+      return this.fieldIds.get(field);
+    });
+    __publicField(this, "getFieldSelectorByKey", (key) => {
+      for (const [fieldSelector, k] of this.fieldIds) {
+        if (key === k) {
+          return fieldSelector;
+        }
+      }
+      return void 0;
+    });
+    __publicField(this, "setKeyByFieldSelector", (field) => {
+      if (this.fieldIds.has(field)) {
+        return this.fieldIds.get(field);
+      }
+      const key = String(this.fieldIds.size + 1);
+      this.fieldIds.set(field, key);
+      return key;
+    });
+    __publicField(this, "refreshAllTooltips", () => {
+      this.tooltips.forEach((item) => {
+        item.refresh();
+      });
+    });
+    __publicField(this, "handleDocumentScroll", () => {
+      this.lastScrollPosition = window.scrollY;
+      if (!this.isScrollTick) {
+        window.requestAnimationFrame(() => {
+          this.refreshAllTooltips();
+          this.isScrollTick = false;
+        });
+        this.isScrollTick = true;
+      }
+    });
+    __publicField(this, "formSubmitHandler", (ev) => {
+      ev.preventDefault();
+      this.isSubmitted = true;
+      this.validateHandler(ev);
+    });
+    __publicField(this, "handleFieldChange", (target) => {
+      let foundKey;
+      for (const key in this.fields) {
+        const field = this.fields[key];
+        if (field.elem === target) {
+          foundKey = key;
+          break;
+        }
+      }
+      if (!foundKey) {
+        return;
+      }
+      this.validateField(foundKey, true);
+    });
+    __publicField(this, "handleGroupChange", (target) => {
+      let currentGroup;
+      let foundKey;
+      for (const key in this.groupFields) {
+        const group = this.groupFields[key];
+        if (group.elems.find((elem) => elem === target)) {
+          currentGroup = group;
+          foundKey = key;
+          break;
+        }
+      }
+      if (!currentGroup || !foundKey) {
+        return;
+      }
+      this.validateGroup(foundKey, currentGroup);
+    });
+    __publicField(this, "handlerChange", (ev) => {
+      if (!ev.target) {
+        return;
+      }
+      this.handleFieldChange(ev.target);
+      this.handleGroupChange(ev.target);
+      this.renderErrors();
+    });
+    this.initialize(form, globalConfig, dictLocale);
+  }
+  initialize(form, globalConfig, dictLocale) {
+    this.form = null;
+    this.errors = {};
+    this.isValid = false;
+    this.isSubmitted = false;
+    this.globalConfig = defaultGlobalConfig;
+    this.errorLabels = {};
+    this.successLabels = {};
+    this.eventListeners = [];
+    this.customStyleTags = {};
+    this.tooltips = [];
+    this.currentLocale = "en";
+    if (typeof form === "string") {
+      const elem = document.querySelector(form);
+      if (!elem) {
+        throw Error(
+          `Form with ${form} selector not found! Please check the form selector`
+        );
+      }
+      this.setForm(elem);
+    } else if (form instanceof HTMLFormElement) {
+      this.setForm(form);
+    } else {
+      throw Error(
+        `Form selector is not valid. Please specify a string selector or a DOM element.`
+      );
+    }
+    this.globalConfig = { ...defaultGlobalConfig, ...globalConfig };
+    if (dictLocale) {
+      this.dictLocale = [...dictLocale, ...defaultDictionary];
+    }
+    if (this.isTooltip()) {
+      const styleTag = document.createElement("style");
+      styleTag.textContent = errorLabelCss;
+      this.customStyleTags[CustomStyleTagIds.Label] = document.head.appendChild(styleTag);
+      this.addListener("scroll", document, this.handleDocumentScroll);
+    }
+  }
+  getLocalisedString(rule, ruleValue, customMsg) {
+    var _a;
+    const search = customMsg != null ? customMsg : rule;
+    let localisedStr = (_a = this.dictLocale.find((item) => item.key === search)) == null ? void 0 : _a.dict[this.currentLocale];
+    if (!localisedStr) {
+      if (customMsg) {
+        localisedStr = customMsg;
+      }
+    }
+    if (localisedStr && ruleValue !== void 0) {
+      switch (rule) {
+        case Rules.MaxLength:
+        case Rules.MinLength:
+        case Rules.MaxNumber:
+        case Rules.MinNumber:
+        case Rules.MinFilesCount:
+        case Rules.MaxFilesCount:
+          localisedStr = localisedStr.replace(":value", String(ruleValue));
+      }
+    }
+    return localisedStr || customMsg || DEFAULT_ERROR_FIELD_MESSAGE;
+  }
+  getFieldErrorMessage(fieldRule, elem) {
+    const msg = typeof fieldRule.errorMessage === "function" ? fieldRule.errorMessage(this.getElemValue(elem), this.fields) : fieldRule.errorMessage;
+    return this.getLocalisedString(fieldRule.rule, fieldRule.value, msg);
+  }
+  getFieldSuccessMessage(successMessage, elem) {
+    const msg = typeof successMessage === "function" ? successMessage(this.getElemValue(elem), this.fields) : successMessage;
+    return this.getLocalisedString(void 0, void 0, msg);
+  }
+  getGroupErrorMessage(groupRule) {
+    return this.getLocalisedString(
+      groupRule.rule,
+      void 0,
+      groupRule.errorMessage
+    );
+  }
+  getGroupSuccessMessage(groupRule) {
+    if (!groupRule.successMessage) {
+      return void 0;
+    }
+    return this.getLocalisedString(
+      void 0,
+      void 0,
+      groupRule.successMessage
+    );
+  }
+  setFieldInvalid(key, fieldRule) {
+    this.fields[key].isValid = false;
+    this.fields[key].errorMessage = this.getFieldErrorMessage(
+      fieldRule,
+      this.fields[key].elem
+    );
+  }
+  setFieldValid(key, successMessage) {
+    this.fields[key].isValid = true;
+    if (successMessage !== void 0) {
+      this.fields[key].successMessage = this.getFieldSuccessMessage(
+        successMessage,
+        this.fields[key].elem
+      );
+    }
+  }
+  setGroupInvalid(key, groupRule) {
+    this.groupFields[key].isValid = false;
+    this.groupFields[key].errorMessage = this.getGroupErrorMessage(groupRule);
+  }
+  setGroupValid(key, groupRule) {
+    this.groupFields[key].isValid = true;
+    this.groupFields[key].successMessage = this.getGroupSuccessMessage(groupRule);
+  }
+  getElemValue(elem) {
+    switch (elem.type) {
+      case "checkbox":
+        return elem.checked;
+      case "file":
+        return elem.files;
+      default:
+        return elem.value;
+    }
+  }
+  validateGroupRule(key, elems, groupRule) {
+    switch (groupRule.rule) {
+      case GroupRules.Required: {
+        if (elems.every((elem) => !elem.checked)) {
+          this.setGroupInvalid(key, groupRule);
+        } else {
+          this.setGroupValid(key, groupRule);
+        }
+      }
+    }
+  }
+  validateFieldRule(key, elem, fieldRule, afterInputChanged = false) {
+    const ruleValue = fieldRule.value;
+    const elemValue = this.getElemValue(elem);
+    if (fieldRule.plugin) {
+      const result = fieldRule.plugin(
+        elemValue,
+        this.fields
+      );
+      if (!result) {
+        this.setFieldInvalid(key, fieldRule);
+      }
+      return;
+    }
+    switch (fieldRule.rule) {
+      case Rules.Required: {
+        if (isEmpty(elemValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.Email: {
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (!isEmail(elemValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.MaxLength: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof ruleValue !== "number") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] should be a number. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (elemValue === "") {
+          break;
+        }
+        if (isLengthMoreThanMax(elemValue, ruleValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.MinLength: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof ruleValue !== "number") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] should be a number. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (elemValue === "") {
+          break;
+        }
+        if (isLengthLessThanMin(elemValue, ruleValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.Password: {
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (elemValue === "") {
+          break;
+        }
+        if (!isPassword(elemValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.StrongPassword: {
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (elemValue === "") {
+          break;
+        }
+        if (!isStrongPassword(elemValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.Number: {
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (elemValue === "") {
+          break;
+        }
+        if (!isNumber(elemValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.MaxNumber: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof ruleValue !== "number") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field should be a number. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (elemValue === "") {
+          break;
+        }
+        const num = +elemValue;
+        if (Number.isNaN(num) || isNumberMoreThanMax(num, ruleValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.MinNumber: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof ruleValue !== "number") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field should be a number. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof elemValue !== "string") {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (elemValue === "") {
+          break;
+        }
+        const num = +elemValue;
+        if (Number.isNaN(num) || isNumberLessThanMin(num, ruleValue)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.CustomRegexp: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          return;
+        }
+        let regexp;
+        try {
+          regexp = new RegExp(ruleValue);
+        } catch (e) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] should be a valid regexp. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        const str = String(elemValue);
+        if (str !== "" && !regexp.test(str)) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+        break;
+      }
+      case Rules.MinFilesCount: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof ruleValue !== "number") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field should be a number. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (Number.isFinite(elemValue == null ? void 0 : elemValue.length) && elemValue.length < ruleValue) {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        break;
+      }
+      case Rules.MaxFilesCount: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (typeof ruleValue !== "number") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field should be a number. The field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        if (Number.isFinite(elemValue == null ? void 0 : elemValue.length) && elemValue.length > ruleValue) {
+          this.setFieldInvalid(key, fieldRule);
+          break;
+        }
+        break;
+      }
+      case Rules.Files: {
+        if (ruleValue === void 0) {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field is not defined. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          return;
+        }
+        if (typeof ruleValue !== "object") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field should be an object. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          return;
+        }
+        const filesConfig = ruleValue.files;
+        if (typeof filesConfig !== "object") {
+          console.error(
+            `Value for ${fieldRule.rule} rule for [${key}] field should be an object with files array. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          return;
+        }
+        const isFilePropsInvalid = (file, fileConfig) => {
+          const minSizeInvalid = Number.isFinite(fileConfig.minSize) && file.size < fileConfig.minSize;
+          const maxSizeInvalid = Number.isFinite(fileConfig.maxSize) && file.size > fileConfig.maxSize;
+          const nameInvalid = Array.isArray(fileConfig.names) && !fileConfig.names.includes(file.name);
+          const extInvalid = Array.isArray(fileConfig.extensions) && !fileConfig.extensions.includes(
+            file.name.split(".")[file.name.split(".").length - 1]
+          );
+          const typeInvalid = Array.isArray(fileConfig.types) && !fileConfig.types.includes(file.type);
+          return minSizeInvalid || maxSizeInvalid || nameInvalid || extInvalid || typeInvalid;
+        };
+        if (typeof elemValue === "object" && elemValue !== null) {
+          for (let fileIdx = 0, len = elemValue.length; fileIdx < len; ++fileIdx) {
+            const file = elemValue.item(fileIdx);
+            if (!file) {
+              this.setFieldInvalid(key, fieldRule);
+              break;
+            }
+            const filesInvalid = isFilePropsInvalid(file, filesConfig);
+            if (filesInvalid) {
+              this.setFieldInvalid(key, fieldRule);
+              break;
+            }
+          }
+        }
+        break;
+      }
+      default: {
+        if (typeof fieldRule.validator !== "function") {
+          console.error(
+            `Validator for custom rule for [${key}] field should be a function. This field will be always invalid.`
+          );
+          this.setFieldInvalid(key, fieldRule);
+          return;
+        }
+        const result = fieldRule.validator(
+          elemValue,
+          this.fields
+        );
+        if (typeof result !== "boolean" && typeof result !== "function") {
+          console.error(
+            `Validator return value for [${key}] field should be boolean or function. It will be cast to boolean.`
+          );
+        }
+        if (typeof result === "function") {
+          if (afterInputChanged) {
+            this.fields[key].asyncCheckPending = true;
+          } else {
+            this.fields[key].asyncCheckPending = false;
+            const promise = result();
+            if (!isPromise(promise)) {
+              console.error(
+                `Validator function for custom rule for [${key}] field should return a Promise. This field will be always invalid.`
+              );
+              this.setFieldInvalid(key, fieldRule);
+              return;
+            }
+            return promise.then((resp) => {
+              if (!resp) {
+                this.setFieldInvalid(key, fieldRule);
+              }
+            }).catch(() => {
+              this.setFieldInvalid(key, fieldRule);
+            });
+          }
+        }
+        if (!result) {
+          this.setFieldInvalid(key, fieldRule);
+        }
+      }
+    }
+  }
+  validateField(key, afterInputChanged = false) {
+    var _a;
+    const field = this.fields[key];
+    field.isValid = true;
+    const promises = [];
+    [...field.rules].reverse().forEach((rule) => {
+      const res = this.validateFieldRule(
+        key,
+        field.elem,
+        rule,
+        afterInputChanged
+      );
+      if (isPromise(res)) {
+        promises.push(res);
+      }
+    });
+    if (field.isValid) {
+      this.setFieldValid(key, (_a = field.config) == null ? void 0 : _a.successMessage);
+    }
+    return Promise.allSettled(promises);
+  }
+  revalidateField(fieldSelector) {
+    if (typeof fieldSelector !== "string" && !isElement(fieldSelector)) {
+      throw Error(
+        `Field selector is not valid. Please specify a string selector or a valid DOM element.`
+      );
+    }
+    const key = this.getKeyByFieldSelector(fieldSelector);
+    if (!key || !this.fields[key]) {
+      console.error(`Field not found. Check the field selector.`);
+      return Promise.reject();
+    }
+    return new Promise((resolve) => {
+      this.validateField(key, true).finally(() => {
+        this.clearFieldStyle(key);
+        this.clearFieldLabel(key);
+        this.renderFieldError(key);
+        resolve(!!this.fields[key].isValid);
+      });
+    });
+  }
+  validateGroup(key, group) {
+    const promises = [];
+    [...group.rules].reverse().forEach((rule) => {
+      const res = this.validateGroupRule(key, group.elems, rule);
+      if (isPromise(res)) {
+        promises.push(res);
+      }
+    });
+    return Promise.allSettled(promises);
+  }
+  focusInvalidField() {
+    for (const key in this.fields) {
+      const field = this.fields[key];
+      if (!field.isValid) {
+        setTimeout(() => field.elem.focus(), 0);
+        break;
+      }
+    }
+  }
+  afterSubmitValidation(forceRevalidation = false) {
+    this.renderErrors(forceRevalidation);
+    if (this.globalConfig.focusInvalidField) {
+      this.focusInvalidField();
+    }
+  }
+  validate(forceRevalidation = false) {
+    return new Promise((resolve) => {
+      const promises = [];
+      Object.keys(this.fields).forEach((key) => {
+        const promise = this.validateField(key);
+        if (isPromise(promise)) {
+          promises.push(promise);
+        }
+      });
+      Object.keys(this.groupFields).forEach((key) => {
+        const group = this.groupFields[key];
+        const promise = this.validateGroup(key, group);
+        if (isPromise(promise)) {
+          promises.push(promise);
+        }
+      });
+      if (promises.length) {
+        Promise.allSettled(promises).then(() => {
+          this.afterSubmitValidation(forceRevalidation);
+          resolve(true);
+        });
+      } else {
+        this.afterSubmitValidation(forceRevalidation);
+        resolve(false);
+      }
+    });
+  }
+  revalidate() {
+    return new Promise((resolve) => {
+      this.validateHandler(void 0, true).finally(() => {
+        if (this.globalConfig.focusInvalidField) {
+          this.focusInvalidField();
+        }
+        resolve(this.isValid);
+      });
+    });
+  }
+  validateHandler(ev, forceRevalidation = false) {
+    if (this.globalConfig.lockForm) {
+      this.lockForm();
+    }
+    return this.validate(forceRevalidation).finally(() => {
+      var _a, _b;
+      if (this.globalConfig.lockForm) {
+        this.unlockForm();
+      }
+      if (this.isValid) {
+        (_a = this.onSuccessCallback) == null ? void 0 : _a.call(this, ev);
+      } else {
+        (_b = this.onFailCallback) == null ? void 0 : _b.call(this, this.fields, this.groupFields);
+      }
+    });
+  }
+  setForm(form) {
+    this.form = form;
+    this.form.setAttribute("novalidate", "novalidate");
+    this.removeListener("submit", this.form, this.formSubmitHandler);
+    this.addListener("submit", this.form, this.formSubmitHandler);
+  }
+  addListener(type, elem, handler) {
+    elem.addEventListener(type, handler);
+    this.eventListeners.push({ type, elem, func: handler });
+  }
+  removeListener(type, elem, handler) {
+    elem.removeEventListener(type, handler);
+    this.eventListeners = this.eventListeners.filter(
+      (item) => item.type !== type || item.elem !== elem
+    );
+  }
+  addField(fieldSelector, rules, config) {
+    if (typeof fieldSelector !== "string" && !isElement(fieldSelector)) {
+      throw Error(
+        `Field selector is not valid. Please specify a string selector or a valid DOM element.`
+      );
+    }
+    let elem;
+    if (typeof fieldSelector === "string") {
+      elem = this.form.querySelector(fieldSelector);
+    } else {
+      elem = fieldSelector;
+    }
+    if (!elem) {
+      throw Error(
+        `Field doesn't exist in the DOM! Please check the field selector.`
+      );
+    }
+    if (!Array.isArray(rules) || !rules.length) {
+      throw Error(
+        `Rules argument should be an array and should contain at least 1 element.`
+      );
+    }
+    rules.forEach((item) => {
+      if (!("rule" in item || "validator" in item || "plugin" in item)) {
+        throw Error(
+          `Rules argument must contain at least one rule or validator property.`
+        );
+      }
+      if (!item.validator && !item.plugin && (!item.rule || !Object.values(Rules).includes(item.rule))) {
+        throw Error(
+          `Rule should be one of these types: ${Object.values(Rules).join(
+            ", "
+          )}. Provided value: ${item.rule}`
+        );
+      }
+    });
+    const key = this.setKeyByFieldSelector(fieldSelector);
+    this.fields[key] = {
+      elem,
+      rules,
+      isValid: void 0,
+      config
+    };
+    this.setListeners(elem);
+    if (this.isSubmitted) {
+      this.validate();
+    }
+    return this;
+  }
+  removeField(fieldSelector) {
+    if (typeof fieldSelector !== "string" && !isElement(fieldSelector)) {
+      throw Error(
+        `Field selector is not valid. Please specify a string selector or a valid DOM element.`
+      );
+    }
+    const key = this.getKeyByFieldSelector(fieldSelector);
+    if (!key || !this.fields[key]) {
+      console.error(`Field not found. Check the field selector.`);
+      return this;
+    }
+    const type = this.getListenerType(this.fields[key].elem.type);
+    this.removeListener(type, this.fields[key].elem, this.handlerChange);
+    this.clearErrors();
+    delete this.fields[key];
+    return this;
+  }
+  removeGroup(group) {
+    if (typeof group !== "string") {
+      throw Error(
+        `Group selector is not valid. Please specify a string selector.`
+      );
+    }
+    const key = this.getKeyByFieldSelector(group);
+    if (!key || !this.groupFields[key]) {
+      console.error(`Group not found. Check the group selector.`);
+      return this;
+    }
+    this.groupFields[key].elems.forEach((elem) => {
+      const type = this.getListenerType(elem.type);
+      this.removeListener(type, elem, this.handlerChange);
+    });
+    this.clearErrors();
+    delete this.groupFields[key];
+    return this;
+  }
+  addRequiredGroup(groupField, errorMessage, config, successMessage) {
+    if (typeof groupField !== "string") {
+      throw Error(
+        `Group selector is not valid. Please specify a string selector.`
+      );
+    }
+    const elem = this.form.querySelector(groupField);
+    if (!elem) {
+      throw Error(
+        `Group with ${groupField} selector not found! Please check the group selector.`
+      );
+    }
+    const inputs = elem.querySelectorAll("input");
+    const childrenInputs = Array.from(inputs).filter((input) => {
+      const parent = getClosestParent(this.groupFields, getNodeParents(input));
+      if (!parent) {
+        return true;
+      }
+      return parent[1].elems.find((elem2) => elem2 !== input);
+    });
+    const key = this.setKeyByFieldSelector(groupField);
+    this.groupFields[key] = {
+      rules: [
+        {
+          rule: GroupRules.Required,
+          errorMessage,
+          successMessage
+        }
+      ],
+      groupElem: elem,
+      elems: childrenInputs,
+      isDirty: false,
+      isValid: void 0,
+      config
+    };
+    inputs.forEach((input) => {
+      this.setListeners(input);
+    });
+    return this;
+  }
+  getListenerType(type) {
+    switch (type) {
+      case "checkbox":
+      case "select-one":
+      case "file":
+      case "radio": {
+        return "change";
+      }
+      default: {
+        return "input";
+      }
+    }
+  }
+  setListeners(elem) {
+    const type = this.getListenerType(elem.type);
+    this.removeListener(type, elem, this.handlerChange);
+    this.addListener(type, elem, this.handlerChange);
+  }
+  clearFieldLabel(key) {
+    var _a, _b;
+    (_a = this.errorLabels[key]) == null ? void 0 : _a.remove();
+    (_b = this.successLabels[key]) == null ? void 0 : _b.remove();
+  }
+  clearFieldStyle(key) {
+    var _a, _b, _c, _d;
+    const field = this.fields[key];
+    const errorStyle = ((_a = field.config) == null ? void 0 : _a.errorFieldStyle) || this.globalConfig.errorFieldStyle;
+    Object.keys(errorStyle).forEach((key2) => {
+      field.elem.style[key2] = "";
+    });
+    const successStyle = ((_b = field.config) == null ? void 0 : _b.successFieldStyle) || this.globalConfig.successFieldStyle || {};
+    Object.keys(successStyle).forEach((key2) => {
+      field.elem.style[key2] = "";
+    });
+    field.elem.classList.remove(
+      ...getClassList(
+        ((_c = field.config) == null ? void 0 : _c.errorFieldCssClass) || this.globalConfig.errorFieldCssClass
+      ),
+      ...getClassList(
+        ((_d = field.config) == null ? void 0 : _d.successFieldCssClass) || this.globalConfig.successFieldCssClass
+      )
+    );
+  }
+  clearErrors() {
+    var _a, _b;
+    Object.keys(this.errorLabels).forEach(
+      (key) => this.errorLabels[key].remove()
+    );
+    Object.keys(this.successLabels).forEach(
+      (key) => this.successLabels[key].remove()
+    );
+    for (const key in this.fields) {
+      this.clearFieldStyle(key);
+    }
+    for (const key in this.groupFields) {
+      const group = this.groupFields[key];
+      const errorStyle = ((_a = group.config) == null ? void 0 : _a.errorFieldStyle) || this.globalConfig.errorFieldStyle;
+      Object.keys(errorStyle).forEach((key2) => {
+        group.elems.forEach((elem) => {
+          var _a2;
+          elem.style[key2] = "";
+          elem.classList.remove(
+            ...getClassList(
+              ((_a2 = group.config) == null ? void 0 : _a2.errorFieldCssClass) || this.globalConfig.errorFieldCssClass
+            )
+          );
+        });
+      });
+      const successStyle = ((_b = group.config) == null ? void 0 : _b.successFieldStyle) || this.globalConfig.successFieldStyle || {};
+      Object.keys(successStyle).forEach((key2) => {
+        group.elems.forEach((elem) => {
+          var _a2;
+          elem.style[key2] = "";
+          elem.classList.remove(
+            ...getClassList(
+              ((_a2 = group.config) == null ? void 0 : _a2.successFieldCssClass) || this.globalConfig.successFieldCssClass
+            )
+          );
+        });
+      });
+    }
+    this.tooltips = [];
+  }
+  isTooltip() {
+    return !!this.globalConfig.tooltip;
+  }
+  lockForm() {
+    const elems = this.form.querySelectorAll(
+      "input, textarea, button, select"
+    );
+    for (let i = 0, len = elems.length; i < len; ++i) {
+      elems[i].setAttribute(
+        "data-just-validate-fallback-disabled",
+        elems[i].disabled ? "true" : "false"
+      );
+      elems[i].setAttribute("disabled", "disabled");
+      elems[i].style.pointerEvents = "none";
+      elems[i].style.webkitFilter = "grayscale(100%)";
+      elems[i].style.filter = "grayscale(100%)";
+    }
+  }
+  unlockForm() {
+    const elems = this.form.querySelectorAll(
+      "input, textarea, button, select"
+    );
+    for (let i = 0, len = elems.length; i < len; ++i) {
+      if (elems[i].getAttribute("data-just-validate-fallback-disabled") !== "true") {
+        elems[i].removeAttribute("disabled");
+      }
+      elems[i].style.pointerEvents = "";
+      elems[i].style.webkitFilter = "";
+      elems[i].style.filter = "";
+    }
+  }
+  renderTooltip(elem, errorLabel, position) {
+    var _a;
+    const { top, left, width, height } = elem.getBoundingClientRect();
+    const errorLabelRect = errorLabel.getBoundingClientRect();
+    const pos = position || ((_a = this.globalConfig.tooltip) == null ? void 0 : _a.position);
+    switch (pos) {
+      case "left": {
+        errorLabel.style.top = `${top + height / 2 - errorLabelRect.height / 2}px`;
+        errorLabel.style.left = `${left - errorLabelRect.width - TOOLTIP_ARROW_HEIGHT}px`;
+        break;
+      }
+      case "top": {
+        errorLabel.style.top = `${top - errorLabelRect.height - TOOLTIP_ARROW_HEIGHT}px`;
+        errorLabel.style.left = `${left + width / 2 - errorLabelRect.width / 2}px`;
+        break;
+      }
+      case "right": {
+        errorLabel.style.top = `${top + height / 2 - errorLabelRect.height / 2}px`;
+        errorLabel.style.left = `${left + width + TOOLTIP_ARROW_HEIGHT}px`;
+        break;
+      }
+      case "bottom": {
+        errorLabel.style.top = `${top + height + TOOLTIP_ARROW_HEIGHT}px`;
+        errorLabel.style.left = `${left + width / 2 - errorLabelRect.width / 2}px`;
+        break;
+      }
+    }
+    errorLabel.dataset.direction = pos;
+    const refresh = () => {
+      this.renderTooltip(elem, errorLabel, position);
+    };
+    return {
+      refresh
+    };
+  }
+  createErrorLabelElem(key, errorMessage, config) {
+    const errorLabel = document.createElement("div");
+    errorLabel.innerHTML = errorMessage;
+    const customErrorLabelStyle = this.isTooltip() ? config == null ? void 0 : config.errorLabelStyle : (config == null ? void 0 : config.errorLabelStyle) || this.globalConfig.errorLabelStyle;
+    Object.assign(errorLabel.style, customErrorLabelStyle);
+    errorLabel.classList.add(
+      ...getClassList(
+        (config == null ? void 0 : config.errorLabelCssClass) || this.globalConfig.errorLabelCssClass
+      ),
+      "just-validate-error-label"
+    );
+    if (this.isTooltip()) {
+      errorLabel.dataset.tooltip = "true";
+    }
+    if (this.globalConfig.testingMode) {
+      errorLabel.dataset.testId = `error-label-${key}`;
+    }
+    this.errorLabels[key] = errorLabel;
+    return errorLabel;
+  }
+  createSuccessLabelElem(key, successMessage, config) {
+    if (successMessage === void 0) {
+      return null;
+    }
+    const successLabel = document.createElement("div");
+    successLabel.innerHTML = successMessage;
+    const customSuccessLabelStyle = (config == null ? void 0 : config.successLabelStyle) || this.globalConfig.successLabelStyle;
+    Object.assign(successLabel.style, customSuccessLabelStyle);
+    successLabel.classList.add(
+      ...getClassList(
+        (config == null ? void 0 : config.successLabelCssClass) || this.globalConfig.successLabelCssClass
+      ),
+      "just-validate-success-label"
+    );
+    if (this.globalConfig.testingMode) {
+      successLabel.dataset.testId = `success-label-${key}`;
+    }
+    this.successLabels[key] = successLabel;
+    return successLabel;
+  }
+  renderErrorsContainer(label, errorsContainer) {
+    const container = errorsContainer || this.globalConfig.errorsContainer;
+    if (typeof container === "string") {
+      const elem = this.form.querySelector(container);
+      if (elem) {
+        elem.appendChild(label);
+        return true;
+      } else {
+        console.error(
+          `Error container with ${container} selector not found. Errors will be rendered as usual`
+        );
+      }
+    }
+    if (container instanceof Element) {
+      container.appendChild(label);
+      return true;
+    }
+    if (container !== void 0) {
+      console.error(
+        `Error container not found. It should be a string or existing Element. Errors will be rendered as usual`
+      );
+    }
+    return false;
+  }
+  renderGroupLabel(elem, label, errorsContainer, isSuccess) {
+    if (!isSuccess) {
+      const renderedInErrorsContainer = this.renderErrorsContainer(
+        label,
+        errorsContainer
+      );
+      if (renderedInErrorsContainer) {
+        return;
+      }
+    }
+    elem.appendChild(label);
+  }
+  renderFieldLabel(elem, label, errorsContainer, isSuccess) {
+    var _a, _b, _c, _d, _e, _f, _g;
+    if (!isSuccess) {
+      const renderedInErrorsContainer = this.renderErrorsContainer(
+        label,
+        errorsContainer
+      );
+      if (renderedInErrorsContainer) {
+        return;
+      }
+    }
+    if (elem.type === "checkbox" || elem.type === "radio") {
+      const labelElem = document.querySelector(
+        `label[for="${elem.getAttribute("id")}"]`
+      );
+      if (((_b = (_a = elem.parentElement) == null ? void 0 : _a.tagName) == null ? void 0 : _b.toLowerCase()) === "label") {
+        (_d = (_c = elem.parentElement) == null ? void 0 : _c.parentElement) == null ? void 0 : _d.appendChild(label);
+      } else if (labelElem) {
+        (_e = labelElem.parentElement) == null ? void 0 : _e.appendChild(label);
+      } else {
+        (_f = elem.parentElement) == null ? void 0 : _f.appendChild(label);
+      }
+    } else {
+      (_g = elem.parentElement) == null ? void 0 : _g.appendChild(label);
+    }
+  }
+  showLabels(fields, isError) {
+    Object.keys(fields).forEach((fieldName, i) => {
+      const error = fields[fieldName];
+      const key = this.getKeyByFieldSelector(fieldName);
+      if (!key || !this.fields[key]) {
+        console.error(`Field not found. Check the field selector.`);
+        return;
+      }
+      const field = this.fields[key];
+      field.isValid = !isError;
+      this.clearFieldStyle(key);
+      this.clearFieldLabel(key);
+      this.renderFieldError(key, error);
+      if (i === 0 && this.globalConfig.focusInvalidField) {
+        setTimeout(() => field.elem.focus(), 0);
+      }
+    });
+  }
+  showErrors(fields) {
+    if (typeof fields !== "object") {
+      throw Error(
+        "[showErrors]: Errors should be an object with key: value format"
+      );
+    }
+    this.showLabels(fields, true);
+  }
+  showSuccessLabels(fields) {
+    if (typeof fields !== "object") {
+      throw Error(
+        "[showSuccessLabels]: Labels should be an object with key: value format"
+      );
+    }
+    this.showLabels(fields, false);
+  }
+  renderFieldError(key, message) {
+    var _a, _b, _c, _d, _e, _f;
+    const field = this.fields[key];
+    if (field.isValid === void 0) {
+      return;
+    }
+    if (field.isValid) {
+      if (!field.asyncCheckPending) {
+        const successLabel = this.createSuccessLabelElem(
+          key,
+          message !== void 0 ? message : field.successMessage,
+          field.config
+        );
+        if (successLabel) {
+          this.renderFieldLabel(
+            field.elem,
+            successLabel,
+            (_a = field.config) == null ? void 0 : _a.errorsContainer,
+            true
+          );
+        }
+        field.elem.classList.add(
+          ...getClassList(
+            ((_b = field.config) == null ? void 0 : _b.successFieldCssClass) || this.globalConfig.successFieldCssClass
+          )
+        );
+      }
+      return;
+    }
+    this.isValid = false;
+    field.elem.classList.add(
+      ...getClassList(
+        ((_c = field.config) == null ? void 0 : _c.errorFieldCssClass) || this.globalConfig.errorFieldCssClass
+      )
+    );
+    const errorLabel = this.createErrorLabelElem(
+      key,
+      message !== void 0 ? message : field.errorMessage,
+      field.config
+    );
+    this.renderFieldLabel(
+      field.elem,
+      errorLabel,
+      (_d = field.config) == null ? void 0 : _d.errorsContainer
+    );
+    if (this.isTooltip()) {
+      this.tooltips.push(
+        this.renderTooltip(
+          field.elem,
+          errorLabel,
+          (_f = (_e = field.config) == null ? void 0 : _e.tooltip) == null ? void 0 : _f.position
+        )
+      );
+    }
+  }
+  renderGroupError(key) {
+    var _a, _b, _c, _d;
+    const group = this.groupFields[key];
+    if (group.isValid === void 0) {
+      return;
+    }
+    if (group.isValid) {
+      group.elems.forEach((elem) => {
+        var _a2, _b2;
+        Object.assign(
+          elem.style,
+          ((_a2 = group.config) == null ? void 0 : _a2.successFieldStyle) || this.globalConfig.successFieldStyle
+        );
+        elem.classList.add(
+          ...getClassList(
+            ((_b2 = group.config) == null ? void 0 : _b2.successFieldCssClass) || this.globalConfig.successFieldCssClass
+          )
+        );
+      });
+      const successLabel = this.createSuccessLabelElem(
+        key,
+        group.successMessage,
+        group.config
+      );
+      if (successLabel) {
+        this.renderGroupLabel(
+          group.groupElem,
+          successLabel,
+          (_a = group.config) == null ? void 0 : _a.errorsContainer,
+          true
+        );
+      }
+      return;
+    }
+    this.isValid = false;
+    group.elems.forEach((elem) => {
+      var _a2, _b2;
+      Object.assign(
+        elem.style,
+        ((_a2 = group.config) == null ? void 0 : _a2.errorFieldStyle) || this.globalConfig.errorFieldStyle
+      );
+      elem.classList.add(
+        ...getClassList(
+          ((_b2 = group.config) == null ? void 0 : _b2.errorFieldCssClass) || this.globalConfig.errorFieldCssClass
+        )
+      );
+    });
+    const errorLabel = this.createErrorLabelElem(
+      key,
+      group.errorMessage,
+      group.config
+    );
+    this.renderGroupLabel(
+      group.groupElem,
+      errorLabel,
+      (_b = group.config) == null ? void 0 : _b.errorsContainer
+    );
+    if (this.isTooltip()) {
+      this.tooltips.push(
+        this.renderTooltip(
+          group.groupElem,
+          errorLabel,
+          (_d = (_c = group.config) == null ? void 0 : _c.tooltip) == null ? void 0 : _d.position
+        )
+      );
+    }
+  }
+  renderErrors(forceRevalidation = false) {
+    if (!this.isSubmitted && !forceRevalidation && !this.globalConfig.validateBeforeSubmitting) {
+      return;
+    }
+    this.clearErrors();
+    this.isValid = true;
+    for (const key in this.groupFields) {
+      this.renderGroupError(key);
+    }
+    for (const key in this.fields) {
+      this.renderFieldError(key);
+    }
+  }
+  destroy() {
+    this.eventListeners.forEach((event) => {
+      this.removeListener(event.type, event.elem, event.func);
+    });
+    Object.keys(this.customStyleTags).forEach((key) => {
+      this.customStyleTags[key].remove();
+    });
+    this.clearErrors();
+    if (this.globalConfig.lockForm) {
+      this.unlockForm();
+    }
+  }
+  refresh() {
+    this.destroy();
+    if (!this.form) {
+      console.error("Cannot initialize the library! Form is not defined");
+    } else {
+      this.initialize(this.form, this.globalConfig);
+      Object.keys(this.fields).forEach((key) => {
+        const fieldSelector = this.getFieldSelectorByKey(key);
+        if (fieldSelector) {
+          this.addField(
+            fieldSelector,
+            [...this.fields[key].rules],
+            this.fields[key].config
+          );
+        }
+      });
+    }
+  }
+  setCurrentLocale(locale) {
+    if (typeof locale !== "string" && locale !== void 0) {
+      console.error("Current locale should be a string");
+      return;
+    }
+    this.currentLocale = locale;
+    if (this.isSubmitted) {
+      this.validate();
+    }
+  }
+  onSuccess(callback) {
+    this.onSuccessCallback = callback;
+    return this;
+  }
+  onFail(callback) {
+    this.onFailCallback = callback;
+    return this;
+  }
+}
+
+
 
 /***/ }),
 
@@ -10789,6 +18069,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/***/ }),
+
+/***/ "./node_modules/countries-phone-masks/src/countries.json":
+/*!***************************************************************!*\
+  !*** ./node_modules/countries-phone-masks/src/countries.json ***!
+  \***************************************************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse('[{"name":"Afghanistan","code":"+93","iso":"AF","flag":"https://cdn.kcak11.com/CountryFlags/countries/af.svg","mask":"##-###-####"},{"name":"Aland Islands","code":"+358","iso":"AX","flag":"https://cdn.kcak11.com/CountryFlags/countries/ax.svg","mask":"(###)###-##-##"},{"name":"Albania","code":"+355","iso":"AL","flag":"https://cdn.kcak11.com/CountryFlags/countries/al.svg","mask":"(###)###-###"},{"name":"Algeria","code":"+213","iso":"DZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/dz.svg","mask":"##-###-####"},{"name":"American Samoa","code":"+1","iso":"AS","flag":"https://cdn.kcak11.com/CountryFlags/countries/as.svg","mask":"(684)###-####"},{"name":"Andorra","code":"+376","iso":"AD","flag":"https://cdn.kcak11.com/CountryFlags/countries/ad.svg","mask":"###-###"},{"name":"Angola","code":"+244","iso":"AO","flag":"https://cdn.kcak11.com/CountryFlags/countries/ao.svg","mask":"(###)###-###"},{"name":"Anguilla","code":"+1","iso":"AI","flag":"https://cdn.kcak11.com/CountryFlags/countries/ai.svg","mask":"(264)###-####"},{"name":"Antarctica","code":"+672","iso":"AQ","flag":"https://cdn.kcak11.com/CountryFlags/countries/aq.svg","mask":"1##-###"},{"name":"Antigua and Barbuda","code":"+1","iso":"AG","flag":"https://cdn.kcak11.com/CountryFlags/countries/ag.svg","mask":"(268)###-####"},{"name":"Argentina","code":"+54","iso":"AR","flag":"https://cdn.kcak11.com/CountryFlags/countries/ar.svg","mask":"(###)###-####"},{"name":"Armenia","code":"+374","iso":"AM","flag":"https://cdn.kcak11.com/CountryFlags/countries/am.svg","mask":"##-###-###"},{"name":"Aruba","code":"+297","iso":"AW","flag":"https://cdn.kcak11.com/CountryFlags/countries/aw.svg","mask":"###-####"},{"name":"Ascension Island","code":"+247","iso":"AC","flag":"https://cdn.kcak11.com/CountryFlags/countries/sh.svg","mask":"####"},{"name":"Australia","code":"+61","iso":"AU","flag":"https://cdn.kcak11.com/CountryFlags/countries/au.svg","mask":"#-####-####"},{"name":"Austria","code":"+43","iso":"AT","flag":"https://cdn.kcak11.com/CountryFlags/countries/at.svg","mask":"(###)###-####"},{"name":"Azerbaijan","code":"+994","iso":"AZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/az.svg","mask":"##-###-##-##"},{"name":"Bahamas","code":"+1","iso":"BS","flag":"https://cdn.kcak11.com/CountryFlags/countries/bs.svg","mask":"(242)###-####"},{"name":"Bahrain","code":"+973","iso":"BH","flag":"https://cdn.kcak11.com/CountryFlags/countries/bh.svg","mask":"####-####"},{"name":"Bangladesh","code":"+880","iso":"BD","flag":"https://cdn.kcak11.com/CountryFlags/countries/bd.svg","mask":"1###-######"},{"name":"Barbados","code":"+1","iso":"BB","flag":"https://cdn.kcak11.com/CountryFlags/countries/bb.svg","mask":"(246)###-####"},{"name":"Belarus","code":"+375","iso":"BY","flag":"https://cdn.kcak11.com/CountryFlags/countries/by.svg","mask":"(##)###-##-##"},{"name":"Belgium","code":"+32","iso":"BE","flag":"https://cdn.kcak11.com/CountryFlags/countries/be.svg","mask":"(###)###-###"},{"name":"Belize","code":"+501","iso":"BZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/bz.svg","mask":"###-####"},{"name":"Benin","code":"+229","iso":"BJ","flag":"https://cdn.kcak11.com/CountryFlags/countries/bj.svg","mask":"##-##-####"},{"name":"Bermuda","code":"+1","iso":"BM","flag":"https://cdn.kcak11.com/CountryFlags/countries/bm.svg","mask":"(441)###-####"},{"name":"Bhutan","code":"+975","iso":"BT","flag":"https://cdn.kcak11.com/CountryFlags/countries/bt.svg","mask":["17-###-###","77-###-###","#-###-###"]},{"name":"Bolivia","code":"+591","iso":"BO","flag":"https://cdn.kcak11.com/CountryFlags/countries/bo.svg","mask":"#-###-####"},{"name":"Bosnia and Herzegovina","code":"+387","iso":"BA","flag":"https://cdn.kcak11.com/CountryFlags/countries/ba.svg","mask":["##-####","##-#####"]},{"name":"Botswana","code":"+267","iso":"BW","flag":"https://cdn.kcak11.com/CountryFlags/countries/bw.svg","mask":"##-###-###"},{"name":"Brazil","code":"+55","iso":"BR","flag":"https://cdn.kcak11.com/CountryFlags/countries/br.svg","mask":["(##)####-####","(##)#####-####"]},{"name":"British Indian Ocean Territory","code":"+246","iso":"IO","flag":"https://cdn.kcak11.com/CountryFlags/countries/io.svg","mask":"###-####"},{"name":"Brunei Darussalam","code":"+673","iso":"BN","flag":"https://cdn.kcak11.com/CountryFlags/countries/bn.svg","mask":"###-####"},{"name":"Bulgaria","code":"+359","iso":"BG","flag":"https://cdn.kcak11.com/CountryFlags/countries/bg.svg","mask":"(###)###-###"},{"name":"Burkina Faso","code":"+226","iso":"BF","flag":"https://cdn.kcak11.com/CountryFlags/countries/bf.svg","mask":"##-##-####"},{"name":"Burundi","code":"+257","iso":"BI","flag":"https://cdn.kcak11.com/CountryFlags/countries/bi.svg","mask":"##-##-####"},{"name":"Cambodia","code":"+855","iso":"KH","flag":"https://cdn.kcak11.com/CountryFlags/countries/kh.svg","mask":"##-###-###"},{"name":"Cameroon","code":"+237","iso":"CM","flag":"https://cdn.kcak11.com/CountryFlags/countries/cm.svg","mask":"####-####"},{"name":"Canada","code":"+1","iso":"CA","flag":"https://cdn.kcak11.com/CountryFlags/countries/ca.svg","mask":"(###)###-####"},{"name":"Cape Verde","code":"+238","iso":"CV","flag":"https://cdn.kcak11.com/CountryFlags/countries/cv.svg","mask":"(###)##-##"},{"name":"Cayman Islands","code":"+1","iso":"KY","flag":"https://cdn.kcak11.com/CountryFlags/countries/ky.svg","mask":"(345)###-####"},{"name":"Central African Republic","code":"+236","iso":"CF","flag":"https://cdn.kcak11.com/CountryFlags/countries/cf.svg","mask":"##-##-####"},{"name":"Chad","code":"+235","iso":"TD","flag":"https://cdn.kcak11.com/CountryFlags/countries/td.svg","mask":"##-##-##-##"},{"name":"Chile","code":"+56","iso":"CL","flag":"https://cdn.kcak11.com/CountryFlags/countries/cl.svg","mask":"#-####-####"},{"name":"China","code":"+86","iso":"CN","flag":"https://cdn.kcak11.com/CountryFlags/countries/cn.svg","mask":["(###)####-###","(###)####-####","##-#####-#####"]},{"name":"Christmas Island","code":"+61","iso":"CX","flag":"https://cdn.kcak11.com/CountryFlags/countries/cx.svg","mask":"#-####-####"},{"name":"Cocos (Keeling) Islands","code":"+61","iso":"CC","flag":"https://cdn.kcak11.com/CountryFlags/countries/cc.svg","mask":"#-####-####"},{"name":"Colombia","code":"+57","iso":"CO","flag":"https://cdn.kcak11.com/CountryFlags/countries/co.svg","mask":"(###)###-####"},{"name":"Comoros","code":"+269","iso":"KM","flag":"https://cdn.kcak11.com/CountryFlags/countries/km.svg","mask":"##-#####"},{"name":"Congo","code":"+242","iso":"CG","flag":"https://cdn.kcak11.com/CountryFlags/countries/cg.svg","mask":"##-#####"},{"name":"Cook Islands","code":"+682","iso":"CK","flag":"https://cdn.kcak11.com/CountryFlags/countries/ck.svg","mask":"##-###"},{"name":"Costa Rica","code":"+506","iso":"CR","flag":"https://cdn.kcak11.com/CountryFlags/countries/cr.svg","mask":"####-####"},{"name":"Croatia","code":"+385","iso":"HR","flag":"https://cdn.kcak11.com/CountryFlags/countries/hr.svg","mask":"##-###-###"},{"name":"Cuba","code":"+53","iso":"CU","flag":"https://cdn.kcak11.com/CountryFlags/countries/cu.svg","mask":"#-###-####"},{"name":"Cyprus","code":"+357","iso":"CY","flag":"https://cdn.kcak11.com/CountryFlags/countries/cy.svg","mask":"##-###-###"},{"name":"Czech Republic","code":"+420","iso":"CZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/cz.svg","mask":"(###)###-###"},{"name":"Democratic Republic of the Congo","code":"+243","iso":"CD","flag":"https://cdn.kcak11.com/CountryFlags/countries/cd.svg","mask":"(###)###-###"},{"name":"Denmark","code":"+45","iso":"DK","flag":"https://cdn.kcak11.com/CountryFlags/countries/dk.svg","mask":"##-##-##-##"},{"name":"Djibouti","code":"+253","iso":"DJ","flag":"https://cdn.kcak11.com/CountryFlags/countries/dj.svg","mask":"##-##-##-##"},{"name":"Dominica","code":"+1","iso":"DM","flag":"https://cdn.kcak11.com/CountryFlags/countries/dm.svg","mask":"(767)###-####"},{"name":"Dominican Republic","code":"+1","iso":"DO","flag":"https://cdn.kcak11.com/CountryFlags/countries/do.svg","mask":["(809)###-####","(829)###-####","(849)###-####"]},{"name":"Ecuador","code":"+593","iso":"EC","flag":"https://cdn.kcak11.com/CountryFlags/countries/ec.svg","mask":["#-###-####","##-###-####"]},{"name":"Egypt","code":"+20","iso":"EG","flag":"https://cdn.kcak11.com/CountryFlags/countries/eg.svg","mask":"(###)###-####"},{"name":"El Salvador","code":"+503","iso":"SV","flag":"https://cdn.kcak11.com/CountryFlags/countries/sv.svg","mask":"##-##-####"},{"name":"Equatorial Guinea","code":"+240","iso":"GQ","flag":"https://cdn.kcak11.com/CountryFlags/countries/gq.svg","mask":"##-###-####"},{"name":"Eritrea","code":"+291","iso":"ER","flag":"https://cdn.kcak11.com/CountryFlags/countries/er.svg","mask":"#-###-###"},{"name":"Estonia","code":"+372","iso":"EE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ee.svg","mask":["###-####","####-####"]},{"name":"Eswatini","code":"+268","iso":"SZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/sz.svg","mask":"##-##-####"},{"name":"Ethiopia","code":"+251","iso":"ET","flag":"https://cdn.kcak11.com/CountryFlags/countries/et.svg","mask":"##-###-####"},{"name":"Falkland Islands (Malvinas)","code":"+500","iso":"FK","flag":"https://cdn.kcak11.com/CountryFlags/countries/fk.svg","mask":"#####"},{"name":"Faroe Islands","code":"+298","iso":"FO","flag":"https://cdn.kcak11.com/CountryFlags/countries/fo.svg","mask":"###-###"},{"name":"Fiji","code":"+679","iso":"FJ","flag":"https://cdn.kcak11.com/CountryFlags/countries/fj.svg","mask":"##-#####"},{"name":"Finland","code":"+358","iso":"FI","flag":"https://cdn.kcak11.com/CountryFlags/countries/fi.svg","mask":"(###)###-##-##"},{"name":"France","code":"+33","iso":"FR","flag":"https://cdn.kcak11.com/CountryFlags/countries/fr.svg","mask":"(###)###-###"},{"name":"French Guiana","code":"+594","iso":"GF","flag":"https://cdn.kcak11.com/CountryFlags/countries/gf.svg","mask":"#####-####"},{"name":"French Polynesia","code":"+689","iso":"PF","flag":"https://cdn.kcak11.com/CountryFlags/countries/pf.svg","mask":"##-##-##"},{"name":"Gabon","code":"+241","iso":"GA","flag":"https://cdn.kcak11.com/CountryFlags/countries/ga.svg","mask":"#-##-##-##"},{"name":"Gambia","code":"+220","iso":"GM","flag":"https://cdn.kcak11.com/CountryFlags/countries/gm.svg","mask":"(###)##-##"},{"name":"Georgia","code":"+995","iso":"GE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ge.svg","mask":"(###)###-###"},{"name":"Germany","code":"+49","iso":"DE","flag":"https://cdn.kcak11.com/CountryFlags/countries/de.svg","mask":["###-###","(###)##-##","(###)##-###","(###)##-####","(###)###-####","(####)###-####"]},{"name":"Ghana","code":"+233","iso":"GH","flag":"https://cdn.kcak11.com/CountryFlags/countries/gh.svg","mask":"(###)###-###"},{"name":"Gibraltar","code":"+350","iso":"GI","flag":"https://cdn.kcak11.com/CountryFlags/countries/gi.svg","mask":"###-#####"},{"name":"Greece","code":"+30","iso":"GR","flag":"https://cdn.kcak11.com/CountryFlags/countries/gr.svg","mask":"(###)###-####"},{"name":"Greenland","code":"+299","iso":"GL","flag":"https://cdn.kcak11.com/CountryFlags/countries/gl.svg","mask":"##-##-##"},{"name":"Grenada","code":"+1","iso":"GD","flag":"https://cdn.kcak11.com/CountryFlags/countries/gd.svg","mask":"(473)###-####"},{"name":"Guadeloupe","code":"+590","iso":"GP","flag":"https://cdn.kcak11.com/CountryFlags/countries/gp.svg","mask":"(###)###-###"},{"name":"Guam","code":"+1","iso":"GU","flag":"https://cdn.kcak11.com/CountryFlags/countries/gu.svg","mask":"(671)###-####"},{"name":"Guatemala","code":"+502","iso":"GT","flag":"https://cdn.kcak11.com/CountryFlags/countries/gt.svg","mask":"#-###-####"},{"name":"Guernsey","code":"+44","iso":"GG","flag":"https://cdn.kcak11.com/CountryFlags/countries/gg.svg","mask":"(####)######"},{"name":"Guinea","code":"+224","iso":"GN","flag":"https://cdn.kcak11.com/CountryFlags/countries/gn.svg","mask":"##-###-###"},{"name":"Guinea-Bissau","code":"+245","iso":"GW","flag":"https://cdn.kcak11.com/CountryFlags/countries/gw.svg","mask":"#-######"},{"name":"Guyana","code":"+592","iso":"GY","flag":"https://cdn.kcak11.com/CountryFlags/countries/gy.svg","mask":"###-####"},{"name":"Haiti","code":"+509","iso":"HT","flag":"https://cdn.kcak11.com/CountryFlags/countries/ht.svg","mask":"##-##-####"},{"name":"Holy See (Vatican City State)","code":"+39","iso":"VA","flag":"https://cdn.kcak11.com/CountryFlags/countries/va.svg","mask":"06 698#####"},{"name":"Honduras","code":"+504","iso":"HN","flag":"https://cdn.kcak11.com/CountryFlags/countries/hn.svg","mask":"####-####"},{"name":"Hong Kong","code":"+852","iso":"HK","flag":"https://cdn.kcak11.com/CountryFlags/countries/hk.svg","mask":"####-####"},{"name":"Hungary","code":"+36","iso":"HU","flag":"https://cdn.kcak11.com/CountryFlags/countries/hu.svg","mask":"(###)###-###"},{"name":"Iceland","code":"+354","iso":"IS","flag":"https://cdn.kcak11.com/CountryFlags/countries/is.svg","mask":"###-####"},{"name":"India","code":"+91","iso":"IN","flag":"https://cdn.kcak11.com/CountryFlags/countries/in.svg","mask":"(####)###-###"},{"name":"Indonesia","code":"+62","iso":"ID","flag":"https://cdn.kcak11.com/CountryFlags/countries/id.svg","mask":["##-###-##","##-###-###","##-###-####","(8##)###-###","(8##)###-##-###"]},{"name":"Iran","code":"+98","iso":"IR","flag":"https://cdn.kcak11.com/CountryFlags/countries/ir.svg","mask":"(###)###-####"},{"name":"Iraq","code":"+964","iso":"IQ","flag":"https://cdn.kcak11.com/CountryFlags/countries/iq.svg","mask":"(###)###-####"},{"name":"Ireland","code":"+353","iso":"IE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ie.svg","mask":"(###)###-###"},{"name":"Isle of Man","code":"+44","iso":"IM","flag":"https://cdn.kcak11.com/CountryFlags/countries/im.svg","mask":"(####)######"},{"name":"Israel","code":"+972","iso":"IL","flag":"https://cdn.kcak11.com/CountryFlags/countries/il.svg","mask":["#-###-####","5#-###-####"]},{"name":"Italy","code":"+39","iso":"IT","flag":"https://cdn.kcak11.com/CountryFlags/countries/it.svg","mask":"(###)####-###"},{"name":"Ivory Coast / Cote d\'Ivoire","code":"+225","iso":"CI","flag":"https://cdn.kcak11.com/CountryFlags/countries/ci.svg","mask":"##-###-###"},{"name":"Jamaica","code":"+1","iso":"JM","flag":"https://cdn.kcak11.com/CountryFlags/countries/jm.svg","mask":"(876)###-####"},{"name":"Japan","code":"+81","iso":"JP","flag":"https://cdn.kcak11.com/CountryFlags/countries/jp.svg","mask":["(###)###-###","##-####-####"]},{"name":"Jersey","code":"+44","iso":"JE","flag":"https://cdn.kcak11.com/CountryFlags/countries/je.svg","mask":"(####)####-######"},{"name":"Jordan","code":"+962","iso":"JO","flag":"https://cdn.kcak11.com/CountryFlags/countries/jo.svg","mask":"#-####-####"},{"name":"Kazakhstan","code":"+77","iso":"KZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/kz.svg","mask":["(6##)###-##-##","(7##)###-##-##"]},{"name":"Kenya","code":"+254","iso":"KE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ke.svg","mask":"###-######"},{"name":"Kiribati","code":"+686","iso":"KI","flag":"https://cdn.kcak11.com/CountryFlags/countries/ki.svg","mask":"##-###"},{"name":"Korea, Democratic People\'s Republic of Korea","code":"+850","iso":"KP","flag":"https://cdn.kcak11.com/CountryFlags/countries/kp.svg","mask":["###-###","####-####","##-###-###","###-####-###","191-###-####","####-#############"]},{"name":"Korea, Republic of South Korea","code":"+82","iso":"KR","flag":"https://cdn.kcak11.com/CountryFlags/countries/kr.svg","mask":"##-###-####"},{"name":"Kosovo","code":"+383","iso":"XK","flag":"https://cdn.kcak11.com/CountryFlags/countries/xk.svg","mask":["##-###-###","###-###-###"]},{"name":"Kuwait","code":"+965","iso":"KW","flag":"https://cdn.kcak11.com/CountryFlags/countries/kw.svg","mask":"####-####"},{"name":"Kyrgyzstan","code":"+996","iso":"KG","flag":"https://cdn.kcak11.com/CountryFlags/countries/kg.svg","mask":"(###)###-###"},{"name":"Laos","code":"+856","iso":"LA","flag":"https://cdn.kcak11.com/CountryFlags/countries/la.svg","mask":["##-###-###","(20##)###-###"]},{"name":"Latvia","code":"+371","iso":"LV","flag":"https://cdn.kcak11.com/CountryFlags/countries/lv.svg","mask":"##-###-###"},{"name":"Lebanon","code":"+961","iso":"LB","flag":"https://cdn.kcak11.com/CountryFlags/countries/lb.svg","mask":["#-###-###","##-###-###"]},{"name":"Lesotho","code":"+266","iso":"LS","flag":"https://cdn.kcak11.com/CountryFlags/countries/ls.svg","mask":"#-###-####"},{"name":"Liberia","code":"+231","iso":"LR","flag":"https://cdn.kcak11.com/CountryFlags/countries/lr.svg","mask":"##-###-###"},{"name":"Libya","code":"+218","iso":"LY","flag":"https://cdn.kcak11.com/CountryFlags/countries/ly.svg","mask":["##-###-###","21-###-####"]},{"name":"Liechtenstein","code":"+423","iso":"LI","flag":"https://cdn.kcak11.com/CountryFlags/countries/li.svg","mask":"(###)###-####"},{"name":"Lithuania","code":"+370","iso":"LT","flag":"https://cdn.kcak11.com/CountryFlags/countries/lt.svg","mask":"(###)##-###"},{"name":"Luxembourg","code":"+352","iso":"LU","flag":"https://cdn.kcak11.com/CountryFlags/countries/lu.svg","mask":"(###)###-###"},{"name":"Macau","code":"+853","iso":"MO","flag":"https://cdn.kcak11.com/CountryFlags/countries/mo.svg","mask":"####-####"},{"name":"Madagascar","code":"+261","iso":"MG","flag":"https://cdn.kcak11.com/CountryFlags/countries/mg.svg","mask":"##-##-#####"},{"name":"Malawi","code":"+265","iso":"MW","flag":"https://cdn.kcak11.com/CountryFlags/countries/mw.svg","mask":["1-###-###","#-####-####"]},{"name":"Malaysia","code":"+60","iso":"MY","flag":"https://cdn.kcak11.com/CountryFlags/countries/my.svg","mask":["#-###-###","##-###-###","(###)###-###","##-###-####"]},{"name":"Maldives","code":"+960","iso":"MV","flag":"https://cdn.kcak11.com/CountryFlags/countries/mv.svg","mask":"###-####"},{"name":"Mali","code":"+223","iso":"ML","flag":"https://cdn.kcak11.com/CountryFlags/countries/ml.svg","mask":"##-##-####"},{"name":"Malta","code":"+356","iso":"MT","flag":"https://cdn.kcak11.com/CountryFlags/countries/mt.svg","mask":"####-####"},{"name":"Marshall Islands","code":"+692","iso":"MH","flag":"https://cdn.kcak11.com/CountryFlags/countries/mh.svg","mask":"###-####"},{"name":"Martinique","code":"+596","iso":"MQ","flag":"https://cdn.kcak11.com/CountryFlags/countries/mq.svg","mask":"(###)##-##-##"},{"name":"Mauritania","code":"+222","iso":"MR","flag":"https://cdn.kcak11.com/CountryFlags/countries/mr.svg","mask":"##-##-####"},{"name":"Mauritius","code":"+230","iso":"MU","flag":"https://cdn.kcak11.com/CountryFlags/countries/mu.svg","mask":"###-####"},{"name":"Mayotte","code":"+262","iso":"YT","flag":"https://cdn.kcak11.com/CountryFlags/countries/yt.svg","mask":"#####-####"},{"name":"Mexico","code":"+52","iso":"MX","flag":"https://cdn.kcak11.com/CountryFlags/countries/mx.svg","mask":["##-##-####","(###)###-####"]},{"name":"Micronesia, Federated States of Micronesia","code":"+691","iso":"FM","flag":"https://cdn.kcak11.com/CountryFlags/countries/fm.svg","mask":"###-####"},{"name":"Moldova","code":"+373","iso":"MD","flag":"https://cdn.kcak11.com/CountryFlags/countries/md.svg","mask":"####-####"},{"name":"Monaco","code":"+377","iso":"MC","flag":"https://cdn.kcak11.com/CountryFlags/countries/mc.svg","mask":["##-###-###","(###)###-###"]},{"name":"Mongolia","code":"+976","iso":"MN","flag":"https://cdn.kcak11.com/CountryFlags/countries/mn.svg","mask":"##-##-####"},{"name":"Montenegro","code":"+382","iso":"ME","flag":"https://cdn.kcak11.com/CountryFlags/countries/me.svg","mask":"##-###-###"},{"name":"Montserrat","code":"+1","iso":"MS","flag":"https://cdn.kcak11.com/CountryFlags/countries/ms.svg","mask":"(664)###-####"},{"name":"Morocco","code":"+212","iso":"MA","flag":"https://cdn.kcak11.com/CountryFlags/countries/ma.svg","mask":"##-####-###"},{"name":"Mozambique","code":"+258","iso":"MZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/mz.svg","mask":"##-###-###"},{"name":"Myanmar","code":"+95","iso":"MM","flag":"https://cdn.kcak11.com/CountryFlags/countries/mm.svg","mask":["###-###","#-###-###","##-###-###"]},{"name":"Namibia","code":"+264","iso":"NA","flag":"https://cdn.kcak11.com/CountryFlags/countries/na.svg","mask":"##-###-####"},{"name":"Nauru","code":"+674","iso":"NR","flag":"https://cdn.kcak11.com/CountryFlags/countries/nr.svg","mask":"###-####"},{"name":"Nepal","code":"+977","iso":"NP","flag":"https://cdn.kcak11.com/CountryFlags/countries/np.svg","mask":"##-###-###"},{"name":"Netherlands","code":"+31","iso":"NL","flag":"https://cdn.kcak11.com/CountryFlags/countries/nl.svg","mask":"##-###-####"},{"name":"New Caledonia","code":"+687","iso":"NC","flag":"https://cdn.kcak11.com/CountryFlags/countries/nc.svg","mask":"##-####"},{"name":"New Zealand","code":"+64","iso":"NZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/nz.svg","mask":["#-###-###","(###)###-###","(###)###-####"]},{"name":"Nicaragua","code":"+505","iso":"NI","flag":"https://cdn.kcak11.com/CountryFlags/countries/ni.svg","mask":"####-####"},{"name":"Niger","code":"+227","iso":"NE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ne.svg","mask":"##-##-####"},{"name":"Nigeria","code":"+234","iso":"NG","flag":"https://cdn.kcak11.com/CountryFlags/countries/ng.svg","mask":["##-###-##","##-###-###","(###)###-####"]},{"name":"Niue","code":"+683","iso":"NU","flag":"https://cdn.kcak11.com/CountryFlags/countries/nu.svg","mask":"####"},{"name":"Norfolk Island","code":"+672","iso":"NF","flag":"https://cdn.kcak11.com/CountryFlags/countries/nf.svg","mask":"3##-###"},{"name":"North Macedonia","code":"+389","iso":"MK","flag":"https://cdn.kcak11.com/CountryFlags/countries/mk.svg","mask":"##-###-###"},{"name":"Northern Mariana Islands","code":"+1","iso":"MP","flag":"https://cdn.kcak11.com/CountryFlags/countries/mp.svg","mask":"(670)###-####"},{"name":"Norway","code":"+47","iso":"NO","flag":"https://cdn.kcak11.com/CountryFlags/countries/no.svg","mask":"(###)##-###"},{"name":"Oman","code":"+968","iso":"OM","flag":"https://cdn.kcak11.com/CountryFlags/countries/om.svg","mask":"##-###-###"},{"name":"Pakistan","code":"+92","iso":"PK","flag":"https://cdn.kcak11.com/CountryFlags/countries/pk.svg","mask":"(###)###-####"},{"name":"Palau","code":"+680","iso":"PW","flag":"https://cdn.kcak11.com/CountryFlags/countries/pw.svg","mask":"###-####"},{"name":"Palestine","code":"+970","iso":"PS","flag":"https://cdn.kcak11.com/CountryFlags/countries/ps.svg","mask":"##-###-####"},{"name":"Panama","code":"+507","iso":"PA","flag":"https://cdn.kcak11.com/CountryFlags/countries/pa.svg","mask":"###-####"},{"name":"Papua New Guinea","code":"+675","iso":"PG","flag":"https://cdn.kcak11.com/CountryFlags/countries/pg.svg","mask":"(###)##-###"},{"name":"Paraguay","code":"+595","iso":"PY","flag":"https://cdn.kcak11.com/CountryFlags/countries/py.svg","mask":"(###)###-###"},{"name":"Peru","code":"+51","iso":"PE","flag":"https://cdn.kcak11.com/CountryFlags/countries/pe.svg","mask":"(###)###-###"},{"name":"Philippines","code":"+63","iso":"PH","flag":"https://cdn.kcak11.com/CountryFlags/countries/ph.svg","mask":"(###)###-####"},{"name":"Pitcairn","code":"+870","iso":"PN","flag":"https://cdn.kcak11.com/CountryFlags/countries/pn.svg","mask":"###-###-###"},{"name":"Poland","code":"+48","iso":"PL","flag":"https://cdn.kcak11.com/CountryFlags/countries/pl.svg","mask":"(###)###-###"},{"name":"Portugal","code":"+351","iso":"PT","flag":"https://cdn.kcak11.com/CountryFlags/countries/pt.svg","mask":"##-###-####"},{"name":"Puerto Rico","code":"+1","iso":"PR","flag":"https://cdn.kcak11.com/CountryFlags/countries/pr.svg","mask":["(787) ### ####","(939) ### ####"]},{"name":"Qatar","code":"+974","iso":"QA","flag":"https://cdn.kcak11.com/CountryFlags/countries/qa.svg","mask":"####-####"},{"name":"Reunion","code":"+262","iso":"RE","flag":"https://cdn.kcak11.com/CountryFlags/countries/re.svg","mask":"#####-####"},{"name":"Romania","code":"+40","iso":"RO","flag":"https://cdn.kcak11.com/CountryFlags/countries/ro.svg","mask":"##-###-####"},{"name":"Russia","code":"+7","iso":"RU","flag":"https://cdn.kcak11.com/CountryFlags/countries/ru.svg","mask":"(###)###-##-##"},{"name":"Rwanda","code":"+250","iso":"RW","flag":"https://cdn.kcak11.com/CountryFlags/countries/rw.svg","mask":"(###)###-###"},{"name":"Saint Barthelemy","code":"+590","iso":"BL","flag":"https://cdn.kcak11.com/CountryFlags/countries/bl.svg","mask":"###-##-##-##"},{"name":"Saint Helena, Ascension and Tristan Da Cunha","code":"+290","iso":"SH","flag":"https://cdn.kcak11.com/CountryFlags/countries/sh.svg","mask":"####"},{"name":"Saint Kitts and Nevis","code":"+1","iso":"KN","flag":"https://cdn.kcak11.com/CountryFlags/countries/kn.svg","mask":"(869)###-####"},{"name":"Saint Lucia","code":"+1","iso":"LC","flag":"https://cdn.kcak11.com/CountryFlags/countries/lc.svg","mask":"(758)###-####"},{"name":"Saint Martin","code":"+590","iso":"MF","flag":"https://cdn.kcak11.com/CountryFlags/countries/mf.svg","mask":"(###)###-###"},{"name":"Saint Pierre and Miquelon","code":"+508","iso":"PM","flag":"https://cdn.kcak11.com/CountryFlags/countries/pm.svg","mask":"##-####"},{"name":"Saint Vincent and the Grenadines","code":"+1","iso":"VC","flag":"https://cdn.kcak11.com/CountryFlags/countries/vc.svg","mask":"(784)###-####"},{"name":"Samoa","code":"+685","iso":"WS","flag":"https://cdn.kcak11.com/CountryFlags/countries/ws.svg","mask":"##-####"},{"name":"San Marino","code":"+378","iso":"SM","flag":"https://cdn.kcak11.com/CountryFlags/countries/sm.svg","mask":"####-######"},{"name":"Sao Tome and Principe","code":"+239","iso":"ST","flag":"https://cdn.kcak11.com/CountryFlags/countries/st.svg","mask":"##-#####"},{"name":"Saudi Arabia","code":"+966","iso":"SA","flag":"https://cdn.kcak11.com/CountryFlags/countries/sa.svg","mask":["#-###-####","5#-####-####"]},{"name":"Senegal","code":"+221","iso":"SN","flag":"https://cdn.kcak11.com/CountryFlags/countries/sn.svg","mask":"##-###-####"},{"name":"Serbia","code":"+381","iso":"RS","flag":"https://cdn.kcak11.com/CountryFlags/countries/rs.svg","mask":"##-###-####"},{"name":"Seychelles","code":"+248","iso":"SC","flag":"https://cdn.kcak11.com/CountryFlags/countries/sc.svg","mask":"#-###-###"},{"name":"Sierra Leone","code":"+232","iso":"SL","flag":"https://cdn.kcak11.com/CountryFlags/countries/sl.svg","mask":"##-######"},{"name":"Singapore","code":"+65","iso":"SG","flag":"https://cdn.kcak11.com/CountryFlags/countries/sg.svg","mask":"####-####"},{"name":"Sint Maarten","code":"+1","iso":"SX","flag":"https://cdn.kcak11.com/CountryFlags/countries/sx.svg","mask":"(721)###-####"},{"name":"Slovakia","code":"+421","iso":"SK","flag":"https://cdn.kcak11.com/CountryFlags/countries/sk.svg","mask":"(###)###-###"},{"name":"Slovenia","code":"+386","iso":"SI","flag":"https://cdn.kcak11.com/CountryFlags/countries/si.svg","mask":"##-###-###"},{"name":"Solomon Islands","code":"+677","iso":"SB","flag":"https://cdn.kcak11.com/CountryFlags/countries/sb.svg","mask":["#####","###-####"]},{"name":"Somalia","code":"+252","iso":"SO","flag":"https://cdn.kcak11.com/CountryFlags/countries/so.svg","mask":["#-###-###","##-###-###"]},{"name":"South Africa","code":"+27","iso":"ZA","flag":"https://cdn.kcak11.com/CountryFlags/countries/za.svg","mask":"##-###-####"},{"name":"South Georgia and the South Sandwich Islands","code":"+500","iso":"GS","flag":"https://cdn.kcak11.com/CountryFlags/countries/gs.svg","mask":"#####"},{"name":"South Sudan","code":"+211","iso":"SS","flag":"https://cdn.kcak11.com/CountryFlags/countries/ss.svg","mask":"##-###-####"},{"name":"Spain","code":"+34","iso":"ES","flag":"https://cdn.kcak11.com/CountryFlags/countries/es.svg","mask":"(###)###-###"},{"name":"Sri Lanka","code":"+94","iso":"LK","flag":"https://cdn.kcak11.com/CountryFlags/countries/lk.svg","mask":"##-###-####"},{"name":"Sudan","code":"+249","iso":"SD","flag":"https://cdn.kcak11.com/CountryFlags/countries/sd.svg","mask":"##-###-####"},{"name":"Suriname","code":"+597","iso":"SR","flag":"https://cdn.kcak11.com/CountryFlags/countries/sr.svg","mask":["###-###","###-####"]},{"name":"Svalbard and Jan Mayen","code":"+47","iso":"SJ","flag":"https://cdn.kcak11.com/CountryFlags/countries/sj.svg","mask":"(###)##-###"},{"name":"Sweden","code":"+46","iso":"SE","flag":"https://cdn.kcak11.com/CountryFlags/countries/se.svg","mask":"##-###-####"},{"name":"Switzerland","code":"+41","iso":"CH","flag":"https://cdn.kcak11.com/CountryFlags/countries/ch.svg","mask":"##-###-####"},{"name":"Syrian Arab Republic","code":"+963","iso":"SY","flag":"https://cdn.kcak11.com/CountryFlags/countries/sy.svg","mask":"##-####-###"},{"name":"Taiwan","code":"+886","iso":"TW","flag":"https://cdn.kcak11.com/CountryFlags/countries/tw.svg","mask":["####-####","#-####-####"]},{"name":"Tajikistan","code":"+992","iso":"TJ","flag":"https://cdn.kcak11.com/CountryFlags/countries/tj.svg","mask":"##-###-####"},{"name":"Tanzania, United Republic of Tanzania","code":"+255","iso":"TZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/tz.svg","mask":"##-###-####"},{"name":"Thailand","code":"+66","iso":"TH","flag":"https://cdn.kcak11.com/CountryFlags/countries/th.svg","mask":["##-###-###","##-###-####"]},{"name":"Timor-Leste","code":"+670","iso":"TL","flag":"https://cdn.kcak11.com/CountryFlags/countries/tl.svg","mask":["###-####","77#-#####","78#-#####"]},{"name":"Togo","code":"+228","iso":"TG","flag":"https://cdn.kcak11.com/CountryFlags/countries/tg.svg","mask":"##-###-###"},{"name":"Tokelau","code":"+690","iso":"TK","flag":"https://cdn.kcak11.com/CountryFlags/countries/tk.svg","mask":"####"},{"name":"Tonga","code":"+676","iso":"TO","flag":"https://cdn.kcak11.com/CountryFlags/countries/to.svg","mask":"#####"},{"name":"Trinidad and Tobago","code":"+1","iso":"TT","flag":"https://cdn.kcak11.com/CountryFlags/countries/tt.svg","mask":"(868)###-####"},{"name":"Tunisia","code":"+216","iso":"TN","flag":"https://cdn.kcak11.com/CountryFlags/countries/tn.svg","mask":"##-###-###"},{"name":"Turkey","code":"+90","iso":"TR","flag":"https://cdn.kcak11.com/CountryFlags/countries/tr.svg","mask":"(###)###-####"},{"name":"Turkmenistan","code":"+993","iso":"TM","flag":"https://cdn.kcak11.com/CountryFlags/countries/tm.svg","mask":"#-###-####"},{"name":"Turks and Caicos Islands","code":"+1","iso":"TC","flag":"https://cdn.kcak11.com/CountryFlags/countries/tc.svg","mask":"(249)###-###"},{"name":"Tuvalu","code":"+688","iso":"TV","flag":"https://cdn.kcak11.com/CountryFlags/countries/tv.svg","mask":["2####","90####"]},{"name":"Uganda","code":"+256","iso":"UG","flag":"https://cdn.kcak11.com/CountryFlags/countries/ug.svg","mask":"(###)###-###"},{"name":"Ukraine","code":"+380","iso":"UA","flag":"https://cdn.kcak11.com/CountryFlags/countries/ua.svg","mask":"(##)###-##-##"},{"name":"United Arab Emirates","code":"+971","iso":"AE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ae.svg","mask":["#-###-####","5#-###-####"]},{"name":"United Kingdom","code":"+44","iso":"GB","flag":"https://cdn.kcak11.com/CountryFlags/countries/gb.svg","mask":"##-####-####"},{"name":"United States","code":"+1","iso":"US","flag":"https://cdn.kcak11.com/CountryFlags/countries/us.svg","mask":"(###)###-####"},{"name":"Uruguay","code":"+598","iso":"UY","flag":"https://cdn.kcak11.com/CountryFlags/countries/uy.svg","mask":"#-###-##-##"},{"name":"Uzbekistan","code":"+998","iso":"UZ","flag":"https://cdn.kcak11.com/CountryFlags/countries/uz.svg","mask":"##-###-####"},{"name":"Vanuatu","code":"+678","iso":"VU","flag":"https://cdn.kcak11.com/CountryFlags/countries/vu.svg","mask":["#####","##-#####"]},{"name":"Venezuela, Bolivarian Republic of Venezuela","code":"+58","iso":"VE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ve.svg","mask":"(###)###-####"},{"name":"Vietnam","code":"+84","iso":"VN","flag":"https://cdn.kcak11.com/CountryFlags/countries/vn.svg","mask":["##-####-###","(###)####-###"]},{"name":"Virgin Islands, British","code":"+1","iso":"VG","flag":"https://cdn.kcak11.com/CountryFlags/countries/vg.svg","mask":"(284)###-####"},{"name":"Virgin Islands, U.S.","code":"+1","iso":"VI","flag":"https://cdn.kcak11.com/CountryFlags/countries/vi.svg","mask":"(340)###-####"},{"name":"Wallis and Futuna","code":"+681","iso":"WF","flag":"https://cdn.kcak11.com/CountryFlags/countries/wf.svg","mask":"##-####"},{"name":"Yemen","code":"+967","iso":"YE","flag":"https://cdn.kcak11.com/CountryFlags/countries/ye.svg","mask":["#-###-###","##-###-###","###-###-###"]},{"name":"Zambia","code":"+260","iso":"ZM","flag":"https://cdn.kcak11.com/CountryFlags/countries/zm.svg","mask":"##-###-####"},{"name":"Zimbabwe","code":"+263","iso":"ZW","flag":"https://cdn.kcak11.com/CountryFlags/countries/zw.svg","mask":"#-######"}]');
+
 /***/ })
 
 /******/ 	});
@@ -10811,7 +18102,7 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;

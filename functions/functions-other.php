@@ -142,7 +142,7 @@ function is_dev_site() {
 	return in_array( wp_get_environment_type(), [ 'local', 'development' ], true );
 }
 
-add_filter( 'show_admin_bar', 'admin_bar_for_editors_and_dev_site', 99 );
+// add_filter( 'show_admin_bar', 'admin_bar_for_editors_and_dev_site', 99 );
 
 /**
  * Для админа и редакторов тулбар оставить, для остальных - скрыть (кроме DEV версии сайт).

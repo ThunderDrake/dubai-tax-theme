@@ -16,8 +16,9 @@
         <div class="preferences-section__form-title">
           Fill out the form and our specialist will will contact you<br><span>within 15 minutes</span>
         </div>
-        <form class="preferences-section__form" action="">
-          <input class="preferences-section__form-input input-reset" type="text" placeholder="Your e-mail">
+        <form class="preferences-section__form" data-form="section-form">
+          <input class="preferences-section__form-input input-reset preferences-section__form-input--name" name="name" type="text" placeholder="Your e-mail">
+          <input class="preferences-section__form-input input-reset preferences-section__form-input--tel" name="phone" data-phone-country type="tel">
           <button class="btn-reset preferences-section__form-button btn--main">Next</button>
           <label class="custom-checkbox preferences-section__form-checkbox">
             <input type="checkbox" class="custom-checkbox__field">

@@ -262,6 +262,8 @@
       border-radius: 115px;
       padding-right: get-vw(45px);
       padding-left: get-vw(45px);
+      width: 100%;
+      height: 100%;
       box-shadow: 0 0 21px 0 rgb(255 255 255 / 40%) inset;
       font-weight: 500;
       font-style: normal;
@@ -283,6 +285,10 @@
       @include mobile {
         padding: 23px;
       }
+    }
+
+    .iti__flag-container {
+      color: #1c1c1c;
     }
 
     &-button {

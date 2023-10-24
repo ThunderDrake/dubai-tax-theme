@@ -10,8 +10,8 @@
           </svg>
           <div class="form-section__info-text">Updated: <span>12 august 2023</span></div>
         </div>
-        <form class="form-section__form" action="">
-          <input class="form-section__form-input input-reset" type="text" placeholder="Your e-mail">
+        <form class="form-section__form" action="" data-form="guide-form">
+          <input class="form-section__form-input input-reset form-section__form-input--mail" type="text" placeholder="Your e-mail">
           <button class="btn-reset form-section__form-button btn--main">Next</button>
           <label class="custom-checkbox form-section__form-checkbox">
             <input type="checkbox" class="custom-checkbox__field">

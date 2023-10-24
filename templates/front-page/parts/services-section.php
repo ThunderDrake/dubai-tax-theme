@@ -20,7 +20,7 @@
         </ul>
         <div class="service__footer">
           <div class="service__price">from 10 000 AED</div>
-          <button class="btn-reset service__button btn--main-stroke" data-graph-path="callback-modal">Order a service</button>
+          <button class="btn-reset service__button btn--main-stroke" data-graph-path="legal-modal">Order a service</button>
         </div>
       </div>
       <div class="services__item service">
@@ -38,7 +38,7 @@
         </ul>
         <div class="service__footer">
           <div class="service__price">from 15 000 AED</div>
-          <button class="btn-reset service__button btn--main-stroke" data-graph-path="callback-modal">Order a service</button>
+          <button class="btn-reset service__button btn--main-stroke" data-graph-path="accounting-modal">Order a service</button>
         </div>
       </div>
     </div>
