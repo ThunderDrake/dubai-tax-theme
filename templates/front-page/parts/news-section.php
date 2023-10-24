@@ -1,3 +1,12 @@
+<?php
+global $post;
+
+$news_list = get_posts([
+  'numberposts' => 10,
+	'post_type'   => 'news',
+	'suppress_filters' => true,
+]);
+?>
 <section class="news-section">
   <div class="news-section__container content-container">
     <div class="news-section__header">
@@ -18,71 +27,23 @@
 
     <div class="swiper news-section__slider">
       <div class="swiper-wrapper news-section__slider-wrapper">
+        <?php foreach($news_list as $post): ?>
+          <?php setup_postdata( $post ) ?>
          <div class="swiper-slide news-section__slider-slide news">
             <div class="news__wrapper">
               <div class="news__image-wrapper">
-                <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/news-image.jpg" class="news__image" width="370" height="218" alt="">
-                <div class="news__date">13 июля, 2023</div>
+                <img loading="lazy" src="<?= get_the_post_thumbnail_url(get_the_ID(), 'full') ?>" class="news__image" width="370" height="218" alt="">
+                <div class="news__date"><?= get_the_date('j F, Y') ?></div>
               </div>
               <div class="news__content">
-                <div class="news__title">В Абу-Даби пресечена деятельность фиктивной туристической фирмы</div>
-                <div class="news__description">В Абу-Даби суд приговорил к тюремному заключению 13 человек за финансовые махинации и неуплату налогов. Сумма махинаций составила 510 млн дирхамов ОАЭ или примерно 139</div>
-                <a class="news__link" href="#">Подробнее</a>
+                <div class="news__title"><?php the_title() ?></div>
+                <div class="news__description"><?php the_excerpt() ?></div>
+                <a class="news__link" href="<?= get_permalink() ?>">More</a>
               </div>
             </div>
          </div>
-         <div class="swiper-slide news-section__slider-slide news">
-            <div class="news__wrapper">
-              <div class="news__image-wrapper">
-                <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/news-image.jpg" class="news__image" width="370" height="218" alt="">
-                <div class="news__date">13 июля, 2023</div>
-              </div>
-              <div class="news__content">
-                <div class="news__title">В Абу-Даби пресечена деятельность фиктивной туристической фирмы</div>
-                <div class="news__description">В Абу-Даби суд приговорил к тюремному заключению 13 человек за финансовые махинации и неуплату налогов. Сумма махинаций составила 510 млн дирхамов ОАЭ или примерно 139</div>
-                <a class="news__link" href="#">Подробнее</a>
-              </div>
-            </div>
-         </div>
-         <div class="swiper-slide news-section__slider-slide news">
-            <div class="news__wrapper">
-              <div class="news__image-wrapper">
-                <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/news-image.jpg" class="news__image" width="370" height="218" alt="">
-                <div class="news__date">13 июля, 2023</div>
-              </div>
-              <div class="news__content">
-                <div class="news__title">В Абу-Даби пресечена деятельность фиктивной туристической фирмы</div>
-                <div class="news__description">В Абу-Даби суд приговорил к тюремному заключению 13 человек за финансовые махинации и неуплату налогов. Сумма махинаций составила 510 млн дирхамов ОАЭ или примерно 139</div>
-                <a class="news__link" href="#">Подробнее</a>
-              </div>
-            </div>
-         </div>
-         <div class="swiper-slide news-section__slider-slide news">
-            <div class="news__wrapper">
-              <div class="news__image-wrapper">
-                <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/news-image.jpg" class="news__image" width="370" height="218" alt="">
-                <div class="news__date">13 июля, 2023</div>
-              </div>
-              <div class="news__content">
-                <div class="news__title">В Абу-Даби пресечена деятельность фиктивной туристической фирмы</div>
-                <div class="news__description">В Абу-Даби суд приговорил к тюремному заключению 13 человек за финансовые махинации и неуплату налогов. Сумма махинаций составила 510 млн дирхамов ОАЭ или примерно 139</div>
-                <a class="news__link" href="#">Подробнее</a>
-              </div>
-            </div>
-         </div>
-         <div class="swiper-slide news-section__slider-slide news">
-            <div class="news__wrapper">
-              <div class="news__image-wrapper">
-                <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/news-image.jpg" class="news__image" width="370" height="218" alt="">
-                <div class="news__date">13 июля, 2023</div>
-              </div>
-              <div class="news__content">
-                <div class="news__title">В Абу-Даби пресечена деятельность фиктивной туристической фирмы</div>
-                <div class="news__description">В Абу-Даби суд приговорил к тюремному заключению 13 человек за финансовые махинации и неуплату налогов. Сумма махинаций составила 510 млн дирхамов ОАЭ или примерно 139</div>
-                <a class="news__link" href="#">Подробнее</a>
-              </div>
-            </div>
-         </div>
+         <?php endforeach; ?>
+         <?php wp_reset_postdata() ?>
 
       </div>
     </div>
