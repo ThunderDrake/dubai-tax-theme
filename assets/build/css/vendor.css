@@ -2924,12 +2924,12 @@ button.swiper-pagination-bullet {
 }
 
 .iti__flag {
-  background-image: url("../../../node_modules/intl-tel-input/build/img/flags.png");
+  background-image: url("../img/flags.png");
 }
 
 @media (min-device-pixel-ratio: 2), (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .iti__flag {
-    background-image: url("../../../node_modules/intl-tel-input/build/img/flags@2x.png");
+    background-image: url("../img/flags@2x.png");
   }
 }
 /*# sourceMappingURL=vendor.css.map */
