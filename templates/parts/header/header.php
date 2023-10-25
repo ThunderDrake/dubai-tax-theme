@@ -1,3 +1,8 @@
+<?php
+$site_menu_accounting = get_field('site_menu_accounting', 'option')['site_menu_item'];
+$site_menu_legal = get_field('site_menu_legal', 'option')['site_menu_item'];
+$site_menu_info = get_field('site_menu_info', 'option')['site_menu_item'];
+?>
 <!DOCTYPE html>
 <html lang="ru" class="page">
 
@@ -8,9 +13,35 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="theme-color" content="#111111">
   <?php wp_head(); ?>
+
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+      });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src =
+        'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-KW6XBZGV');
+
+  </script>
+  <!-- End Google Tag Manager -->
+
 </head>
 
 <body class="page__body">
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KW6XBZGV"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
   <div class="site-container">
     <header class="header">
       <div class="container header__container">
@@ -61,8 +92,10 @@
           <div class="header__contacts">
             <div class="header__top-text">We are working now, call</div>
             <div class="header__phone">
-              <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/dub-flag.png" class="header__phone-flag" width="30" height="15" alt="">
-              <a class="header__phone-link" href="tel:<?= Contacts::get_main_phone()['formated'] ?>"><?= Contacts::get_main_phone()['raw'] ?></a>
+              <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/dub-flag.png" class="header__phone-flag"
+                width="30" height="15" alt="">
+              <a class="header__phone-link"
+                href="tel:<?= Contacts::get_main_phone()['formated'] ?>"><?= Contacts::get_main_phone()['raw'] ?></a>
             </div>
           </div>
 
@@ -77,25 +110,52 @@
                 <li class="nav__item">
                   <span class="nav__link nav__link--dropdown">Accounting services</span>
                   <div class="nav__item-submenu">
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 1</a>
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 2</a>
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 3</a>
+                    <?php foreach($site_menu_accounting as $item): ?>
+                    <?php
+                    $title = '';
+
+                    if($item['item-name']) {
+                      $title = $item['item-name'];
+                    } else {
+                      $title = get_the_title(url_to_postid( $item['linked-page'] ));
+                    }
+                    ?>
+                    <a class="nav__link nav__link--submenu" href="<?= $item['linked-page'] ?>"><?= $title ?></a>
+                    <?php endforeach; ?>
                   </div>
                 </li>
                 <li class="nav__item">
                   <span class="nav__link nav__link--dropdown">Legal services</span>
                   <div class="nav__item-submenu">
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 1</a>
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 2</a>
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 3</a>
+                    <?php foreach($site_menu_legal as $item): ?>
+                    <?php
+                    $title = '';
+
+                    if($item['item-name']) {
+                      $title = $item['item-name'];
+                    } else {
+                      $title = get_the_title(url_to_postid( $item['linked-page'] ));
+                    }
+                    ?>
+                    <a class="nav__link nav__link--submenu" href="<?= $item['linked-page'] ?>"><?= $title ?></a>
+                    <?php endforeach; ?>
                   </div>
                 </li>
                 <li class="nav__item">
                   <span class="nav__link nav__link--dropdown">Helpful information</span>
                   <div class="nav__item-submenu">
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 1</a>
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 2</a>
-                    <a class="nav__link nav__link--submenu" href="#">Подменю 3</a>
+                    <?php foreach($site_menu_info as $item): ?>
+                    <?php
+                    $title = '';
+
+                    if($item['item-name']) {
+                      $title = $item['item-name'];
+                    } else {
+                      $title = get_the_title(url_to_postid( $item['linked-page'] ));
+                    }
+                    ?>
+                    <a class="nav__link nav__link--submenu" href="<?= $item['linked-page'] ?>"><?= $title ?></a>
+                    <?php endforeach; ?>
                   </div>
                 </li>
                 <li class="nav__item"><a href="/contacts/" class="nav__link">Contacts</a></li>
