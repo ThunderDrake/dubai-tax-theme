@@ -141,7 +141,7 @@
   </div>
 </footer>
 <div class="lang-switcher">
-<?php echo do_shortcode('[gtranslate]') ?>
+<?php echo do_shortcode('[language-switcher]') ?>
 </div>
 <?php ct()->template('/parts/modals/modals-section.php') ?>
 <?php wp_footer() ?>

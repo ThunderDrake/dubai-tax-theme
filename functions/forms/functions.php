@@ -54,7 +54,6 @@ function ajax_action_callback() {
     }
 
 		$headers = 'From: ' . $form_name . ' <' . $email_to . '>' . "\r\n" . 'Reply-To: ' . $email_to;
-    error_log( print_r( $body, true ) );
 		wp_mail( $email_to, 'Заявка с сайта Dubai TAX', $body, $headers );
 
 		$message_success = 'Собщение отправлено. В ближайшее время c вами свяжутся.';

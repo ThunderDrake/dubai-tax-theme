@@ -51,15 +51,17 @@
       flex-direction: column;
       border-radius: 3px;
       padding: get-vw(18px) get-vw(20px);
+      width: 250px;
       box-shadow: 0 0 7px 0 rgb(0 0 0 / 20%);
       background-color: #fff;
-      transform: translateY(30%);
+      transform: translateY(45px);
 
       @include mobile {
         position: relative;
         display: flex;
         overflow: hidden;
         padding: 0;
+        width: auto;
         max-height: 0;
         background-color: transparent;
         transform: translate(0);
