@@ -9,7 +9,7 @@
           <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/socials-section__video.jpg"
             class="socials-section__video-image" width="725" height="440" alt="">
           <div class="socials-section__links">
-            <a class="socials-section__links-item link-round-hover" href="#">
+            <a class="socials-section__links-item link-round-hover" href="<?= Contacts::get_tg_url() ?>">
               <svg width="112" height="112" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="112" height="112" rx="56" fill="url(#paint0_linear_1_1002)" />
                 <rect width="112" height="112" rx="56" fill="#05A0EB" />
@@ -25,7 +25,7 @@
                 </defs>
               </svg>
             </a>
-            <a class="socials-section__links-item link-round-hover" href="#">
+            <a class="socials-section__links-item link-round-hover" href="<?= Contacts::get_yt_url() ?>">
               <svg width="112" height="112" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="112" height="112" rx="56" fill="url(#paint0_linear_1_1009)" />
                 <rect width="112" height="112" rx="56" fill="#FF313D" />

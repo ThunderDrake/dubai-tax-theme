@@ -30,8 +30,8 @@
               width="98" height="98" alt="">
             <div class="header__address-content">
               <div class="header__address-title">Office address:</div>
-              <div class="header__address-text">Dubai Silicon Oasis, DDP</div>
-              <a class="header__address-link link-default" href="#">Show on map</a>
+              <div class="header__address-text"><?= Contacts::get_address() ?></div>
+              <a class="header__address-link link-default" href="<?= Contacts::get_map_url() ?>">Show on map</a>
             </div>
           </div>
 
@@ -39,7 +39,7 @@
 
           <div class="header__socials">
             <div class="header__socials-text">Ask a question, <br><span>we are online</span></div>
-            <a class="header__socials-link link-round-hover" href="#">
+            <a class="header__socials-link link-round-hover" href="<?= Contacts::get_wa_url() ?>">
               <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="54" height="54" rx="27" fill="#31B939" />
                 <path
@@ -48,7 +48,7 @@
               </svg>
 
             </a>
-            <a class="header__socials-link link-round-hover" href="#">
+            <a class="header__socials-link link-round-hover" href="<?= Contacts::get_tg_url() ?>">
               <svg width="55" height="54" viewBox="0 0 55 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="0.0839844" width="54" height="54" rx="27" fill="#05A0EB" />
                 <path
@@ -62,7 +62,7 @@
             <div class="header__top-text">We are working now, call</div>
             <div class="header__phone">
               <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/dub-flag.png" class="header__phone-flag" width="30" height="15" alt="">
-              <a class="header__phone-link" href="tel:+ 971 (58) 547-22-35">+ 971 (58) 547-22-35</a>
+              <a class="header__phone-link" href="tel:<?= Contacts::get_main_phone()['formated'] ?>"><?= Contacts::get_main_phone()['raw'] ?></a>
             </div>
           </div>
 
