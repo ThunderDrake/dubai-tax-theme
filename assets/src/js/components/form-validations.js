@@ -79,12 +79,10 @@ const validateForms = (selector, rules, url, nonce, action, afterSend) => {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          if (afterSend) {
-            // form.querySelector('.form__button').insertAdjacentHTML('afterend', `<p class="form-success">Спасибо за заявку! Мы скоро с вами свяжемся</p>`)
-          }
+          form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="form-success">Спасибо за заявку! Мы скоро с вами свяжемся</p>`)
           console.log('Отправлено');
         } else {
-          // form.querySelector('.form__button').insertAdjacentHTML('afterend', `<p class="just-validate-error-label">Что-то пошло не так!</p>`)
+          form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="just-validate-error-label">Что-то пошло не так!</p>`)
           console.log('Ошибка');
         }
       }
