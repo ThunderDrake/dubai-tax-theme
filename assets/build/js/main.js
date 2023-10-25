@@ -317,8 +317,8 @@ const sectionFormRules = [{
     errorMessage: 'Заполните телефон!'
   }]
 }];
-const serviceFormRules = [{
-  ruleSelector: '.service-modal__form-input--name',
+const serviceLegalFormRules = [{
+  ruleSelector: '.service-modal--legal .service-modal__form-input--name',
   rules: [{
     rule: 'minLength',
     value: 3
@@ -328,7 +328,27 @@ const serviceFormRules = [{
     errorMessage: 'Заполните имя!'
   }]
 }, {
-  ruleSelector: '.service-modal__form-input--tel',
+  ruleSelector: '.service-modal--legal .service-modal__form-input--tel',
+  tel: true,
+  telError: 'Введите корректный телефон',
+  rules: [{
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните телефон!'
+  }]
+}];
+const serviceAccountingFormRules = [{
+  ruleSelector: '.service-modal--accounting .service-modal__form-input--name',
+  rules: [{
+    rule: 'minLength',
+    value: 3
+  }, {
+    rule: 'required',
+    value: true,
+    errorMessage: 'Заполните имя!'
+  }]
+}, {
+  ruleSelector: '.service-modal--accounting .service-modal__form-input--tel',
   tel: true,
   telError: 'Введите корректный телефон',
   rules: [{
@@ -354,8 +374,8 @@ const guideFormRules = [{
 }];
 validateForms('[data-form="footer-form"]', footerFormRules, form_object.url, form_object.nonce, 'form_action');
 validateForms('[data-form="section-form"]', sectionFormRules, form_object.url, form_object.nonce, 'form_action');
-validateForms('[data-form="legal-form"]', serviceFormRules, form_object.url, form_object.nonce, 'form_action');
-validateForms('[data-form="accounting-form"]', serviceFormRules, form_object.url, form_object.nonce, 'form_action');
+validateForms('[data-form="legal-form"]', serviceLegalFormRules, form_object.url, form_object.nonce, 'form_action');
+validateForms('[data-form="accounting-form"]', serviceAccountingFormRules, form_object.url, form_object.nonce, 'form_action');
 validateForms('[data-form="guide-form"]', guideFormRules, form_object.url, form_object.nonce, 'form_action');
 
 /***/ }),
