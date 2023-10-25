@@ -1,4 +1,5 @@
-<section class="map-section">
+<section class="map-section" id="map
+">
   <div class="map-section__container content-container">
     <iframe class="map-section__map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10217.313217866327!2d55.37383907405759!3d25.12332329443916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f64405d99a8e3%3A0x8ace9c6fbf110ed1!2sDubai%20Silicon%20Oasis%20Authority!5e0!3m2!1sru!2sru!4v1694184654538!5m2!1sru!2sru" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     <div class="map-section__content">
