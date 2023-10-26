@@ -276,6 +276,10 @@ const validateForms = (selector, rules, url, nonce, action, afterSend) => {
         if (xhr.status === 200) {
           form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="form-success">Спасибо за заявку! Мы скоро с вами свяжемся</p>`);
           console.log('Отправлено');
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({
+            'event': 'formsubmit_all'
+          });
         } else {
           form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="just-validate-error-label">Что-то пошло не так!</p>`);
           console.log('Ошибка');
