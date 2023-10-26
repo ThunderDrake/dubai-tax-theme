@@ -10,6 +10,7 @@ function add_templates_to_dropdown( $templates ) {
 
 	// выбор шаблона в атрибутах
 	$templates['templates/contacts-page/contacts-page.php'] = 'Шаблон страницы "Контакты"';
+	$templates['templates/tariffs-page/tariffs-page.php'] = 'Шаблон страницы "Тарифы"';
 
 	return $templates;
 }
