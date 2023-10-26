@@ -37,7 +37,7 @@
           <li class="service__content-item">Annual audit</li>
         </ul>
         <div class="service__footer">
-          <div class="service__price">from 15 000 AED</div>
+          <div class="service__price">from 1500 AED</div>
           <button class="btn-reset service__button btn--main-stroke" data-graph-path="accounting-modal">Order a service</button>
         </div>
       </div>
