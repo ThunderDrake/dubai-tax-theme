@@ -13,7 +13,7 @@ $site_menu_legal = get_field('site_menu_legal', 'option')['site_menu_item'];
         <button class="btn-reset footer__form-button btn--main">Next</button>
         <label class="custom-checkbox footer__form-checkbox">
           <input type="checkbox" class="custom-checkbox__field">
-          <span class="custom-checkbox__content">I agree with the terms of the <a href="<?= get_privacy_policy_url() ?>">policy data
+          <span class="custom-checkbox__content">I agree with the terms of the <a href="<?= get_privacy_policy_url() ?>" target="_blank">policy data
               privacy</a></span>
         </label>
       </form>

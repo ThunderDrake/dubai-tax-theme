@@ -22,7 +22,7 @@
         <option value="Other">Other</option>
       </select>
       <button class="btn-reset service-modal__form-button">Find out the price</button>
-      <div class="service-modal__form-legal">By submitting the form you agree to the terms of the <a href="<?= get_privacy_policy_url() ?>">data
+      <div class="service-modal__form-legal">By submitting the form you agree to the terms of the <a href="<?= get_privacy_policy_url() ?>" target="_blank">data
           privacy policy</a></div>
     </form>
   </div>

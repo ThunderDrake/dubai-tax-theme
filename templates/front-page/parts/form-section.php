@@ -15,7 +15,7 @@
           <button class="btn-reset form-section__form-button btn--main">Next</button>
           <label class="custom-checkbox form-section__form-checkbox">
             <input type="checkbox" class="custom-checkbox__field">
-            <span class="custom-checkbox__content">I agree with the terms of the <a href="<?= get_privacy_policy_url() ?>">policy data privacy</a></span>
+            <span class="custom-checkbox__content">I agree with the terms of the <a href="<?= get_privacy_policy_url() ?>" target="_blank">policy data privacy</a></span>
           </label>
         </form>
       </div>
