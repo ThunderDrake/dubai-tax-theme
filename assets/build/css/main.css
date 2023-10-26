@@ -2492,6 +2492,8 @@ a {
 }
 .status-section__container {
   position: relative;
+}
+.status-section__slide {
   padding-top: 9.8958333333vw;
   padding-bottom: 9.375vw;
 }
@@ -2548,7 +2550,7 @@ a {
 }
 .status-section__doc-image {
   position: absolute;
-  right: -0.9375vw;
+  right: 0;
   bottom: -4.1666666667vw;
   width: 45.2083333333vw;
   height: 43.6979166667vw;
@@ -2576,7 +2578,8 @@ a {
     -webkit-box-pack: center;
     -ms-flex-pack: center;
     justify-content: center;
-    width: 100%;
+    margin: 0 auto;
+    width: auto;
   }
 }
 @media (max-width: 768px) {

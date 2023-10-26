@@ -7,6 +7,9 @@
 
   &__container {
     position: relative;
+  }
+
+  &__slide {
     padding-top: get-vw(190px);
     padding-bottom: get-vw(180px);
   }
@@ -64,7 +67,7 @@
 
   &__doc-image {
     position: absolute;
-    right: get-vw(-18px);
+    right: 0;
     bottom: get-vw(-80px);
     width: get-vw(868px);
     height: get-vw(839px);
@@ -88,7 +91,8 @@
 
     @include mobile {
       justify-content: center;
-      width: 100%;
+      margin: 0 auto;
+      width: auto;
     }
   }
 

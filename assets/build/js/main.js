@@ -25,8 +25,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_burger_menu__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/burger-menu */ "./assets/src/js/components/burger-menu.js");
 /* harmony import */ var _components_steps_slider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/steps-slider */ "./assets/src/js/components/steps-slider.js");
 /* harmony import */ var _components_team_slider__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/team-slider */ "./assets/src/js/components/team-slider.js");
-/* harmony import */ var _components_form_validations__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/form-validations */ "./assets/src/js/components/form-validations.js");
-/* harmony import */ var _components_modals__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/modals */ "./assets/src/js/components/modals.js");
+/* harmony import */ var _components_status_slider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/status-slider */ "./assets/src/js/components/status-slider.js");
+/* harmony import */ var _components_form_validations__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/form-validations */ "./assets/src/js/components/form-validations.js");
+/* harmony import */ var _components_modals__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/modals */ "./assets/src/js/components/modals.js");
+
 
 
 
@@ -441,6 +443,34 @@ const newsSlider = new swiper__WEBPACK_IMPORTED_MODULE_0__["default"]('.news-sec
       spaceBetween: 30
     }
   }
+});
+
+/***/ }),
+
+/***/ "./assets/src/js/components/status-slider.js":
+/*!***************************************************!*\
+  !*** ./assets/src/js/components/status-slider.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var swiper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! swiper */ "./node_modules/swiper/swiper.mjs");
+/* harmony import */ var swiper_modules__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! swiper/modules */ "./node_modules/swiper/modules/index.mjs");
+
+
+const statusSlider = new swiper__WEBPACK_IMPORTED_MODULE_0__["default"]('.status-section__slider', {
+  modules: [swiper_modules__WEBPACK_IMPORTED_MODULE_1__.Navigation, swiper_modules__WEBPACK_IMPORTED_MODULE_1__.Autoplay],
+  navigation: {
+    nextEl: '.steps__slider-button--next',
+    prevEl: '.steps__slider-button--prev'
+  },
+  slidesPerView: 1,
+  spaceBetween: 0,
+  autoplay: {
+    delay: 3000
+  },
+  loop: true
 });
 
 /***/ }),
