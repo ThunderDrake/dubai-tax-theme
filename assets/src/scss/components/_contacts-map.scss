@@ -42,6 +42,7 @@
   }
 
   &__map {
+    height: max(525px, get-vw(1120px));
     aspect-ratio: 16/9;
 
     @include mobile {

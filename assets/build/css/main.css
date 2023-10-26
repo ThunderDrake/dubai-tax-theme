@@ -3420,6 +3420,7 @@ a {
   }
 }
 .contacts-map__map {
+  height: max(525px, 58.3333333333vw);
   aspect-ratio: 16/9;
 }
 @media (max-width: 576px) {
