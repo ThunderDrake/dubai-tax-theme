@@ -4,7 +4,6 @@ global $post;
 $news_list = get_posts([
   'numberposts' => 10,
 	'post_type'   => 'news',
-	'suppress_filters' => true,
 ]);
 ?>
 <section class="news-section">
