@@ -345,7 +345,7 @@
             "label": "Ссылка на внешнюю карту",
             "name": "site-map-url",
             "aria-label": "",
-            "type": "url",
+            "type": "text",
             "instructions": "Укажите ссылку на внешнюю карту с расположением офиса компании",
             "required": 1,
             "conditional_logic": 0,
@@ -355,7 +355,10 @@
                 "id": ""
             },
             "default_value": "",
-            "placeholder": ""
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
         },
         {
             "key": "field_65384ef0a38c9",
@@ -531,5 +534,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1698280068
+    "modified": 1698364544
 }

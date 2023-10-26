@@ -70,7 +70,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
           <div class="header__socials">
             <div class="header__socials-text">Ask a question, <br><span>we are online</span></div>
-            <a class="header__socials-link link-round-hover" href="<?= Contacts::get_wa_url() ?>">
+            <a class="header__socials-link link-round-hover" href="<?= Contacts::get_wa_url() ?>" rel="nofollow noopener noreferrer">
               <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="54" height="54" rx="27" fill="#31B939" />
                 <path
@@ -79,7 +79,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </svg>
 
             </a>
-            <a class="header__socials-link link-round-hover" href="<?= Contacts::get_tg_url() ?>">
+            <a class="header__socials-link link-round-hover" href="<?= Contacts::get_tg_url() ?>" rel="nofollow noopener noreferrer">
               <svg width="55" height="54" viewBox="0 0 55 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="0.0839844" width="54" height="54" rx="27" fill="#05A0EB" />
                 <path
