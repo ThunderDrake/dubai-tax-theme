@@ -37,7 +37,7 @@ function ajax_action_callback() {
 
 	} else {
 
-		$email_to = 'drake9100@mail.ru';
+		$email_to = get_field('site_callback-email', 'option');
 
 		if ( ! $email_to ) {
 			$email_to = get_option( 'admin_email' );
