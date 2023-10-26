@@ -1,6 +1,6 @@
 <div class="advantages">
   <div class="advantages__container content-container">
-    <h2 class="advantages__title site-title">There are only <span>2 taxes</span> in the UAE and one of the <b>most
+    <h2 class="advantages__title site-title" data-aos="fade-up">There are only <span>2 taxes</span> in the UAE and one of the <b>most
         favorable tax jurisdictions in the world</b></h2>
     <div class="advantages__layout">
       <div class="advantages__grid-wrapper">

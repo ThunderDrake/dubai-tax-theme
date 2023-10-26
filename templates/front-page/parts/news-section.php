@@ -10,7 +10,7 @@ $news_list = get_posts([
 <section class="news-section">
   <div class="news-section__container content-container">
     <div class="news-section__header">
-      <h2 class="news-section__title">And we talk about the <span>nuances of accounting</span>, <b>share useful tools</b></h2>
+      <h2 class="news-section__title" data-aos="fade-up">And we talk about the <span>nuances of accounting</span>, <b>share useful tools</b></h2>
       <div class="news-section__slider-controls">
         <button class="btn-reset news-section__slider-button news-section__slider-button--prev">
           <svg class="news-section__slider-button-icon" width="29" height="16">

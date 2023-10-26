@@ -1,6 +1,6 @@
 <section class="services">
   <div class="services__container content-container">
-    <h2 class="services__title site-title">You are <span>completely exempt</span> from <b>accounting</b> and <b>legal</b> services issues, we will take care of everything</h2>
+    <h2 class="services__title site-title" data-aos="fade-up">You are <span>completely exempt</span> from <b>accounting</b> and <b>legal</b> services issues, we will take care of everything</h2>
     <div class="services__list">
       <div class="services__item service">
         <div class="service__title">Legal services</div>

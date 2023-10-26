@@ -3,7 +3,7 @@
     <div class="content-container contacts-map__content">
       <div class="contacts-map__left">
         <div class="contacts-map__wrapper">
-          <div class="contacts-map__title">Наши контакты</div>
+          <div class="contacts-map__title">Our contacts</div>
           <div class="contacts-map__phones">
             <div class="footer__top-text">We are working now, call</div>
             <div class="footer__phone">

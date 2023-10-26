@@ -1,7 +1,7 @@
 <section class="steps">
   <div class="steps__container container">
     <div class="content-container">
-      <h2 class="steps__title"><span>Comprehensive management of your business</span> (from creation to accounting) -
+      <h2 class="steps__title" data-aos="fade-up"><span>Comprehensive management of your business</span> (from creation to accounting) -
         just 4 steps</h2>
       <div class="steps__slider-controls">
         <button class="btn-reset steps__slider-button steps__slider-button--prev">

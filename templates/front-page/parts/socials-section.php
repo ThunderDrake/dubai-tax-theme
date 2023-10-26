@@ -1,8 +1,8 @@
 <section class="socials-section">
   <div class="socials-section__container content-container">
     <div class="socials-section__wrapper">
-      <div class="socials-section__subtitle">We are active on social networks</div>
-      <div class="socials-section__title">We not only show the work process in an ideal format, <span>but also talk
+      <div class="socials-section__subtitle" data-aos="fade-right">We are active on social networks</div>
+      <div class="socials-section__title" data-aos="fade-up" data-aos-delay="500">We not only show the work process in an ideal format, <span>but also talk
           about the difficulties and how we deal with them</span></div>
       <div class="socials-section__content">
         <div class="socials-section__video">

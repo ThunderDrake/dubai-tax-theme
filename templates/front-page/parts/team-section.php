@@ -1,9 +1,9 @@
 <section class="team">
   <div class="team__container container">
     <div class="content-container">
-      <h2 class="team__title">To <span>successfully launch a business in the UAE</span>, <span>experience in this
+      <h2 class="team__title" data-aos="fade-up">To <span>successfully launch a business in the UAE</span>, <span>experience in this
           country</span> is required</h2>
-      <div class="team__text"><b>Our entire team</b> of specialists has <span>over 10 years of experience in the
+      <div class="team__text" data-aos="fade-up" data-aos-delay="600"><b>Our entire team</b> of specialists has <span>over 10 years of experience in the
           UAE</span></div>
       <div class="team__slider-controls">
         <button class="btn-reset team__slider-button team__slider-button--prev">

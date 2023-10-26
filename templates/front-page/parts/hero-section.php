@@ -1,10 +1,10 @@
 <section class="hero">
   <div class="content-container hero__container">
     <div class="hero__content">
-      <h1 class="hero__title">
+      <h1 class="hero__title" data-aos="fade-up">
         <span>We will register your business in the UAE</span> with a further strategy
         for <span>2 weeks</span> on a turnkey basis</h1>
-      <div class="hero__subtitle">
+      <div class="hero__subtitle" data-aos="fade-up" data-aos-delay="300">
         We guarantee the opening of a bank account.<br>
         <span>With us, you will become a resident of the UAE.</span>
 
@@ -38,6 +38,6 @@
       </div>
     </div>
     <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/hero-persons.png" class="hero__persons-image" width="849"
-      height="769" alt="">
+      height="769" alt="" data-aos="fade-left" data-aos-delay="600">
   </div>
 </section>
