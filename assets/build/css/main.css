@@ -793,6 +793,7 @@ a {
   z-index: 1;
   margin: 0 0.78125vw;
   padding: 0.5208333333vw 0;
+  text-align: center;
 }
 .nav__item-submenu {
   position: absolute;

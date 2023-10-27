@@ -1,6 +1,7 @@
 <?php
 $site_menu_accounting = get_field('site_menu_accounting', 'option')['site_menu_item'];
 $site_menu_legal = get_field('site_menu_legal', 'option')['site_menu_item'];
+$site_menu_hr = get_field('site_menu_hr', 'option')['site_menu_item'];
 $site_menu_info = get_field('site_menu_info', 'option')['site_menu_item'];
 ?>
 <!DOCTYPE html>
@@ -128,6 +129,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   <span class="nav__link nav__link--dropdown">Legal services</span>
                   <div class="nav__item-submenu">
                     <?php foreach($site_menu_legal as $item): ?>
+                    <?php
+                    $title = '';
+
+                    if($item['item-name']) {
+                      $title = $item['item-name'];
+                    } else {
+                      $title = get_the_title(url_to_postid( $item['linked-page'] ));
+                    }
+                    ?>
+                    <a class="nav__link nav__link--submenu" href="<?= $item['linked-page'] ?>"><?= $title ?></a>
+                    <?php endforeach; ?>
+                  </div>
+                </li>
+                <li class="nav__item">
+                  <span class="nav__link nav__link--dropdown">HR in UAE</span>
+                  <div class="nav__item-submenu">
+                    <?php foreach($site_menu_hr as $item): ?>
                     <?php
                     $title = '';
 

@@ -196,6 +196,94 @@
             ]
         },
         {
+            "key": "field_653bd2cc22636",
+            "label": "Пункт меню HR in UAE",
+            "name": "site_menu_hr",
+            "aria-label": "",
+            "type": "group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "layout": "block",
+            "sub_fields": [
+                {
+                    "key": "field_653bd2cc2263a",
+                    "label": "Пункт меню",
+                    "name": "site_menu_item",
+                    "aria-label": "",
+                    "type": "repeater",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "layout": "block",
+                    "pagination": 0,
+                    "min": 0,
+                    "max": 0,
+                    "collapsed": "",
+                    "button_label": "Добавить",
+                    "rows_per_page": 20,
+                    "sub_fields": [
+                        {
+                            "key": "field_653bd2cc2263b",
+                            "label": "Связанная страница",
+                            "name": "linked-page",
+                            "aria-label": "",
+                            "type": "page_link",
+                            "instructions": "Выберите страницу, на которую должна быть ссылка в меню",
+                            "required": 1,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "post_type": [
+                                "page",
+                                "news"
+                            ],
+                            "post_status": "",
+                            "taxonomy": "",
+                            "allow_archives": 1,
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "parent_repeater": "field_653bd2cc2263a"
+                        },
+                        {
+                            "key": "field_653bd2cc2263c",
+                            "label": "Название пункта",
+                            "name": "item-name",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "Укажите название пункта меню. Можете оставить поле пустым и тогда будет использован заголовок страницы",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "maxlength": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "parent_repeater": "field_653bd2cc2263a"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "key": "field_653913055bca3",
             "label": "Пункт меню Helpful information",
             "name": "site_menu_info",
@@ -534,5 +622,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1698364544
+    "modified": 1698419415
 }
