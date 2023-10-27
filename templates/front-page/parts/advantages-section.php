@@ -49,7 +49,7 @@
         </a>
       </div>
       <div class="advantages__callback">
-        <div class="advantages__callback-cite">«<span>700+ companies have chosen our expertise</span> to successfully start a business in the UAE. We are located in Dubai and have all the practical experience in the region»</div>
+        <div class="advantages__callback-cite">«<span>450+ companies have chosen our expertise</span> to successfully start a business in the UAE. We are located in Dubai and have all the practical experience in the region»</div>
         <div class="advantages__callback-footer">
           <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/advantages-person.png" class="advantages__callback-person" width="125" height="125" alt="">
           <div class="advantages__callback-info">
