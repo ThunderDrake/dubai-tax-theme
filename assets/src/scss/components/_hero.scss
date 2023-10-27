@@ -101,6 +101,36 @@
       }
     }
 
+    &-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-item {
+      position: relative;
+      padding-left: 20px;
+      font-weight: 400;
+      font-size: max(16px, get-vw(24px));
+      line-height: 1.4;
+      letter-spacing: -0.5px;
+      color: #6b6b6b;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: max(8px, get-vw(10px));
+        border-radius: 50%;
+        width: 8px;
+        height: 8px;
+        background: #6b6b6b;
+      }
+
+      span {
+        font-weight: 700;
+      }
+    }
+
     span {
       font-weight: 600;
     }
@@ -132,6 +162,10 @@
   }
 
   &__small-text {
+    @include small-tablet {
+    }
+
+    position: relative;
     margin-left: get-vw(30px);
     font-weight: 400;
     font-style: normal;
@@ -141,13 +175,42 @@
     color: #1c1c1c;
     transform: translateY(get-vw(48px));
 
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: max(160px, get-vw(180px));
+      height: max(130px, get-vw(145px));
+      background-image: url("../img/hero__guide.png");
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform: translateY(-80%);
+
+      @include small-tablet {
+        left: 0;
+        top: 0;
+        width: 160px;
+        height: 130px;
+        transform: translate(0);
+      }
+    }
+
     span {
       font-weight: 600;
     }
 
+    @include small-tablet {
+      padding-top: 30px;
+      padding-left: 180px;
+      text-align: left;
+    }
+
     @include mobile {
+      margin-bottom: 40px;
       margin-left: 0;
-      text-align: center;
+      text-align: left;
     }
   }
 

@@ -5,8 +5,14 @@
         <span>We will register your business in the UAE</span> with a further strategy
         for <span>2 weeks</span> on a turnkey basis</h1>
       <div class="hero__subtitle" data-aos="fade-up" data-aos-delay="300">
-        We guarantee the opening of a bank account.<br>
-        <span>With us, you will become a resident of the UAE.</span>
+        <div class="hero__subtitle-list">
+          <div class="hero__subtitle-item">
+            We guarantee the opening of a bank account.
+          </div>
+          <div class="hero__subtitle-item">
+            Preliminary consultation of an accountant <span>for free</span>
+          </div>
+        </div>
 
       </div>
       <div class="hero__footer">
@@ -24,7 +30,7 @@
       </div>
       <div class="hero__advantages">
         <div class="hero__advantages-item">
-          <div class="hero__advantages-title">9300 +</div>
+          <div class="hero__advantages-title">5300 +</div>
           <div class="hero__advantages-text">Consultations held</div>
         </div>
         <div class="hero__advantages-item">
@@ -32,7 +38,7 @@
           <div class="hero__advantages-text">Global Partners in the UAE</div>
         </div>
         <div class="hero__advantages-item">
-          <div class="hero__advantages-title">700+</div>
+          <div class="hero__advantages-title">450+</div>
           <div class="hero__advantages-text">Companies registered</div>
         </div>
       </div>
