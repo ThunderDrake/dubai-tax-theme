@@ -461,10 +461,6 @@ __webpack_require__.r(__webpack_exports__);
 
 const statusSlider = new swiper__WEBPACK_IMPORTED_MODULE_0__["default"]('.status-section__slider', {
   modules: [swiper_modules__WEBPACK_IMPORTED_MODULE_1__.Navigation, swiper_modules__WEBPACK_IMPORTED_MODULE_1__.Autoplay],
-  navigation: {
-    nextEl: '.steps__slider-button--next',
-    prevEl: '.steps__slider-button--prev'
-  },
   slidesPerView: 1,
   spaceBetween: 0,
   autoplay: {
