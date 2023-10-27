@@ -1,7 +1,7 @@
 <section class="status-section">
   <div class="status-section__container content-container">
     <div class="swiper status-section__slider">
-      <div class="swiper-wrapper status-section__slider">
+      <div class="swiper-wrapper status-section__slider-wrapper">
         <div class="swiper-slide status-section__slide">
           <h2 class="status-section__title" data-aos="fade-up">Our company has the <span>status of a professional
               partner of the free economic
