@@ -176,10 +176,7 @@
     &--bottom {
       align-items: center;
       justify-content: space-between;
-
-      @include mobile {
-        padding-bottom: 72px;
-      }
+      padding-bottom: 140px;
     }
 
     @include small-tablet {

@@ -367,6 +367,11 @@ a {
   border-radius: 0;
   width: 560px;
 }
+@media (max-width: 576px) {
+  .graph-modal__container {
+    width: 90%;
+  }
+}
 
 .lang-switcher {
   position: fixed;
@@ -3602,6 +3607,16 @@ a {
   flex-basis: auto;
 }
 
+.quiz iframe {
+  height: max(765px, 42.4479166667vw);
+}
+@media (max-width: 576px) {
+  .quiz iframe {
+    height: 765px !important;
+    aspect-ratio: auto;
+  }
+}
+
 .footer {
   color: #fff;
   background-color: #1c1c1c;
@@ -3798,11 +3813,7 @@ a {
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
-}
-@media (max-width: 576px) {
-  .footer__container--bottom {
-    padding-bottom: 72px;
-  }
+  padding-bottom: 140px;
 }
 @media (max-width: 768px) {
   .footer__container {

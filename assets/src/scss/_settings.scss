@@ -290,6 +290,10 @@ a {
 .graph-modal__container {
   border-radius: 0;
   width: 560px;
+
+  @include mobile {
+    width: 90%;
+  }
 }
 
 .lang-switcher {
