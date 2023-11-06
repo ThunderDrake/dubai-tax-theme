@@ -51,6 +51,14 @@
               <div class="team__list-item-text">Chief Operating Officer</div>
             </div>
           </div>
+          <div class="swiper-slide team__slider-item">
+            <div class="team__list-item">
+              <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/team-person-5.jpg"
+                class="team__list-item-image" width="350" height="350" alt="">
+              <div class="team__list-item-title">Ekaterina Tverdokhleb</div>
+              <div class="team__list-item-text">HR Director</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

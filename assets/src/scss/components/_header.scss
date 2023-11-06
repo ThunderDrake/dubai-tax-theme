@@ -182,7 +182,7 @@
 
 .logo {
   width: max(60px, get-vw(110px));
-  height: max(50px, get-vw(92px));
+  height: max(50px, get-vw(100px));
   line-height: 140%;
   letter-spacing: -0.5px;
   color: #1c1c1c;
@@ -204,7 +204,7 @@
 
   @include mobile {
     width: 60px;
-    height: 50px;
+    height: 75px;
   }
 }
 

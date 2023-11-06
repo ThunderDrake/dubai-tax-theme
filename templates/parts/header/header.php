@@ -46,7 +46,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="site-container">
     <header class="header">
       <div class="container header__container">
-        <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/small-logo.png" class="header__small-logo" width="72"
+        <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/small-logo.svg" class="header__small-logo" width="72"
           height="72" alt="">
         <div class="content-container">
           <div class="logo__container">

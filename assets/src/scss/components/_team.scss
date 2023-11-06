@@ -49,10 +49,6 @@
   }
 
   &__list {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: get-vw(40px);
-
     &-item {
       display: flex;
       flex-direction: column;
@@ -123,12 +119,8 @@
     }
 
     &-controls {
-      display: none;
-
-      @include small-tablet {
-        display: flex;
-        margin-bottom: 45px;
-      }
+      display: flex;
+      margin-bottom: 45px;
     }
   }
 }

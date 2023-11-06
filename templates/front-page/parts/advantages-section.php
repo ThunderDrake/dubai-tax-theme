@@ -54,7 +54,7 @@
           <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/advantages-person.png" class="advantages__callback-person" width="125" height="125" alt="">
           <div class="advantages__callback-info">
             <div class="advantages__callback-name">Roman Bykov</div>
-            <div class="advantages__callback-role">CCO</div>
+            <div class="advantages__callback-role">COO</div>
             <a class="btn-reset advantages__callback-button btn--main" href="https://wa.me/+971585472235" target="_blank">Ask a question</a>
           </div>
         </div>
