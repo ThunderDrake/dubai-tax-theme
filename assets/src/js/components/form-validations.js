@@ -54,7 +54,7 @@ const validateForms = (selector, rules, url, nonce, action, afterSend) => {
           rule: 'function',
           validator: function() {
             const phone = telSelector.inputmask.unmaskedvalue();
-            return phone;
+            return phone.length === 9;
           },
           errorMessage: item.telError
         });
@@ -79,15 +79,13 @@ const validateForms = (selector, rules, url, nonce, action, afterSend) => {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="form-success">Спасибо за заявку! Мы скоро с вами свяжемся</p>`)
-          console.log('Отправлено');
+          form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="form-success">Thanks for the application! We will contact you soon</p>`)
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({
           'event': 'formsubmit_all',
           });
         } else {
-          form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="just-validate-error-label">Что-то пошло не так!</p>`)
-          console.log('Ошибка');
+          form.querySelector('.btn-reset').insertAdjacentHTML('afterend', `<p class="just-validate-error-label">Something went wrong!</p>`)
         }
       }
     }
@@ -216,6 +214,35 @@ const serviceAccountingFormRules = [
   },
 ];
 
+const serviceConsultFormRules = [
+  {
+    ruleSelector: '.service-modal--consult .service-modal__form-input--name',
+    rules: [
+      {
+        rule: 'minLength',
+        value: 3
+      },
+      {
+        rule: 'required',
+        value: true,
+        errorMessage: 'Заполните имя!'
+      }
+    ]
+  },
+  {
+    ruleSelector: '.service-modal--consult .service-modal__form-input--tel',
+    tel: true,
+    telError: 'Введите корректный телефон',
+    rules: [
+      {
+        rule: 'required',
+        value: true,
+        errorMessage: 'Заполните телефон!'
+      }
+    ]
+  },
+];
+
 const guideFormRules = [
   {
     ruleSelector: '.form-section__form-input--mail',
@@ -243,4 +270,5 @@ validateForms('[data-form="footer-form"]', footerFormRules, form_object.url, for
 validateForms('[data-form="section-form"]', sectionFormRules, form_object.url, form_object.nonce, 'form_action');
 validateForms('[data-form="legal-form"]', serviceLegalFormRules, form_object.url, form_object.nonce, 'form_action');
 validateForms('[data-form="accounting-form"]', serviceAccountingFormRules, form_object.url, form_object.nonce, 'form_action');
+validateForms('[data-form="consult-form"]', serviceConsultFormRules, form_object.url, form_object.nonce, 'form_action');
 validateForms('[data-form="guide-form"]', guideFormRules, form_object.url, form_object.nonce, 'form_action');

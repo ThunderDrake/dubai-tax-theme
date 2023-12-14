@@ -38,6 +38,10 @@
 
   &__logo {
     width: max(110px, get-vw(140px));
+
+    @include mobile {
+      height: 77px;
+    }
   }
 
   .logo__container {

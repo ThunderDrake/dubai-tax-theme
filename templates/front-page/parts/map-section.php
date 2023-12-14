@@ -15,7 +15,7 @@
             <div class="map-section__item-text"><span>License</span> to provide <b>legal services</b></div>
           </div>
         </div>
-        <button class="btn-reset map-section__button btn--main" data-graph-path="callback-modal">Submit your application</button>
+        <button class="btn-reset map-section__button btn--main" data-graph-path="consult-modal">Submit your application</button>
       </div>
       <div class="map-section__right">
         <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/map-section__image-1.png" class="map-section__image" width="195" height="245" alt="">

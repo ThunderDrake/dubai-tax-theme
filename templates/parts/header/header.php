@@ -50,8 +50,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           height="72" alt="">
         <div class="content-container">
           <div class="logo__container">
-            <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/logo.svg" class="header__logo logo" width="110"
-              height="92" alt="">
+            <a href="/" class="logo__link">
+              <img loading="lazy" src="<?= ct()->get_assets_url() ?>/img/logo.svg" class="header__logo logo" width="110"
+                height="92" alt="">
+            </a>
             <span class="logo__text">
               Legal and accounting services TAX~UAE
             </span>
@@ -66,8 +68,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <a class="header__address-link link-default" href="<?= Contacts::get_map_url() ?>">Show on map</a>
             </div>
           </div>
-
-          <a class="header__link link-default" href="<?= get_home_url() ?>/#quiz">Calculate the cost</a>
+          <button class="header__link link-default btn-reset" data-graph-path="consult-modal">Calculate the cost</button>
 
           <div class="header__socials">
             <div class="header__socials-text">Ask a question, <br><span>we are online</span></div>
@@ -99,7 +100,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 href="tel:<?= Contacts::get_main_phone()['formated'] ?>"><?= Contacts::get_main_phone()['raw'] ?></a>
             </div>
           </div>
-
+          <?php if(!get_field('hide_menu', 'options')): ?>
           <button class="burger header__burger" aria-label="Открыть меню" aria-expanded="false" data-burger>
             <span class="burger__line"></span>
           </button>
@@ -180,6 +181,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               </ul>
             </nav>
           </div>
+          <?php endif; ?>
         </div>
       </div>
     </header>
